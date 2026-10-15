@@ -1,0 +1,46 @@
+# Nginx Reverse Proxy Configuration for Patchwork OS
+# Copy or symlink to: /etc/nginx/sites-available/patchworkos
+# Then: sudo ln -s /etc/nginx/sites-available/patchworkos /etc/nginx/sites-enabled/
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name yourdomain.com www.yourdomain.com; # Replace with your domain or VPS IP
+
+    # Redirect all HTTP traffic to HTTPS (Certbot will configure this automatically)
+    # return 301 https://$host$request_uri;
+
+    client_max_body_size 50M;
+
+    # Gzip Compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/json;
+
+    # Security Headers
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+
+        # WebSocket and Connection Headers
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Forwarded Client Info
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Timeouts for long requests / database operations
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}

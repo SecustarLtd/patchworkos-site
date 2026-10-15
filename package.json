@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "node test_features_expansion.js",
     "test:phase2": "node test_phase2.js"
   },

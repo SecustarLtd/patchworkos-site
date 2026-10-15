@@ -1,0 +1,14 @@
+services:
+  patchworkos:
+    build: .
+    container_name: patchworkos
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./patchwork.db:/app/patchwork.db
+      - ./patchwork.db-shm:/app/patchwork.db-shm
+      - ./patchwork.db-wal:/app/patchwork.db-wal
+      - ./backups:/app/backups
