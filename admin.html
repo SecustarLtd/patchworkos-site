@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patchwork OS — Platform Superadmin Cockpit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0284c7',
+              600: '#0369a1',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    /* Visible focus styles for WCAG 2.4.7 */
+    :focus-visible {
+      outline: 2px solid #06b6d4;
+      outline-offset: 2px;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col justify-between antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- Skip to Main Content Link (WCAG 2.4.1) -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cyan-600 focus:text-white focus:rounded-lg focus:font-mono focus:text-xs shadow-lg">Skip to main content</a>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-[#0d1322]/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-xs font-mono font-bold text-white shadow-lg shadow-cyan-500/20">PW</div>
+          <span class="text-lg font-bold tracking-tight text-white">Patchwork <span class="text-cyan-400">OS</span></span>
+        </a>
+        <div class="flex items-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-md font-mono font-semibold shadow-sm shadow-rose-950/40">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          SUPERADMIN COCKPIT
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4 text-xs">
+        <a href="/account" class="text-slate-400 hover:text-white transition flex items-center gap-1 font-medium bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-lg hover:border-slate-700">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Customer Portal (/account)</span>
+        </a>
+
+        <div class="h-4 w-px bg-slate-800"></div>
+
+        <div id="admin-user-badge" class="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+          <span id="admin-user-email" class="text-slate-300 font-mono text-[11px]">admin@patchworkos.com</span>
+        </div>
+
+        <button onclick="handleLogout()" class="text-slate-400 hover:text-rose-400 transition font-mono border border-slate-800 hover:border-rose-900/50 bg-slate-900/60 px-3 py-1.5 rounded-lg">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+    <!-- KPI Header Row (4 Cards) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1: Platform MRR -->
+      <div class="bg-[#111827] border border-slate-800/90 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-cyan-500/40 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono uppercase text-slate-400 font-semibold tracking-wider">Platform MRR</span>
+          <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div id="kpi-mrr" class="text-2xl font-extrabold text-white font-mono tracking-tight">KES 0</div>
+          <p id="kpi-mrr-breakdown" class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+            <span class="text-cyan-400 font-medium">Base Subs</span> + <span class="text-indigo-400 font-medium">Seat Add-ons</span>
+          </p>
+        </div>
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-cyan-500/5 rounded-full blur-xl pointer-events-none"></div>
+      </div>
+
+      <!-- KPI 2: Active Workspaces -->
+      <div class="bg-[#111827] border border-slate-800/90 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-indigo-500/40 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono uppercase text-slate-400 font-semibold tracking-wider">Active Workspaces</span>
+          <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div id="kpi-workspaces" class="text-2xl font-extrabold text-white font-mono tracking-tight">0 Orgs</div>
+          <p id="kpi-workspaces-breakdown" class="text-xs text-slate-400 mt-1">
+            <span class="text-emerald-400 font-medium">0 active</span> &bull; <span class="text-cyan-400 font-medium">0 trialing</span> &bull; <span class="text-rose-400 font-medium">0 suspended</span>
+          </p>
+        </div>
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+      </div>
+
+      <!-- KPI 3: Seat Pool Utilization -->
+      <div class="bg-[#111827] border border-slate-800/90 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-emerald-500/40 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono uppercase text-slate-400 font-semibold tracking-wider">Seat Pool Utilization</span>
+          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div class="flex items-baseline justify-between">
+            <div id="kpi-seats" class="text-2xl font-extrabold text-white font-mono tracking-tight">0 / 0</div>
+            <span id="kpi-seats-pct" class="text-xs font-mono text-emerald-400 font-bold">0%</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
+            <div id="kpi-seats-bar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+      </div>
+
+      <!-- KPI 4: Platform Consumption & Velocity -->
+      <div class="bg-[#111827] border border-slate-800/90 rounded-2xl p-5 relative overflow-hidden shadow-lg group hover:border-rose-500/40 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono uppercase text-slate-400 font-semibold tracking-wider">Ingestion Velocity</span>
+          <div class="p-2 rounded-xl bg-rose-500/10 text-rose-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div id="kpi-rows" class="text-2xl font-extrabold text-white font-mono tracking-tight">0 rows</div>
+          <p id="kpi-queue-status" class="text-xs text-slate-400 mt-1">
+            <span class="text-amber-400 font-medium">0 open tickets</span> &bull; <span class="text-cyan-400 font-medium">0 demo requests</span>
+          </p>
+        </div>
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-rose-500/5 rounded-full blur-xl pointer-events-none"></div>
+      </div>
+    </div>
+
+    <!-- Navigation Tab Bar -->
+    <div class="border-b border-slate-800 flex overflow-x-auto gap-2 text-sm font-medium" role="tablist" aria-label="Superadmin cockpit sections">
+      <button role="tab" aria-selected="true" aria-controls="panel-orgs" onclick="switchAdminTab('orgs')" id="nav-tab-orgs" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-cyan-500 text-cyan-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <span>Organizations & Subscriptions</span>
+      </button>
+
+      <button role="tab" aria-selected="false" aria-controls="panel-users" tabindex="-1" onclick="switchAdminTab('users')" id="nav-tab-users" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span>Platform Users</span>
+      </button>
+
+      <button role="tab" aria-selected="false" aria-controls="panel-support" tabindex="-1" onclick="switchAdminTab('support')" id="nav-tab-support" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span>Support & Demo Inquiries</span>
+      </button>
+
+      <button role="tab" aria-selected="false" aria-controls="panel-webhooks" tabindex="-1" onclick="switchAdminTab('webhooks')" id="nav-tab-webhooks" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span>Global Webhook Inspector</span>
+      </button>
+
+      <button role="tab" aria-selected="false" aria-controls="panel-backups" tabindex="-1" onclick="switchAdminTab('backups')" id="nav-tab-backups" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16m-8 4v6m-3-3l3 3 3-3"/></svg>
+        <span>Disaster Recovery & Backups</span>
+      </button>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 1: Organizations & Subscriptions                   -->
+    <!-- ======================================================== -->
+    <div id="panel-orgs" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-orgs" class="space-y-6">
+      
+      <!-- Filters Bar -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div class="relative flex-1 sm:w-72">
+            <svg class="w-4 h-4 absolute left-3 top-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="orgs-search" placeholder="Search org name, slug, owner..." aria-label="Search organizations by name, slug, or owner" oninput="debounceOrgsSearch()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:border-cyan-500 outline-none transition font-mono">
+          </div>
+
+          <select id="orgs-plan-filter" aria-label="Filter organizations by plan" onchange="loadOrganizations()" class="bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-cyan-500 font-mono">
+            <option value="">All Plans</option>
+            <option value="developer">Developer Starter</option>
+            <option value="growth">Growth Tier</option>
+            <option value="enterprise">Enterprise Tier</option>
+          </select>
+
+          <select id="orgs-status-filter" aria-label="Filter organizations by subscription status" onchange="loadOrganizations()" class="bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-cyan-500 font-mono">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="trialing">Trialing</option>
+            <option value="suspended">Suspended</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <button onclick="loadOrganizations()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-mono font-medium flex items-center gap-1.5 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Organizations Table -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" aria-label="Organizations and subscriptions roster">
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+              <tr>
+                <th scope="col" class="py-3 px-4">Organization</th>
+                <th scope="col" class="py-3 px-4">Owner Email</th>
+                <th scope="col" class="py-3 px-4">Plan</th>
+                <th scope="col" class="py-3 px-4">Seats (Occ/Alloc)</th>
+                <th scope="col" class="py-3 px-4">Subscription & Trial</th>
+                <th scope="col" class="py-3 px-4">Monthly Ingestion</th>
+                <th scope="col" class="py-3 px-4">Created Date</th>
+                <th scope="col" class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orgs-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <tr>
+                <td colspan="8" class="py-8 text-center text-slate-500 font-mono">Loading organizations...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div class="bg-slate-900/50 border-t border-slate-800 px-4 py-3 flex items-center justify-between text-xs font-mono text-slate-400">
+          <span id="orgs-pagination-info">Showing 0 of 0</span>
+          <div class="flex gap-2">
+            <button id="orgs-prev-btn" onclick="paginateOrgs(-1)" disabled class="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200">Prev</button>
+            <button id="orgs-next-btn" onclick="paginateOrgs(1)" disabled class="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 2: Platform Users                                  -->
+    <!-- ======================================================== -->
+    <div id="panel-users" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-users" class="space-y-6 hidden">
+      
+      <!-- Users Search -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="relative w-full sm:w-80">
+          <svg class="w-4 h-4 absolute left-3 top-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="users-search" placeholder="Search name, email, workspace..." aria-label="Search platform users by name, email, or workspace" oninput="debounceUsersSearch()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:border-cyan-500 outline-none transition font-mono">
+        </div>
+
+        <button onclick="loadUsers()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-mono font-medium flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Refresh Directory
+        </button>
+      </div>
+
+      <!-- Users Table -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" aria-label="Platform users directory">
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+              <tr>
+                <th scope="col" class="py-3 px-4">User</th>
+                <th scope="col" class="py-3 px-4">Email</th>
+                <th scope="col" class="py-3 px-4">Workspace</th>
+                <th scope="col" class="py-3 px-4">Role</th>
+                <th scope="col" class="py-3 px-4">Platform Privilege</th>
+                <th scope="col" class="py-3 px-4">Registered Date</th>
+                <th scope="col" class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <tr>
+                <td colspan="7" class="py-8 text-center text-slate-500 font-mono">Loading users...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Users Pagination -->
+        <div class="bg-slate-900/50 border-t border-slate-800 px-4 py-3 flex items-center justify-between text-xs font-mono text-slate-400">
+          <span id="users-pagination-info">Showing 0 of 0</span>
+          <div class="flex gap-2">
+            <button id="users-prev-btn" onclick="paginateUsers(-1)" disabled class="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200">Prev</button>
+            <button id="users-next-btn" onclick="paginateUsers(1)" disabled class="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 3: Support & Demo Inquiries                        -->
+    <!-- ======================================================== -->
+    <!-- ======================================================== -->
+    <!-- PANEL 3: Support & Demo Inquiries                        -->
+    <!-- ======================================================== -->
+    <div id="panel-support" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-support" class="space-y-6 hidden">
+      
+      <!-- Sub-tabs for Support -->
+      <div class="flex border-b border-slate-800 gap-4 text-xs font-mono" role="tablist" aria-label="Support and inquiry queues">
+        <button role="tab" aria-selected="true" aria-controls="subpanel-tickets" onclick="switchSupportSubTab('tickets')" id="subtab-tickets-btn" class="pb-2.5 border-b-2 font-bold text-cyan-400 border-cyan-400 flex items-center gap-1.5">
+          <span>Support Tickets</span>
+          <span id="badge-tickets-count" class="bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 py-0.2 rounded text-[10px]">0</span>
+        </button>
+
+        <button role="tab" aria-selected="false" aria-controls="subpanel-demos" onclick="switchSupportSubTab('demos')" id="subtab-demos-btn" class="pb-2.5 border-b-2 font-bold text-slate-400 border-transparent hover:text-white flex items-center gap-1.5">
+          <span>Demo Requests</span>
+          <span id="badge-demos-count" class="bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded text-[10px]">0</span>
+        </button>
+
+        <button role="tab" aria-selected="false" aria-controls="subpanel-inquiries" onclick="switchSupportSubTab('inquiries')" id="subtab-inquiries-btn" class="pb-2.5 border-b-2 font-bold text-slate-400 border-transparent hover:text-white flex items-center gap-1.5">
+          <span>Contact Submissions</span>
+          <span id="badge-inquiries-count" class="bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded text-[10px]">0</span>
+        </button>
+      </div>
+
+      <!-- Sub-panel A: Support Tickets -->
+      <div id="subpanel-tickets" role="tabpanel" tabindex="0" aria-labelledby="subtab-tickets-btn" class="space-y-4">
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" aria-label="Support tickets triage queue">
+              <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th scope="col" class="py-3 px-4">Ticket ID</th>
+                  <th scope="col" class="py-3 px-4">Subject & Description</th>
+                  <th scope="col" class="py-3 px-4">Company & Requester</th>
+                  <th scope="col" class="py-3 px-4">Priority</th>
+                  <th scope="col" class="py-3 px-4">Status</th>
+                  <th scope="col" class="py-3 px-4">Assigned Engineer</th>
+                  <th scope="col" class="py-3 px-4">Created Date</th>
+                  <th scope="col" class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tickets-table-body" class="divide-y divide-slate-800 text-slate-300">
+                <tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">Loading tickets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-panel B: Demo Requests -->
+      <div id="subpanel-demos" role="tabpanel" tabindex="0" aria-labelledby="subtab-demos-btn" class="space-y-4 hidden">
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" aria-label="Demo requests queue">
+              <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th scope="col" class="py-3 px-4">ID</th>
+                  <th scope="col" class="py-3 px-4">Contact Email</th>
+                  <th scope="col" class="py-3 px-4">Target Role</th>
+                  <th scope="col" class="py-3 px-4">ERP Environment</th>
+                  <th scope="col" class="py-3 px-4">Pipeline Status</th>
+                  <th scope="col" class="py-3 px-4">Created Date</th>
+                  <th scope="col" class="py-3 px-4 text-right">Triage Action</th>
+                </tr>
+              </thead>
+              <tbody id="demos-table-body" class="divide-y divide-slate-800 text-slate-300">
+                <tr><td colspan="7" class="py-8 text-center text-slate-500 font-mono">Loading demo requests...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-panel C: Contact Submissions -->
+      <div id="subpanel-inquiries" role="tabpanel" tabindex="0" aria-labelledby="subtab-inquiries-btn" class="space-y-4 hidden">
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" aria-label="Contact submissions queue">
+              <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th scope="col" class="py-3 px-4">Inquiry ID</th>
+                  <th scope="col" class="py-3 px-4">Company & Requester</th>
+                  <th scope="col" class="py-3 px-4">Objective</th>
+                  <th scope="col" class="py-3 px-4">Target Volume</th>
+                  <th scope="col" class="py-3 px-4">Status</th>
+                  <th scope="col" class="py-3 px-4">Message Snippet</th>
+                  <th scope="col" class="py-3 px-4">Date</th>
+                  <th scope="col" class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="inquiries-table-body" class="divide-y divide-slate-800 text-slate-300">
+                <tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">Loading contact submissions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 4: Global Webhook Inspector                        -->
+    <!-- ======================================================== -->
+    <div id="panel-webhooks" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-webhooks" class="space-y-6 hidden">
+      
+      <!-- Webhooks Filter Bar -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <select id="webhook-type-filter" aria-label="Filter webhook streams by direction" onchange="loadWebhookDeliveries()" class="bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-cyan-500 font-mono">
+            <option value="">All Streams (Inbound & Outbound)</option>
+            <option value="outbound">Outbound Deliveries (Customer Endpoints)</option>
+            <option value="inbound">Inbound Payment Webhooks (Providers)</option>
+          </select>
+
+          <span class="text-xs text-slate-400 font-mono hidden sm:inline">Shows real-time dispatch logs with HTTP statuses & payloads</span>
+        </div>
+
+        <button onclick="loadWebhookDeliveries()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-mono font-medium flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Refresh Logs
+        </button>
+      </div>
+
+      <!-- Webhook Inspector Table -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" aria-label="Global webhook dispatch logs">
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+              <tr>
+                <th scope="col" class="py-3 px-4">Delivery ID</th>
+                <th scope="col" class="py-3 px-4">Direction</th>
+                <th scope="col" class="py-3 px-4">Event Type</th>
+                <th scope="col" class="py-3 px-4">Target URL / Provider</th>
+                <th scope="col" class="py-3 px-4">HTTP Status</th>
+                <th scope="col" class="py-3 px-4">Timestamp</th>
+                <th scope="col" class="py-3 px-4">Latency / Retries</th>
+                <th scope="col" class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="webhooks-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">Loading webhook telemetry...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 5: Disaster Recovery & Backups                     -->
+    <!-- ======================================================== -->
+    <div id="panel-backups" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-backups" class="space-y-6 hidden">
+      
+      <!-- Live DB Health & Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-5 shadow-sm">
+          <span class="text-xs font-mono uppercase text-slate-400">Main SQLite Database File</span>
+          <div class="flex items-baseline justify-between mt-2">
+            <div id="dr-db-size" class="text-2xl font-bold font-mono text-white">0 KB</div>
+            <span class="text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded">ONLINE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1 font-mono">path: ./patchwork.db</p>
+        </div>
+
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-5 shadow-sm">
+          <span class="text-xs font-mono uppercase text-slate-400">Write-Ahead Log (WAL) Journal</span>
+          <div class="flex items-baseline justify-between mt-2">
+            <div id="dr-wal-size" class="text-2xl font-bold font-mono text-cyan-400">0 KB</div>
+            <span id="dr-wal-badge" class="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded">NORMAL</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1 font-mono">path: ./patchwork.db-wal</p>
+        </div>
+
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono uppercase text-slate-400">Journaling Concurrency Mode</span>
+            <div class="text-lg font-bold font-mono text-white mt-1">PRAGMA journal_mode=WAL</div>
+          </div>
+          <span class="text-[11px] text-emerald-400 font-mono mt-2 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Lock-Free Online Readers/Writers Active
+          </span>
+        </div>
+      </div>
+
+      <!-- Disaster Recovery Actions -->
+      <div class="bg-gradient-to-r from-slate-900 via-[#111827] to-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="p-1 rounded bg-rose-500/10 text-rose-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </span>
+            Database Maintenance & Point-in-Time Snapshot Utilities
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">
+            Safely merge WAL transactions with zero downtime, or capture a byte-verified, lock-free SQLite snapshot.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="triggerWalCheckpoint()" id="btn-checkpoint" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:text-white px-4 py-2.5 rounded-xl text-xs font-mono font-semibold transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Force WAL Checkpoint (TRUNCATE)
+          </button>
+
+          <button onclick="triggerCreateSnapshot()" id="btn-create-snapshot" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs font-mono transition shadow-lg shadow-cyan-500/20 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            Create Lock-Free Snapshot
+          </button>
+        </div>
+      </div>
+
+      <!-- Snapshots Catalog -->
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Historical Point-in-Time Snapshots Catalog</span>
+            <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded">14-Day Rolling Retention</span>
+          </h4>
+          <button onclick="loadBackupsCatalog()" class="text-xs font-mono text-cyan-400 hover:underline">Refresh List</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" aria-label="Historical point-in-time snapshots catalog">
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider">
+              <tr>
+                <th scope="col" class="py-3 px-4">Snapshot Filename</th>
+                <th scope="col" class="py-3 px-4">File Size</th>
+                <th scope="col" class="py-3 px-4">SHA-256 Verification Hash</th>
+                <th scope="col" class="py-3 px-4">Generated At</th>
+                <th scope="col" class="py-3 px-4 text-right">Binary Action</th>
+              </tr>
+            </thead>
+            <tbody id="backups-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="5" class="py-8 text-center text-slate-500 font-mono">Loading snapshots catalog...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: Superadmin Authentication Login Gate              -->
+  <!-- ======================================================== -->
+  <dialog id="loginModal" aria-labelledby="loginModalTitle" aria-modal="true" class="backdrop:bg-black/85 backdrop:backdrop-blur-md fixed inset-0 m-auto max-w-md w-[92vw] bg-[#0d1322] border border-rose-500/30 rounded-2xl shadow-2xl p-0 overflow-hidden text-slate-100 z-50">
+    <div class="p-6 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <div>
+          <h3 id="loginModalTitle" class="text-base font-bold text-white">Superadmin Authentication</h3>
+          <p class="text-xs text-slate-400 font-mono">Platform Governance Access</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-bold uppercase">Restricted</span>
+    </div>
+
+    <form onsubmit="handleSuperadminLogin(event)" class="p-6 space-y-4">
+      <div id="login-error-banner" class="hidden p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-rose-300 text-xs font-mono"></div>
+
+      <div>
+        <label for="admin-login-email" class="block text-xs font-mono text-slate-300 mb-1">Superadmin Email</label>
+        <input type="email" id="admin-login-email" required placeholder="admin@patchworkos.com" value="admin@patchworkos.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
+      </div>
+
+      <div>
+        <label for="admin-login-password" class="block text-xs font-mono text-slate-300 mb-1">Password</label>
+        <input type="password" id="admin-login-password" required placeholder="••••••••••••" value="Admin123!" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
+      </div>
+
+      <!-- Helper pre-fill note -->
+      <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl text-xs flex items-center justify-between">
+        <div>
+          <span class="text-slate-400 block text-[11px]">Default Root Superadmin:</span>
+          <span class="text-slate-200 font-mono font-medium text-[11px]">admin@patchworkos.com &bull; Admin123!</span>
+        </div>
+        <button type="button" onclick="fillAdminCreds()" class="text-cyan-400 hover:text-cyan-300 font-mono text-[11px] underline">Auto-fill</button>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" id="admin-login-btn" class="w-full bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-lg shadow-rose-950/40">
+          Sign In to Superadmin Cockpit
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: Organization Subscription & Quota Override        -->
+  <!-- ======================================================== -->
+  <dialog id="subOverrideModal" aria-labelledby="subOverrideModalTitle" aria-modal="true" class="backdrop:bg-black/80 backdrop:backdrop-blur-sm fixed inset-0 m-auto max-w-lg w-[92vw] bg-[#0d1322] border border-slate-700/80 rounded-2xl shadow-2xl p-0 overflow-hidden text-slate-100 z-50">
+    <div class="p-6 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+      <div>
+        <h3 id="subOverrideModalTitle" class="text-base font-bold text-white flex items-center gap-2">
+          <span>Subscription & Quotas Override</span>
+        </h3>
+        <p id="sub-override-orgname" class="text-xs text-cyan-400 font-mono mt-0.5">Org: Loading...</p>
+      </div>
+      <button onclick="closeSubOverrideModal()" aria-label="Close subscription override dialog" class="text-slate-400 hover:text-white text-lg font-mono p-1 rounded-lg hover:bg-slate-800 transition">&times;</button>
+    </div>
+
+    <form onsubmit="saveSubscriptionOverride(event)" class="p-6 space-y-4">
+      <input type="hidden" id="override-org-id">
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="override-plan" class="block text-xs font-mono text-slate-300 mb-1">Tier / Plan</label>
+          <select id="override-plan" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono">
+            <option value="developer">Developer Starter</option>
+            <option value="growth">Growth Tier</option>
+            <option value="enterprise">Enterprise Tier</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="override-status" class="block text-xs font-mono text-slate-300 mb-1">Subscription Status</label>
+          <select id="override-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono">
+            <option value="active">Active (Paid)</option>
+            <option value="trialing">Trialing</option>
+            <option value="suspended">Suspended</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Extend Trial Stepper / Buttons -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 space-y-2">
+        <label class="block text-xs font-mono text-slate-300">Extend Trial Period</label>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setExtendTrial(7)" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs py-1.5 rounded-lg transition font-mono">+7 Days</button>
+          <button type="button" onclick="setExtendTrial(14)" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs py-1.5 rounded-lg transition font-mono">+14 Days</button>
+          <button type="button" onclick="setExtendTrial(30)" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs py-1.5 rounded-lg transition font-mono">+30 Days</button>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <label for="override-extend-days" class="text-[11px] text-slate-400 font-mono cursor-pointer">Custom Days:</label>
+          <input type="number" id="override-extend-days" min="0" placeholder="0" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono outline-none">
+          <span id="override-trial-current" class="text-[11px] text-cyan-400 font-mono ml-auto"></span>
+        </div>
+      </div>
+
+      <!-- Seat Pool Allocation -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="override-allocated-seats" class="block text-xs font-mono text-slate-300 mb-1">Total Allocated Seats</label>
+          <input type="number" id="override-allocated-seats" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono">
+        </div>
+
+        <div>
+          <label for="override-extra-seats" class="block text-xs font-mono text-slate-300 mb-1">Purchased Extra Seats</label>
+          <input type="number" id="override-extra-seats" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono">
+        </div>
+      </div>
+
+      <!-- Metered Overage Policy -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 space-y-3">
+        <label for="override-overage-toggle" class="flex items-center justify-between cursor-pointer">
+          <span class="text-xs font-mono text-slate-300">Metered Overage Protection</span>
+          <input type="checkbox" id="override-overage-toggle" class="w-4 h-4 rounded text-cyan-500 border-slate-700 bg-slate-900">
+        </label>
+        <div>
+          <label for="override-overage-cap" class="block text-[11px] font-mono text-slate-400 mb-1">Monthly Overage Budget Cap (KES)</label>
+          <input type="number" id="override-overage-cap" min="0" step="500" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono outline-none">
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2.5">
+        <button type="button" onclick="closeSubOverrideModal()" class="px-4 py-2 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-medium transition">Cancel</button>
+        <button type="submit" id="override-save-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-5 py-2 rounded-xl transition shadow-lg shadow-cyan-900/40">Apply Overrides</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: Reset Platform User Password                      -->
+  <!-- ======================================================== -->
+  <dialog id="userPasswordModal" aria-labelledby="userPasswordModalTitle" aria-modal="true" class="backdrop:bg-black/80 backdrop:backdrop-blur-sm fixed inset-0 m-auto max-w-sm w-[92vw] bg-[#0d1322] border border-slate-700/80 rounded-2xl shadow-2xl p-0 overflow-hidden text-slate-100 z-50">
+    <div class="p-5 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+      <div>
+        <h3 id="userPasswordModalTitle" class="text-sm font-bold text-white">Reset User Password</h3>
+        <p id="reset-user-email" class="text-xs text-slate-400 font-mono mt-0.5">user@example.com</p>
+      </div>
+      <button onclick="closeUserPasswordModal()" aria-label="Close password reset dialog" class="text-slate-400 hover:text-white text-lg font-mono p-1 rounded-lg hover:bg-slate-800 transition">&times;</button>
+    </div>
+
+    <form onsubmit="handleResetPasswordSubmit(event)" class="p-5 space-y-4">
+      <input type="hidden" id="reset-user-id">
+      <div>
+        <label for="reset-new-password" class="block text-xs font-mono text-slate-300 mb-1">New Password (min 8 chars)</label>
+        <input type="password" id="reset-new-password" required minlength="8" placeholder="Enter secure password..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-500 font-mono">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeUserPasswordModal()" class="px-3.5 py-1.5 rounded-lg border border-slate-700 text-slate-300 text-xs">Cancel</button>
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-1.5 rounded-lg transition">Save Password</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: Webhook Payload & Diagnostics Inspector           -->
+  <!-- ======================================================== -->
+  <dialog id="payloadModal" aria-labelledby="payload-modal-title" aria-modal="true" class="backdrop:bg-black/80 backdrop:backdrop-blur-sm fixed inset-0 m-auto max-w-2xl w-[94vw] bg-[#0d1322] border border-slate-700/80 rounded-2xl shadow-2xl p-0 overflow-hidden text-slate-100 z-50">
+    <div class="p-5 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+      <div>
+        <h3 id="payload-modal-title" class="text-sm font-bold text-white font-mono">Webhook Delivery Payload</h3>
+        <p id="payload-modal-subtitle" class="text-xs text-slate-400 font-mono mt-0.5">Event details</p>
+      </div>
+      <button onclick="closePayloadModal()" aria-label="Close webhook payload inspection dialog" class="text-slate-400 hover:text-white text-lg font-mono p-1 rounded-lg hover:bg-slate-800 transition">&times;</button>
+    </div>
+
+    <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-mono uppercase text-slate-400">Event Payload (JSON)</span>
+          <button onclick="copyPayloadJson()" class="text-xs text-cyan-400 hover:underline font-mono">Copy JSON</button>
+        </div>
+        <pre id="payload-json-code" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto whitespace-pre-wrap"></pre>
+      </div>
+
+      <div id="payload-response-box" class="hidden">
+        <span class="text-xs font-mono uppercase text-slate-400 block mb-1.5">Receiver Response Body</span>
+        <pre id="payload-response-code" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap"></pre>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER                                                   -->
+  <!-- ======================================================== -->
+  <footer class="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500 font-mono mt-auto">
+    Patchwork OS &copy; 2026 &bull; Production Platform Superadmin Cockpit &bull; SOC2 Type II Certified
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT LOGIC                                         -->
+  <!-- ======================================================== -->
+  <script>
+    // State Management
+    let token = localStorage.getItem('patchwork_access_token') || sessionStorage.getItem('patchwork_access_token') || localStorage.getItem('patchwork_token');
+    let currentUser = null;
+    let orgsData = [];
+    let orgsPage = 1;
+    let orgsTotalPages = 1;
+    let usersData = [];
+    let usersPage = 1;
+    let usersTotalPages = 1;
+    let cachedPayloadString = '';
+    let searchDebounceTimer = null;
+
+    const headers = () => ({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+
+    // Toast Notification System
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'border-emerald-500/50 bg-emerald-950/90 text-emerald-200',
+        error: 'border-rose-500/50 bg-rose-950/90 text-rose-200',
+        info: 'border-cyan-500/50 bg-cyan-950/90 text-cyan-200'
+      };
+      toast.className = `p-3.5 rounded-xl border shadow-xl text-xs font-mono flex items-center gap-2 pointer-events-auto transition-all duration-300 transform translate-x-full ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'error' ? 'bg-rose-400' : 'bg-emerald-400'}"></span>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-x-full'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => toast.remove(), 300);
+      }, 3800);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Navigation Tab Switching
+    function switchAdminTab(tab) {
+      ['orgs', 'users', 'support', 'webhooks', 'backups'].forEach(t => {
+        const p = document.getElementById(`panel-${t}`);
+        const b = document.getElementById(`nav-tab-${t}`);
+        if (p) {
+          if (t === tab) {
+            p.classList.remove('hidden');
+            p.setAttribute('aria-hidden', 'false');
+          } else {
+            p.classList.add('hidden');
+            p.setAttribute('aria-hidden', 'true');
+          }
+        }
+        if (b) {
+          if (t === tab) {
+            b.className = "px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-cyan-500 text-cyan-400";
+            b.setAttribute('aria-selected', 'true');
+            b.removeAttribute('tabindex');
+          } else {
+            b.className = "px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700";
+            b.setAttribute('aria-selected', 'false');
+            b.setAttribute('tabindex', '-1');
+          }
+        }
+      });
+
+      if (tab === 'orgs') loadOrganizations();
+      if (tab === 'users') loadUsers();
+      if (tab === 'support') loadSupportData();
+      if (tab === 'webhooks') loadWebhookDeliveries();
+      if (tab === 'backups') loadBackupsCatalog();
+    }
+
+    // Support Sub-tab Switching
+    function switchSupportSubTab(sub) {
+      ['tickets', 'demos', 'inquiries'].forEach(s => {
+        const p = document.getElementById(`subpanel-${s}`);
+        const b = document.getElementById(`subtab-${s}-btn`);
+        if (p) {
+          if (s === sub) {
+            p.classList.remove('hidden');
+            p.setAttribute('aria-hidden', 'false');
+          } else {
+            p.classList.add('hidden');
+            p.setAttribute('aria-hidden', 'true');
+          }
+        }
+        if (b) {
+          if (s === sub) {
+            b.className = "pb-2.5 border-b-2 font-bold text-cyan-400 border-cyan-400 flex items-center gap-1.5";
+            b.setAttribute('aria-selected', 'true');
+            b.removeAttribute('tabindex');
+          } else {
+            b.className = "pb-2.5 border-b-2 font-bold text-slate-400 border-transparent hover:text-white flex items-center gap-1.5";
+            b.setAttribute('aria-selected', 'false');
+            b.setAttribute('tabindex', '-1');
+          }
+        }
+      });
+    }
+
+    // Authentication Gate
+    async function verifySuperadmin() {
+      if (!token) {
+        openLoginModal();
+        return false;
+      }
+      try {
+        const res = await fetch('/api/admin/metrics', { headers: headers() });
+        if (res.status === 401 || res.status === 403) {
+          openLoginModal();
+          return false;
+        }
+        const data = await res.json();
+        renderMetrics(data);
+        return true;
+      } catch (err) {
+        openLoginModal();
+        return false;
+      }
+    }
+
+    function openLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal && !modal.open) modal.showModal();
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      if (modal && modal.open) modal.close();
+    }
+
+    function fillAdminCreds() {
+      document.getElementById('admin-login-email').value = 'admin@patchworkos.com';
+      document.getElementById('admin-login-password').value = 'Admin123!';
+    }
+
+    async function handleSuperadminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('admin-login-email').value.trim();
+      const password = document.getElementById('admin-login-password').value;
+      const btn = document.getElementById('admin-login-btn');
+      const errBanner = document.getElementById('login-error-banner');
+      errBanner.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin mr-2">↻</span> Authenticating Superadmin...`;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errBanner.innerText = data.error || 'Authentication rejected.';
+          errBanner.classList.remove('hidden');
+          return;
+        }
+
+        if (!data.isSuperadmin) {
+          errBanner.innerText = 'Access Denied: This account lacks Platform Superadmin privileges.';
+          errBanner.classList.remove('hidden');
+          return;
+        }
+
+        token = data.accessToken;
+        sessionStorage.setItem('patchwork_access_token', token);
+        localStorage.setItem('patchwork_access_token', token);
+        localStorage.setItem('patchwork_token', token);
+        currentUser = data.user;
+
+        document.getElementById('admin-user-email').innerText = data.user.email;
+        closeLoginModal();
+        showToast('Superadmin session verified.', 'success');
+
+        loadMetrics();
+        loadOrganizations();
+      } catch (err) {
+        errBanner.innerText = 'Network error while attempting authentication.';
+        errBanner.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Sign In to Superadmin Cockpit';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('patchwork_access_token');
+      localStorage.removeItem('patchwork_access_token');
+      localStorage.removeItem('patchwork_token');
+      token = null;
+      openLoginModal();
+      showToast('Logged out of Superadmin Cockpit.', 'info');
+    }
+
+    // ==========================================
+    // METRICS KPI RENDERER
+    // ==========================================
+    async function loadMetrics() {
+      try {
+        const res = await fetch('/api/admin/metrics', { headers: headers() });
+        if (!res.ok) return;
+        const data = await res.json();
+        renderMetrics(data);
+      } catch (e) {
+        console.error('Failed to refresh metrics:', e);
+      }
+    }
+
+    function renderMetrics(data) {
+      if (!data || !data.kpis) return;
+      const k = data.kpis;
+      
+      // MRR
+      const mrrEl = document.getElementById('kpi-mrr');
+      if (mrrEl) mrrEl.innerText = `${k.currency} ${(k.mrrCents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      
+      // Workspaces
+      const wsEl = document.getElementById('kpi-workspaces');
+      if (wsEl) wsEl.innerText = `${k.totalOrgs} Orgs`;
+      const wsBreakdown = document.getElementById('kpi-workspaces-breakdown');
+      if (wsBreakdown) {
+        wsBreakdown.innerHTML = `<span class="text-emerald-400 font-medium">${k.activeSubscriptions} active</span> &bull; <span class="text-cyan-400 font-medium">${k.trialingSubscriptions} trialing</span> &bull; <span class="text-rose-400 font-medium">${k.expiredTrials} expired</span>`;
+      }
+
+      // Seat Pool
+      const seatsEl = document.getElementById('kpi-seats');
+      if (seatsEl) seatsEl.innerText = `${k.totalActiveSeats} / ${k.totalAllocatedSeats}`;
+      const pct = k.totalAllocatedSeats > 0 ? Math.round((k.totalActiveSeats / k.totalAllocatedSeats) * 100) : 0;
+      const pctEl = document.getElementById('kpi-seats-pct');
+      if (pctEl) pctEl.innerText = `${pct}%`;
+      const barEl = document.getElementById('kpi-seats-bar');
+      if (barEl) barEl.style.width = `${Math.min(100, pct)}%`;
+
+      // Ingestion Rows & Queues
+      const rowsEl = document.getElementById('kpi-rows');
+      if (rowsEl) rowsEl.innerText = `${(k.totalRowsProcessedThisMonth || 0).toLocaleString()} rows`;
+      const queueEl = document.getElementById('kpi-queue-status');
+      if (queueEl) {
+        queueEl.innerHTML = `<span class="text-amber-400 font-medium">${k.openTicketsCount || 0} open tickets</span> &bull; <span class="text-cyan-400 font-medium">${k.pendingDemoRequestsCount || 0} demo requests</span>`;
+      }
+
+      // Update badge counts in Support subtabs
+      const tbBadge = document.getElementById('badge-tickets-count');
+      if (tbBadge) tbBadge.innerText = k.openTicketsCount || 0;
+      const dbBadge = document.getElementById('badge-demos-count');
+      if (dbBadge) dbBadge.innerText = k.pendingDemoRequestsCount || 0;
+    }
+
+    // ==========================================
+    // TAB 1: ORGANIZATIONS & SUBSCRIPTIONS
+    // ==========================================
+    function debounceOrgsSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        orgsPage = 1;
+        loadOrganizations();
+      }, 300);
+    }
+
+    async function loadOrganizations() {
+      const search = document.getElementById('orgs-search')?.value.trim() || '';
+      const plan = document.getElementById('orgs-plan-filter')?.value || '';
+      const status = document.getElementById('orgs-status-filter')?.value || '';
+
+      const tbody = document.getElementById('orgs-table-body');
+      tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono"><span class="inline-block animate-spin mr-1">↻</span> Fetching organizations...</td></tr>`;
+
+      try {
+        const query = new URLSearchParams({
+          page: orgsPage,
+          limit: 15,
+          search,
+          plan,
+          status
+        });
+        const res = await fetch(`/api/admin/organizations?${query.toString()}`, { headers: headers() });
+        if (!res.ok) throw new Error('Failed to load organizations.');
+        const data = await res.json();
+        orgsData = data.organizations || [];
+        orgsTotalPages = data.pagination?.totalPages || 1;
+
+        document.getElementById('orgs-pagination-info').innerText = `Showing ${orgsData.length} of ${data.pagination?.total || 0} organizations (Page ${orgsPage} of ${orgsTotalPages})`;
+        document.getElementById('orgs-prev-btn').disabled = orgsPage <= 1;
+        document.getElementById('orgs-next-btn').disabled = orgsPage >= orgsTotalPages;
+
+        if (orgsData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">No matching organizations found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orgsData.map(org => {
+          const planBadges = {
+            developer: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">DEVELOPER</span>',
+            growth: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/80">GROWTH</span>',
+            enterprise: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-950 text-indigo-300 border border-indigo-800/80">ENTERPRISE</span>'
+          };
+
+          const statusBadges = {
+            active: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">ACTIVE</span>',
+            trialing: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">TRIALING</span>',
+            suspended: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 text-rose-300 border border-rose-800">SUSPENDED</span>',
+            canceled: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">CANCELED</span>'
+          };
+
+          let trialText = '';
+          if (org.subscriptionStatus === 'trialing' && org.trialEnd) {
+            const daysLeft = Math.max(0, Math.ceil((new Date(org.trialEnd) - Date.now()) / 86400000));
+            trialText = `<div class="text-[10px] text-cyan-400 font-mono mt-0.5">${daysLeft}d trial left</div>`;
+          }
+
+          const created = new Date(org.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+          const isSuspended = org.status === 'suspended';
+
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4">
+                <div class="font-bold text-white">${escapeHtml(org.name)}</div>
+                <div class="text-[10px] font-mono text-slate-500">${escapeHtml(org.slug)} &bull; ${escapeHtml(org.id)}</div>
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-300">${escapeHtml(org.ownerEmail)}</td>
+              <td class="py-3 px-4">${planBadges[org.planId] || org.planName}</td>
+              <td class="py-3 px-4 font-mono">
+                <span class="text-white font-semibold">${org.activeSeatCount}</span>
+                <span class="text-slate-500">/ ${org.allocatedSeats} seats</span>
+              </td>
+              <td class="py-3 px-4">
+                ${statusBadges[org.subscriptionStatus] || org.subscriptionStatus}
+                ${trialText}
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-200">${Number(org.monthlyRows).toLocaleString()} rows</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${created}</td>
+              <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                <button onclick="openSubOverrideModal('${escapeHtml(org.id)}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 border border-slate-700 rounded-lg text-xs font-mono font-semibold transition">
+                  Override
+                </button>
+                <button onclick="toggleOrgSuspension('${escapeHtml(org.id)}', ${isSuspended})" class="px-2 py-1 ${isSuspended ? 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 border-emerald-800' : 'bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 border-rose-900/60'} border rounded-lg text-xs font-mono transition">
+                  ${isSuspended ? 'Reactivate' : 'Suspend'}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-rose-400 font-mono">Error retrieving organizations.</td></tr>`;
+      }
+    }
+
+    function paginateOrgs(delta) {
+      orgsPage = Math.max(1, Math.min(orgsTotalPages, orgsPage + delta));
+      loadOrganizations();
+    }
+
+    async function toggleOrgSuspension(orgId, currentlySuspended) {
+      const nextStatus = currentlySuspended ? 'active' : 'suspended';
+      const promptMsg = currentlySuspended
+        ? 'Reactivate this organization workspace immediately?'
+        : 'Suspend this workspace? All user reconciliation actions and API keys will be rejected with HTTP 403.';
+      if (!confirm(promptMsg)) return;
+
+      try {
+        const res = await fetch(`/api/admin/organizations/${orgId}/status`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ status: nextStatus, reason: 'Administrative operator action via Cockpit' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update organization status.');
+        showToast(`Organization ${orgId} status updated to ${nextStatus.toUpperCase()}.`, 'success');
+        loadOrganizations();
+        loadMetrics();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Organization Subscription Override Modal
+    function openSubOverrideModal(orgId) {
+      const org = orgsData.find(o => o.id === orgId);
+      if (!org) return;
+
+      document.getElementById('override-org-id').value = org.id;
+      document.getElementById('sub-override-orgname').innerText = `Org: ${org.name} (${org.id})`;
+      document.getElementById('override-plan').value = org.planId;
+      document.getElementById('override-status').value = org.subscriptionStatus;
+      document.getElementById('override-extend-days').value = '';
+      document.getElementById('override-allocated-seats').value = org.allocatedSeats;
+      document.getElementById('override-extra-seats').value = Math.max(0, org.allocatedSeats - 1);
+      document.getElementById('override-overage-toggle').checked = Boolean(org.overageEnabled);
+      document.getElementById('override-overage-cap').value = Math.round((org.overageBudgetCapCents || 5000) / 100);
+
+      const trialCurrent = document.getElementById('override-trial-current');
+      if (org.trialEnd) {
+        trialCurrent.innerText = `Trial expires: ${new Date(org.trialEnd).toLocaleDateString()}`;
+      } else {
+        trialCurrent.innerText = 'No active trial end';
+      }
+
+      const modal = document.getElementById('subOverrideModal');
+      if (modal && !modal.open) modal.showModal();
+    }
+
+    function closeSubOverrideModal() {
+      const modal = document.getElementById('subOverrideModal');
+      if (modal && modal.open) modal.close();
+    }
+
+    function setExtendTrial(days) {
+      document.getElementById('override-extend-days').value = days;
+      document.getElementById('override-status').value = 'trialing';
+    }
+
+    async function saveSubscriptionOverride(e) {
+      e.preventDefault();
+      const orgId = document.getElementById('override-org-id').value;
+      const planId = document.getElementById('override-plan').value;
+      const status = document.getElementById('override-status').value;
+      const extendTrialDays = parseInt(document.getElementById('override-extend-days').value, 10) || null;
+      const allocatedSeats = parseInt(document.getElementById('override-allocated-seats').value, 10) || 1;
+      const extraSeats = parseInt(document.getElementById('override-extra-seats').value, 10) || 0;
+      const overageEnabled = document.getElementById('override-overage-toggle').checked;
+      const overageBudgetCapCents = (parseInt(document.getElementById('override-overage-cap').value, 10) || 50) * 100;
+
+      const btn = document.getElementById('override-save-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Saving...`;
+
+      try {
+        const payload = {
+          planId,
+          status,
+          allocatedSeats,
+          extraSeats,
+          overageEnabled,
+          overageBudgetCapCents
+        };
+        if (extendTrialDays) payload.extendTrialDays = extendTrialDays;
+
+        const res = await fetch(`/api/admin/organizations/${orgId}/subscription`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to apply subscription override.');
+        closeSubOverrideModal();
+        showToast('Organization subscription updated successfully.', 'success');
+        loadOrganizations();
+        loadMetrics();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Apply Overrides';
+      }
+    }
+
+    // ==========================================
+    // TAB 2: PLATFORM USERS
+    // ==========================================
+    function debounceUsersSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        usersPage = 1;
+        loadUsers();
+      }, 300);
+    }
+
+    async function loadUsers() {
+      const search = document.getElementById('users-search')?.value.trim() || '';
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-mono"><span class="inline-block animate-spin mr-1">↻</span> Fetching user directory...</td></tr>`;
+
+      try {
+        const query = new URLSearchParams({ page: usersPage, limit: 15, search });
+        const res = await fetch(`/api/admin/users?${query.toString()}`, { headers: headers() });
+        if (!res.ok) throw new Error('Failed to load users.');
+        const data = await res.json();
+        usersData = data.users || [];
+        usersTotalPages = data.pagination?.totalPages || 1;
+
+        document.getElementById('users-pagination-info').innerText = `Showing ${usersData.length} of ${data.pagination?.total || 0} users (Page ${usersPage} of ${usersTotalPages})`;
+        document.getElementById('users-prev-btn').disabled = usersPage <= 1;
+        document.getElementById('users-next-btn').disabled = usersPage >= usersTotalPages;
+
+        if (usersData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-mono">No matching users found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = usersData.map(u => {
+          const initials = (u.name || 'U').split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+          const isSuper = Boolean(u.isSuperadmin);
+          const superBadge = isSuper
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-950/40">SUPERADMIN</span>'
+            : '<span class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 border border-slate-700">MEMBER</span>';
+          const regDate = new Date(u.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-cyan-400 font-mono">${initials}</div>
+                  <div class="font-bold text-white">${escapeHtml(u.name)}</div>
+                </div>
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-300">${escapeHtml(u.email)}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${escapeHtml(u.workspace || '—')}</td>
+              <td class="py-3 px-4 text-slate-300">${escapeHtml(u.role || 'Member')}</td>
+              <td class="py-3 px-4">${superBadge}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${regDate}</td>
+              <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                <button onclick="toggleSuperadmin(${u.id}, ${isSuper})" class="px-2.5 py-1 ${isSuper ? 'bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 border-rose-900/60' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'} border rounded-lg text-xs font-mono transition">
+                  ${isSuper ? 'Demote' : 'Make Superadmin'}
+                </button>
+                <button onclick="openUserPasswordModal(${u.id}, '${escapeHtml(u.email)}')" class="px-2.5 py-1 bg-indigo-950/50 hover:bg-indigo-900/50 text-indigo-300 border border-indigo-800/80 rounded-lg text-xs font-mono transition">
+                  Reset Password
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-400 font-mono">Failed to retrieve users.</td></tr>`;
+      }
+    }
+
+    function paginateUsers(delta) {
+      usersPage = Math.max(1, Math.min(usersTotalPages, usersPage + delta));
+      loadUsers();
+    }
+
+    async function toggleSuperadmin(userId, current) {
+      const next = !current;
+      const promptMsg = next
+        ? `Grant Superadministrator privileges to user #${userId}? They will gain unconstrained platform governance authority.`
+        : `Revoke Superadministrator privileges from user #${userId}?`;
+      if (!confirm(promptMsg)) return;
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/superadmin`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ isSuperadmin: next })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update superadmin privileges.');
+        showToast(`User #${userId} superadmin privilege: ${next ? 'GRANTED' : 'REVOKED'}`, 'success');
+        loadUsers();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function openUserPasswordModal(userId, email) {
+      document.getElementById('reset-user-id').value = userId;
+      document.getElementById('reset-user-email').innerText = `User ID: ${userId} (${email})`;
+      document.getElementById('reset-new-password').value = '';
+      const modal = document.getElementById('userPasswordModal');
+      if (modal && !modal.open) modal.showModal();
+    }
+
+    function closeUserPasswordModal() {
+      const modal = document.getElementById('userPasswordModal');
+      if (modal && modal.open) modal.close();
+    }
+
+    async function handleResetPasswordSubmit(e) {
+      e.preventDefault();
+      const userId = document.getElementById('reset-user-id').value;
+      const password = document.getElementById('reset-new-password').value;
+      if (!password || password.length < 8) return alert('Password must be at least 8 characters.');
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to reset password.');
+        closeUserPasswordModal();
+        showToast(`Password for user #${userId} reset successfully.`, 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // TAB 3: SUPPORT & DEMO INQUIRIES
+    // ==========================================
+    async function loadSupportData() {
+      loadTickets();
+      loadDemos();
+      loadInquiries();
+    }
+
+    async function loadTickets() {
+      const tbody = document.getElementById('tickets-table-body');
+      try {
+        const res = await fetch('/api/admin/tickets?limit=50', { headers: headers() });
+        const data = await res.json();
+        const tickets = data.tickets || [];
+        if (tickets.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">No support tickets recorded.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = tickets.map(t => {
+          const priorityBadges = {
+            P1: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">P1 EMERGENCY</span>',
+            P2: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">P2 HIGH</span>',
+            P3: '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-400 border border-blue-500/40">P3 STANDARD</span>'
+          };
+
+          const created = new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4 font-mono font-bold text-cyan-400">${escapeHtml(t.id)}</td>
+              <td class="py-3 px-4">
+                <div class="font-bold text-white">${escapeHtml(t.subject || 'No Subject')}</div>
+                <div class="text-[11px] text-slate-400 truncate max-w-xs">${escapeHtml(t.description || '')}</div>
+              </td>
+              <td class="py-3 px-4">
+                <div class="text-white font-medium">${escapeHtml(t.company || '—')}</div>
+                <div class="text-[11px] font-mono text-slate-400">${escapeHtml(t.email || '')}</div>
+              </td>
+              <td class="py-3 px-4">${priorityBadges[t.priority] || t.priority}</td>
+              <td class="py-3 px-4">
+                <select onchange="updateTicketStatus('${escapeHtml(t.id)}', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono outline-none">
+                  <option value="OPEN" ${t.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
+                  <option value="INVESTIGATING" ${t.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
+                  <option value="IN PROGRESS" ${t.status === 'IN PROGRESS' ? 'selected' : ''}>IN PROGRESS</option>
+                  <option value="ESCALATED" ${t.status === 'ESCALATED' ? 'selected' : ''}>ESCALATED</option>
+                  <option value="RESOLVED" ${t.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                  <option value="CLOSED" ${t.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
+                </select>
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-300">
+                <input type="text" value="${escapeHtml(t.assigned_engineer || '')}" placeholder="Assignee..." onblur="updateTicketAssignee('${escapeHtml(t.id)}', this.value)" class="bg-slate-900 border border-slate-700/60 rounded px-2 py-1 text-xs text-white outline-none w-28">
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-400">${created}</td>
+              <td class="py-3 px-4 text-right">
+                <button onclick="deleteTicket('${escapeHtml(t.id)}')" class="text-rose-400 hover:text-rose-300 font-mono text-xs">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-rose-400 font-mono">Failed to load support tickets.</td></tr>`;
+      }
+    }
+
+    async function updateTicketStatus(id, status) {
+      try {
+        const res = await fetch(`/api/admin/tickets/${id}`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Failed to update ticket status.');
+        showToast(`Ticket ${id} status: ${status}`, 'success');
+        loadMetrics();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function updateTicketAssignee(id, assignee) {
+      try {
+        await fetch(`/api/admin/tickets/${id}`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ assignee })
+        });
+        showToast(`Assigned ${assignee || 'nobody'} to ticket ${id}.`, 'info');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteTicket(id) {
+      if (!confirm(`Delete ticket ${id}?`)) return;
+      try {
+        await fetch(`/api/admin/tickets/${id}`, { method: 'DELETE', headers: headers() });
+        showToast(`Ticket ${id} deleted.`, 'info');
+        loadTickets();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadDemos() {
+      const tbody = document.getElementById('demos-table-body');
+      try {
+        const res = await fetch('/api/admin/demo-requests?limit=50', { headers: headers() });
+        const data = await res.json();
+        const demos = data.requests || [];
+        if (demos.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-mono">No demo requests submitted.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = demos.map(d => {
+          const created = new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4 font-mono text-cyan-400">#${d.id}</td>
+              <td class="py-3 px-4 font-mono text-white font-semibold">${escapeHtml(d.email)}</td>
+              <td class="py-3 px-4 text-slate-300">${escapeHtml(d.role || '—')}</td>
+              <td class="py-3 px-4 font-mono text-slate-300">${escapeHtml(d.erp || 'NetSuite/SAP')}</td>
+              <td class="py-3 px-4">
+                <select onchange="updateDemoStatus(${d.id}, this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono outline-none">
+                  <option value="PENDING_REVIEW" ${d.status === 'PENDING_REVIEW' ? 'selected' : ''}>PENDING_REVIEW</option>
+                  <option value="CONTACTED" ${d.status === 'CONTACTED' ? 'selected' : ''}>CONTACTED</option>
+                  <option value="SCHEDULED" ${d.status === 'SCHEDULED' ? 'selected' : ''}>SCHEDULED</option>
+                  <option value="QUALIFIED" ${d.status === 'QUALIFIED' ? 'selected' : ''}>QUALIFIED</option>
+                  <option value="CLOSED" ${d.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
+                </select>
+              </td>
+              <td class="py-3 px-4 font-mono text-slate-400">${created}</td>
+              <td class="py-3 px-4 text-right">
+                <a href="mailto:${escapeHtml(d.email)}?subject=Patchwork%20OS%20Architect%20Demo" class="text-cyan-400 hover:text-cyan-300 font-mono text-xs">Email Lead &rarr;</a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-400 font-mono">Failed to load demo requests.</td></tr>`;
+      }
+    }
+
+    async function updateDemoStatus(id, status) {
+      try {
+        const res = await fetch(`/api/admin/demo-requests/${id}`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Failed to update demo status.');
+        showToast(`Demo request #${id} updated to ${status}.`, 'success');
+        loadMetrics();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadInquiries() {
+      const tbody = document.getElementById('inquiries-table-body');
+      try {
+        const res = await fetch('/api/admin/inquiries?limit=50', { headers: headers() });
+        const data = await res.json();
+        const inquiries = data.inquiries || [];
+        if (inquiries.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">No contact submissions found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = inquiries.map(inq => {
+          const created = new Date(inq.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4 font-mono text-cyan-400">${escapeHtml(inq.id)}</td>
+              <td class="py-3 px-4">
+                <div class="font-bold text-white">${escapeHtml(inq.company || inq.name || 'Enterprise')}</div>
+                <div class="text-[11px] font-mono text-slate-400">${escapeHtml(inq.email)}</div>
+              </td>
+              <td class="py-3 px-4 text-slate-300 font-mono">${escapeHtml(inq.objective || '—')}</td>
+              <td class="py-3 px-4 text-slate-300 font-mono">${escapeHtml(inq.volume || '—')}</td>
+              <td class="py-3 px-4">
+                <select onchange="updateInquiryStatus('${escapeHtml(inq.id)}', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-mono outline-none">
+                  <option value="NEW" ${inq.status === 'NEW' ? 'selected' : ''}>NEW</option>
+                  <option value="IN_REVIEW" ${inq.status === 'IN_REVIEW' ? 'selected' : ''}>IN_REVIEW</option>
+                  <option value="CONTACTED" ${inq.status === 'CONTACTED' ? 'selected' : ''}>CONTACTED</option>
+                  <option value="CLOSED" ${inq.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
+                </select>
+              </td>
+              <td class="py-3 px-4 text-slate-400 truncate max-w-xs">${escapeHtml(inq.message || '—')}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${created}</td>
+              <td class="py-3 px-4 text-right">
+                <a href="mailto:${escapeHtml(inq.email)}?subject=Patchwork%20OS%20Enterprise%20Inquiry" class="text-cyan-400 hover:text-cyan-300 font-mono text-xs">Reply &rarr;</a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-rose-400 font-mono">Failed to load inquiries.</td></tr>`;
+      }
+    }
+
+    async function updateInquiryStatus(id, status) {
+      try {
+        const res = await fetch(`/api/admin/inquiries/${id}`, {
+          method: 'PATCH',
+          headers: headers(),
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Failed to update inquiry status.');
+        showToast(`Inquiry ${id} updated to ${status}.`, 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // TAB 4: GLOBAL WEBHOOK INSPECTOR
+    // ==========================================
+    async function loadWebhookDeliveries() {
+      const type = document.getElementById('webhook-type-filter')?.value || '';
+      const tbody = document.getElementById('webhooks-table-body');
+      tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono"><span class="inline-block animate-spin mr-1">↻</span> Inspecting webhook events...</td></tr>`;
+
+      try {
+        const query = new URLSearchParams({ limit: 50 });
+        if (type) query.append('type', type);
+        const res = await fetch(`/api/admin/webhooks/inspector?${query.toString()}`, { headers: headers() });
+        const data = await res.json();
+        const deliveries = data.deliveries || [];
+
+        if (deliveries.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-mono">No webhook events recorded in this cycle.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = deliveries.map(d => {
+          const isOut = d.type === 'outbound';
+          const dirBadge = isOut
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/80">OUTBOUND</span>'
+            : '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-950 text-indigo-300 border border-indigo-800/80">INBOUND</span>';
+
+          const status = d.responseStatus || (isOut ? 'PENDING' : 200);
+          const isSuccess = status >= 200 && status < 300;
+          const statusBadge = isSuccess
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/80">HTTP ${status}</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 text-rose-400 border border-rose-800/80">HTTP ${status}</span>`;
+
+          const target = isOut ? (d.targetUrl || '—') : (d.provider || 'paystack').toUpperCase();
+          const timestamp = new Date(d.deliveredAt || d.processedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const latency = isOut ? `${d.durationMs || 0}ms (${d.attempts || 1} att)` : 'Processed';
+
+          const payloadStr = typeof d.payload === 'string' ? d.payload : JSON.stringify(d.payload || {});
+
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4 font-mono font-bold text-slate-300">${escapeHtml(d.id)}</td>
+              <td class="py-3 px-4">${dirBadge}</td>
+              <td class="py-3 px-4 font-mono text-cyan-400 font-semibold">${escapeHtml(d.eventType)}</td>
+              <td class="py-3 px-4 font-mono text-slate-300 truncate max-w-xs" title="${escapeHtml(target)}">${escapeHtml(target)}</td>
+              <td class="py-3 px-4">${statusBadge}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${timestamp}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${latency}</td>
+              <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                <button onclick="viewPayloadDetails('${escapeHtml(d.id)}', '${escapeHtml(d.eventType)}', '${encodeURIComponent(payloadStr).replace(/'/g, '%27')}', '${encodeURIComponent(d.responseBody || '').replace(/'/g, '%27')}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-mono transition">
+                  Payload
+                </button>
+                <button onclick="retryWebhook('${escapeHtml(d.id)}')" class="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-400 border border-cyan-800 rounded-lg text-xs font-mono transition">
+                  Retry
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-rose-400 font-mono">Failed to retrieve webhook telemetry.</td></tr>`;
+      }
+    }
+
+    function viewPayloadDetails(id, eventType, encodedPayload, encodedResp) {
+      const payloadStr = decodeURIComponent(encodedPayload);
+      const respStr = decodeURIComponent(encodedResp);
+      cachedPayloadString = payloadStr;
+
+      document.getElementById('payload-modal-title').innerText = `Webhook Event: ${eventType}`;
+      document.getElementById('payload-modal-subtitle').innerText = `Delivery ID: ${id}`;
+
+      try {
+        const parsed = JSON.parse(payloadStr);
+        document.getElementById('payload-json-code').innerText = JSON.stringify(parsed, null, 2);
+      } catch (_) {
+        document.getElementById('payload-json-code').innerText = payloadStr;
+      }
+
+      const respBox = document.getElementById('payload-response-box');
+      if (respStr && respStr !== 'null' && respStr !== 'undefined') {
+        respBox.classList.remove('hidden');
+        document.getElementById('payload-response-code').innerText = respStr;
+      } else {
+        respBox.classList.add('hidden');
+      }
+
+      const modal = document.getElementById('payloadModal');
+      if (modal && !modal.open) modal.showModal();
+    }
+
+    function closePayloadModal() {
+      const modal = document.getElementById('payloadModal');
+      if (modal && modal.open) modal.close();
+    }
+
+    function copyPayloadJson() {
+      navigator.clipboard.writeText(cachedPayloadString);
+      showToast('Payload JSON copied to clipboard.', 'info');
+    }
+
+    async function retryWebhook(id) {
+      showToast(`Initiating re-dispatch for ${id}...`, 'info');
+      try {
+        const res = await fetch(`/api/admin/webhooks/retry/${id}`, {
+          method: 'POST',
+          headers: headers()
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Retry attempt failed.');
+        showToast(data.message || 'Webhook re-dispatched successfully.', 'success');
+        loadWebhookDeliveries();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // TAB 5: DISASTER RECOVERY & BACKUPS
+    // ==========================================
+    async function loadBackupsCatalog() {
+      const tbody = document.getElementById('backups-table-body');
+      tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 font-mono"><span class="inline-block animate-spin mr-1">↻</span> Querying backup storage...</td></tr>`;
+
+      try {
+        const res = await fetch('/api/admin/backup/list', { headers: headers() });
+        const data = await res.json();
+
+        // Update Live DB stats
+        if (data.liveDatabase) {
+          const l = data.liveDatabase;
+          document.getElementById('dr-db-size').innerText = `${Math.round(l.sizeBytes / 1024)} KB`;
+          document.getElementById('dr-wal-size').innerText = `${Math.round(l.walSizeBytes / 1024)} KB`;
+          const walBadge = document.getElementById('dr-wal-badge');
+          if (walBadge) {
+            if (l.walSizeBytes === 0) {
+              walBadge.innerText = 'TRUNCATED / MERGED';
+              walBadge.className = 'text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded';
+            } else {
+              walBadge.innerText = 'ACTIVE WAL';
+              walBadge.className = 'text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded';
+            }
+          }
+        }
+
+        const snapshots = data.snapshots || [];
+        if (snapshots.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 font-mono">No database snapshots captured yet. Click "Create Lock-Free Snapshot" above.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = snapshots.map(s => {
+          const sizeKb = (s.sizeBytes / 1024).toFixed(1);
+          const created = new Date(s.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const shortHash = s.checksumSha256 ? `${s.checksumSha256.slice(0, 12)}...${s.checksumSha256.slice(-8)}` : '—';
+
+          return `
+            <tr class="hover:bg-slate-900/40 transition">
+              <td class="py-3 px-4 font-mono font-bold text-white flex items-center gap-2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16"/></svg>
+                <span>${escapeHtml(s.filename)}</span>
+              </td>
+              <td class="py-3 px-4 font-mono text-cyan-300 font-semibold">${sizeKb} KB</td>
+              <td class="py-3 px-4 font-mono text-slate-400 text-[11px]" title="${escapeHtml(s.checksumSha256 || '')}">${shortHash}</td>
+              <td class="py-3 px-4 font-mono text-slate-400">${created}</td>
+              <td class="py-3 px-4 text-right">
+                <button onclick="downloadBackup('${escapeHtml(s.id)}', '${escapeHtml(s.filename)}')" class="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-mono font-semibold rounded-lg text-xs transition shadow flex items-center gap-1.5 ml-auto">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  Download .db
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-rose-400 font-mono">Failed to query snapshots.</td></tr>`;
+      }
+    }
+
+    async function triggerWalCheckpoint() {
+      const btn = document.getElementById('btn-checkpoint');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Checkpointing...`;
+
+      try {
+        const res = await fetch('/api/admin/backup/checkpoint', {
+          method: 'POST',
+          headers: headers()
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to checkpoint WAL.');
+        showToast(`WAL Checkpoint Complete: reduced WAL size from ${data.walSizeBeforeBytes} to ${data.walSizeAfterBytes} bytes.`, 'success');
+        loadBackupsCatalog();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Force WAL Checkpoint (TRUNCATE)`;
+      }
+    }
+
+    async function triggerCreateSnapshot() {
+      const btn = document.getElementById('btn-create-snapshot');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Capturing Online Backup...`;
+
+      try {
+        const res = await fetch('/api/admin/backup/create', {
+          method: 'POST',
+          headers: headers()
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create database snapshot.');
+        showToast(`Lock-free snapshot created: ${data.snapshot.filename}`, 'success');
+        loadBackupsCatalog();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg> Create Lock-Free Snapshot`;
+      }
+    }
+
+    async function downloadBackup(id, filename) {
+      showToast(`Preparing download for ${filename}...`, 'info');
+      try {
+        const res = await fetch(`/api/admin/backup/download/${id}`, {
+          headers: headers()
+        });
+        if (!res.ok) throw new Error('Download authorization failed.');
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        showToast('Snapshot downloaded successfully.', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Modal click outside to close
+    ['subOverrideModal', 'userPasswordModal', 'payloadModal'].forEach(mId => {
+      const m = document.getElementById(mId);
+      if (m) {
+        m.addEventListener('click', (e) => {
+          const rect = m.getBoundingClientRect();
+          if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+            m.close();
+          }
+        });
+      }
+    });
+
+    // Auto-boot on load
+    (async () => {
+      const ok = await verifySuperadmin();
+      if (ok) {
+        loadMetrics();
+        loadOrganizations();
+      }
+    })();
+  </script>
+</body>
+</html>
