@@ -1875,8 +1875,8 @@ rules:
                 </div>
             </section>
 
-            <!-- Interactive ROI Calculator -->
-            <section class="py-14 sm:py-20 bg-gray-900 text-white">
+            <!-- ROI calculator removed -->
+            <section class="hidden" aria-hidden="true">
                 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center mb-10 sm:mb-12">
                         <span class="text-brand-400 font-mono text-xs uppercase tracking-widest">Interactive Business Case Builder</span>
@@ -3575,38 +3575,6 @@ rules:
             document.getElementById('demo-success-message').classList.remove('hidden');
         }
 
-        // Interactive ROI Calculator Logic
-        function updateROI() {
-            const legacySpend = parseInt(document.getElementById('calc-legacy').value, 10);
-            const controllerHrs = parseInt(document.getElementById('calc-controllers').value, 10);
-            const devopsHrs = parseInt(document.getElementById('calc-devops').value, 10);
-
-            const enterpriseFee = 30000;
-            const saasDiff = legacySpend - enterpriseFee;
-            const financeAnnualValue = controllerHrs * 12 * 85; // $85/hr blended controller rate
-            const engAnnualValue = devopsHrs * 12 * 110; // $110/hr blended engineer rate
-            const totalNetBenefit = saasDiff + financeAnnualValue + engAnnualValue;
-
-            document.getElementById('val-legacy').textContent = '$' + legacySpend.toLocaleString();
-            document.getElementById('val-controllers').textContent = controllerHrs + ' hrs';
-            document.getElementById('val-devops').textContent = devopsHrs + ' hrs';
-
-            document.getElementById('val-saas-diff').textContent = '$' + saasDiff.toLocaleString() + '/yr';
-            document.getElementById('val-fin-saved').textContent = '$' + financeAnnualValue.toLocaleString() + '/yr';
-            document.getElementById('val-eng-saved').textContent = '$' + engAnnualValue.toLocaleString() + '/yr';
-            document.getElementById('val-total-savings').textContent = '$' + totalNetBenefit.toLocaleString();
-
-            // Update visual comparison bars dynamically
-            const totalLegacyBurden = legacySpend + financeAnnualValue + engAnnualValue;
-            const patchworkRatio = Math.max(8, Math.min(60, Math.round((enterpriseFee / totalLegacyBurden) * 100)));
-            const legacyLabel = document.getElementById('bar-legacy-label');
-            const patchworkBar = document.getElementById('bar-patchwork-fill');
-            if (legacyLabel && patchworkBar) {
-                legacyLabel.textContent = '$' + totalLegacyBurden.toLocaleString() + '/yr';
-                patchworkBar.style.width = patchworkRatio + '%';
-            }
-        }
-
         // ==========================================
         // ROUTER & NAVIGATION CONTROLLER
         // ==========================================
@@ -4447,7 +4415,6 @@ rules:
         document.addEventListener('DOMContentLoaded', () => {
             handleRouting();
             loadPublicPackagePricing();
-            updateROI();
             checkUserSession();
             renderTicketsList();
         });
