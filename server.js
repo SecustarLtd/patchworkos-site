@@ -1,4 +1,15 @@
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL UNCAUGHT EXCEPTION]', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL UNHANDLED REJECTION]', reason);
+  process.exit(1);
+});
+
+console.log(`[Startup] Node.js ${process.version} (${process.platform}) initializing...`);
 require('dotenv').config();
+console.log('[Startup] Loading core modules...');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -6,7 +17,10 @@ const fs = require('fs');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+console.log('[Startup] Loading database module...');
 const db = require('./db');
+console.log('[Startup] Database module loaded successfully.');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,8 +36,14 @@ const PAYSTACK_API = 'https://api.paystack.co';
 if (process.env.PAYSTACK_GROWTH_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='growth'").run(process.env.PAYSTACK_GROWTH_PLAN_CODE);
 if (process.env.PAYSTACK_ENTERPRISE_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='enterprise'").run(process.env.PAYSTACK_ENTERPRISE_PLAN_CODE);
 
-if (!JWT_SECRET) throw new Error('JWT_SECRET must be configured in production.');
+if (!JWT_SECRET) {
+  console.error('[FATAL] JWT_SECRET must be configured in production.');
+  console.error('[FATAL] NODE_ENV:', process.env.NODE_ENV);
+  console.error('[FATAL] Loaded env keys:', Object.keys(process.env).filter(k => !k.startsWith('npm_')));
+  throw new Error('JWT_SECRET must be configured in production.');
+}
 if (!process.env.JWT_SECRET) console.warn('Using a development JWT secret. Set JWT_SECRET before deployment.');
+
 
 app.use(cors());
 app.use(express.json({ verify: (req, res, buffer) => { req.rawBody = buffer; } }));

@@ -5,11 +5,18 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
 const dbPath = path.resolve(process.env.DATABASE_PATH || path.join(__dirname, 'patchwork.db'));
+console.log(`[DB] Opening SQLite database at: ${dbPath}`);
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrency and performance
-db.pragma('journal_mode = WAL');
+try {
+  db.pragma('journal_mode = WAL');
+  console.log('[DB] WAL journal mode enabled.');
+} catch (walErr) {
+  console.warn('[DB] Could not set WAL journal mode, falling back:', walErr.message);
+}
+
 
 // Initialize schema
 db.exec(`
@@ -700,4 +707,5 @@ db.getSuperadminUsers = function() {
   return db.prepare('SELECT id, name, email, workspace, role, tier, is_superadmin, created_at FROM users WHERE is_superadmin = 1').all();
 };
 
+console.log('[DB] Database schema and initial seeds initialized successfully.');
 module.exports = db;

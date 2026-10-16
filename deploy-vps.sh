@@ -107,14 +107,33 @@ PAYSTACK_PROVISION_PLANS=false
 EOF
   chmod 600 .env
 else
-  log "Keeping the existing ${APP_DIR}/.env"
+  log "Ensuring required variables exist in ${APP_DIR}/.env"
+  if ! grep -qE '^JWT_SECRET=[a-zA-Z0-9]+' .env; then
+    log "Generating missing or empty JWT_SECRET in .env"
+    sed -i '/^JWT_SECRET=/d' .env
+    echo "JWT_SECRET=$(openssl rand -hex 64)" >> .env
+  fi
+  if ! grep -qE '^CREDENTIALS_SECRET_KEY=[a-zA-Z0-9]+' .env; then
+    log "Generating missing or empty CREDENTIALS_SECRET_KEY in .env"
+    sed -i '/^CREDENTIALS_SECRET_KEY=/d' .env
+    echo "CREDENTIALS_SECRET_KEY=$(openssl rand -hex 32)" >> .env
+  fi
+  if ! grep -q '^APP_BASE_URL=' .env; then
+    echo "APP_BASE_URL=${APP_URL}" >> .env
+  fi
+  if ! grep -q '^PORT=' .env; then
+    echo "PORT=3000" >> .env
+  fi
+  if ! grep -q '^NODE_ENV=' .env; then
+    echo "NODE_ENV=production" >> .env
+  fi
 fi
 
 log "Building and starting the application"
 compose up -d --build --force-recreate
 
-if [[ -f data/patchwork.db ]]; then
-  if ! docker exec patchworkos test -f /app/data/patchwork.db 2>/dev/null; then
+if [[ -s data/patchwork.db ]]; then
+  if ! docker exec patchworkos test -s /app/data/patchwork.db 2>/dev/null; then
     docker cp data/patchwork.db patchworkos:/app/data/patchwork.db 2>/dev/null || true
     compose restart patchworkos 2>/dev/null || true
   fi
@@ -131,8 +150,11 @@ for _ in $(seq 1 30); do
 done
 
 if [[ "${healthy}" != true ]]; then
+  log "Container logs:"
   compose logs --tail=100 patchworkos
-  fail "The application did not become healthy. Logs are shown above."
+  log "Container status inspection:"
+  docker inspect patchworkos --format='Status={{.State.Status}} ExitCode={{.State.ExitCode}} OOMKilled={{.State.OOMKilled}} Error={{.State.Error}}' 2>/dev/null || true
+  fail "The application did not become healthy. Logs and container state are shown above."
 fi
 
 log "Checking that the domain is not already owned by another Nginx site"
