@@ -43,12 +43,23 @@ compose() {
 log "Installing system packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y ca-certificates curl git nginx certbot python3-certbot-nginx docker.io openssl
+apt-get install -y ca-certificates curl git nginx certbot python3-certbot-nginx openssl
+
+if ! command -v docker >/dev/null 2>&1; then
+  log "Installing Docker"
+  if apt-cache show docker-ce >/dev/null 2>&1; then
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin \
+      || apt-get install -y docker.io
+  else
+    apt-get install -y docker.io
+  fi
+fi
 
 if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
-  apt-get install -y docker-compose-v2 2>/dev/null \
-    || apt-get install -y docker-compose-plugin 2>/dev/null \
-    || apt-get install -y docker-compose
+  apt-get install -y docker-compose-plugin 2>/dev/null \
+    || apt-get install -y docker-compose-v2 2>/dev/null \
+    || apt-get install -y docker-compose 2>/dev/null \
+    || true
 fi
 
 systemctl enable --now docker nginx
