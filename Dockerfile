@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm ci --only=production
+# Compile native addons inside the target image instead of using a downloaded
+# prebuild that may require CPU instructions unavailable on some VPS hosts.
+RUN npm_config_build_from_source=true npm ci --omit=dev
 
 COPY . .
 
