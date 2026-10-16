@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.remember
+backups
+data
+node_modules
+npm-debug.log*
+patchwork.db*
+test_*.js
+*.md
