@@ -3703,14 +3703,15 @@ app.post('/api/admin/webhooks/retry/:id', requireSuperAdmin, async (req, res) =>
 });
 
 // Disaster Recovery & Database Backups
-const backupsDir = path.join(__dirname, 'backups');
+const databasePath = path.resolve(process.env.DATABASE_PATH || path.join(__dirname, 'patchwork.db'));
+const backupsDir = path.resolve(process.env.BACKUPS_DIR || path.join(__dirname, 'backups'));
 if (!fs.existsSync(backupsDir)) {
   fs.mkdirSync(backupsDir, { recursive: true });
 }
 
 app.post('/api/admin/backup/checkpoint', requireSuperAdmin, (req, res) => {
   try {
-    const walFile = path.join(__dirname, 'patchwork.db-wal');
+    const walFile = `${databasePath}-wal`;
     const walSizeBeforeBytes = fs.existsSync(walFile) ? fs.statSync(walFile).size : 0;
 
     const pragmaRes = db.pragma('wal_checkpoint(TRUNCATE)');
@@ -3803,8 +3804,8 @@ app.get('/api/admin/backup/list', requireSuperAdmin, (req, res) => {
       ORDER BY created_at DESC
     `).all();
 
-    const mainDbFile = path.join(__dirname, 'patchwork.db');
-    const walFile = path.join(__dirname, 'patchwork.db-wal');
+    const mainDbFile = databasePath;
+    const walFile = `${databasePath}-wal`;
 
     const liveDatabase = {
       sizeBytes: fs.existsSync(mainDbFile) ? fs.statSync(mainDbFile).size : 0,

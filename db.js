@@ -1,9 +1,11 @@
 const path = require('path');
+const fs = require('fs');
 const Database = require('better-sqlite3');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.join(__dirname, 'patchwork.db');
+const dbPath = path.resolve(process.env.DATABASE_PATH || path.join(__dirname, 'patchwork.db'));
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrency and performance
