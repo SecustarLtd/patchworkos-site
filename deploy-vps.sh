@@ -1,24 +1,22 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Patchwork OS VPS bootstrapper (Ubuntu/Debian)
+# Patchwork OS VPS bootstrapper (Ubuntu/Debian).
+# Keep this file in the project root and run it from there.
 #
-# Domain + HTTPS:
-#   DOMAIN=app.example.com LETSENCRYPT_EMAIL=admin@example.com bash deploy-vps.sh
+# Domain + HTTPS (patchworkos.com is the default domain):
+#   LETSENCRYPT_EMAIL=admin@example.com bash deploy-vps.sh
 #
-# IP-only deployment:
-#   bash deploy-vps.sh
-#
-# Optional overrides:
-#   REPO_URL=https://github.com/SecustarLtd/patchworkos-site.git
-#   APP_DIR=/opt/patchworkos
-#   BRANCH=main
-
-REPO_URL="${REPO_URL:-https://github.com/SecustarLtd/patchworkos-site.git}"
-APP_DIR="${APP_DIR:-/opt/patchworkos}"
-BRANCH="${BRANCH:-main}"
-DOMAIN="${DOMAIN:-}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="${SCRIPT_DIR}"
+DOMAIN="${DOMAIN:-patchworkos.com}"
+# Accept either a hostname or a pasted URL such as https://patchworkos.com/.
+DOMAIN="${DOMAIN#http://}"
+DOMAIN="${DOMAIN#https://}"
+DOMAIN="${DOMAIN%%/*}"
 LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-}"
+PATCHWORK_HOST_PORT="${PATCHWORK_HOST_PORT:-3107}"
+export PATCHWORK_HOST_PORT
 NGINX_SITE="/etc/nginx/sites-available/patchworkos"
 
 log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
@@ -55,18 +53,10 @@ fi
 
 systemctl enable --now docker nginx
 
-log "Installing or updating Patchwork OS"
-if [[ -d "${APP_DIR}/.git" ]]; then
-  git -C "${APP_DIR}" fetch origin "${BRANCH}"
-  git -C "${APP_DIR}" checkout "${BRANCH}"
-  git -C "${APP_DIR}" pull --ff-only origin "${BRANCH}"
-elif [[ -e "${APP_DIR}" ]]; then
-  fail "${APP_DIR} exists but is not a Git checkout. Move it or set APP_DIR to another path."
-else
-  git clone --branch "${BRANCH}" --single-branch "${REPO_URL}" "${APP_DIR}"
-fi
-
+log "Deploying from project root: ${APP_DIR}"
 cd "${APP_DIR}"
+[[ -f docker-compose.yml ]] || fail "docker-compose.yml was not found in ${APP_DIR}. Keep deploy-vps.sh in the project root."
+[[ -f server.js ]] || fail "server.js was not found in ${APP_DIR}. Keep deploy-vps.sh in the project root."
 mkdir -p data/backups
 chmod 750 data data/backups
 
@@ -110,12 +100,12 @@ else
 fi
 
 log "Building and starting the application"
-compose up -d --build --remove-orphans
+compose up -d --build
 
 log "Waiting for the application health endpoint"
 healthy=false
 for _ in $(seq 1 30); do
-  if curl -fsS http://127.0.0.1:3000/api/health >/dev/null; then
+  if curl -fsS "http://127.0.0.1:${PATCHWORK_HOST_PORT}/api/health" >/dev/null; then
     healthy=true
     break
   fi
@@ -127,7 +117,14 @@ if [[ "${healthy}" != true ]]; then
   fail "The application did not become healthy. Logs are shown above."
 fi
 
-log "Configuring Nginx"
+log "Checking that the domain is not already owned by another Nginx site"
+while IFS= read -r existing_site; do
+  [[ "${existing_site}" == "${NGINX_SITE}" ]] && continue
+  [[ "${existing_site}" == "/etc/nginx/sites-enabled/patchworkos" ]] && continue
+  fail "${DOMAIN} is already referenced by ${existing_site}. Refusing to interfere with another site."
+done < <(grep -Rsl --include='*' "server_name.*${DOMAIN}" /etc/nginx/sites-available /etc/nginx/conf.d 2>/dev/null || true)
+
+log "Configuring an isolated Nginx site"
 cat > "${NGINX_SITE}" <<EOF
 server {
     listen 80;
@@ -137,7 +134,7 @@ server {
     client_max_body_size 50M;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:${PATCHWORK_HOST_PORT};
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -151,7 +148,6 @@ server {
 EOF
 
 ln -sfn "${NGINX_SITE}" /etc/nginx/sites-enabled/patchworkos
-rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
 
