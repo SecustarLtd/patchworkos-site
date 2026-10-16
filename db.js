@@ -523,6 +523,8 @@ if (existingInvoiceCount === 0) {
 // Migrate the original USD demonstration prices to the configured Kenyan Paystack plans.
 db.prepare("UPDATE plans SET price_cents = 50000, currency = 'KES' WHERE id = 'growth' AND price_cents = 49900 AND currency = 'USD'").run();
 db.prepare("UPDATE plans SET price_cents = 100000, currency = 'KES' WHERE id = 'enterprise' AND price_cents = 199900 AND currency = 'USD'").run();
+// The public Basic package is the paid entry plan at USD $5/month.
+db.prepare("UPDATE plans SET name = 'Basic', billing_interval = 'monthly', price_cents = 500, base_price_cents = 500, currency = 'USD' WHERE id = 'developer'").run();
 
 // Seed default plans if empty
 const planCount = db.prepare('SELECT COUNT(*) as count FROM plans').get().count;
@@ -532,7 +534,7 @@ if (planCount === 0) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertPlan.run('developer', 'Developer Starter', 'monthly', 0, 0, 0, 2, 'USD');
+  insertPlan.run('developer', 'Basic', 'monthly', 500, 500, 0, 2, 'USD');
   insertPlan.run('growth', 'Growth Tier', 'monthly', 50000, 50000, 5000, 5, 'KES');
   insertPlan.run('enterprise', 'Enterprise Custom', 'monthly', 100000, 100000, 10000, 15, 'KES');
 }

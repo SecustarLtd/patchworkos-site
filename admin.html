@@ -192,6 +192,51 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16m-8 4v6m-3-3l3 3 3-3"/></svg>
         <span>Disaster Recovery & Backups</span>
       </button>
+
+      <button role="tab" aria-selected="false" aria-controls="panel-packages" tabindex="-1" onclick="switchAdminTab('packages')" id="nav-tab-packages" class="px-4 py-3 border-b-2 font-mono flex items-center gap-2 whitespace-nowrap shrink-0 border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Packages</span>
+      </button>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL: Package Management                                -->
+    <!-- ======================================================== -->
+    <div id="panel-packages" role="tabpanel" tabindex="0" aria-labelledby="nav-tab-packages" class="space-y-6 hidden">
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-lg font-bold text-white">Package Management</h2>
+            <p class="text-xs text-slate-400 mt-1">Create packages and update prices, billing cycles, seats, and payment-provider codes.</p>
+          </div>
+          <button onclick="resetPackageForm()" class="px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold">+ New Package</button>
+        </div>
+
+        <form id="package-form" onsubmit="savePackage(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <input type="hidden" id="package-editing-id">
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Package ID</label><input id="package-id" required pattern="[a-z0-9][a-z0-9_-]{1,39}" placeholder="basic" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Name</label><input id="package-name" required placeholder="Basic" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Price</label><input id="package-price" required type="number" min="0" step="0.01" placeholder="5.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Currency</label><select id="package-currency" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option>USD</option><option>KES</option></select></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Billing interval</label><select id="package-interval" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option value="monthly">Monthly</option><option value="annual">Annual</option><option value="yearly">Yearly</option></select></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Included seats</label><input id="package-seats" required type="number" min="1" step="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Extra seat price</label><input id="package-seat-price" required type="number" min="0" step="0.01" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Paystack plan code</label><input id="package-provider-code" placeholder="PLN_..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"></div>
+          <div class="sm:col-span-2 lg:col-span-4 flex gap-2">
+            <button id="package-save-btn" type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">Create Package</button>
+            <button type="button" onclick="resetPackageForm()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" aria-label="Billing packages">
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider"><tr><th class="py-3 px-4">Package</th><th class="py-3 px-4">Price</th><th class="py-3 px-4">Seats</th><th class="py-3 px-4">Provider code</th><th class="py-3 px-4">Subscribers</th><th class="py-3 px-4 text-right">Action</th></tr></thead>
+            <tbody id="packages-table-body" class="divide-y divide-slate-800 text-slate-300"><tr><td colspan="6" class="py-8 text-center text-slate-500 font-mono">Loading packages...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- ======================================================== -->
@@ -764,6 +809,7 @@
     let orgsPage = 1;
     let orgsTotalPages = 1;
     let usersData = [];
+    let packagesData = [];
     let usersPage = 1;
     let usersTotalPages = 1;
     let cachedPayloadString = '';
@@ -809,7 +855,7 @@
 
     // Navigation Tab Switching
     function switchAdminTab(tab) {
-      ['orgs', 'users', 'support', 'webhooks', 'backups'].forEach(t => {
+      ['orgs', 'users', 'support', 'webhooks', 'backups', 'packages'].forEach(t => {
         const p = document.getElementById(`panel-${t}`);
         const b = document.getElementById(`nav-tab-${t}`);
         if (p) {
@@ -839,6 +885,7 @@
       if (tab === 'support') loadSupportData();
       if (tab === 'webhooks') loadWebhookDeliveries();
       if (tab === 'backups') loadBackupsCatalog();
+      if (tab === 'packages') loadPackages();
     }
 
     // Support Sub-tab Switching
@@ -1017,6 +1064,98 @@
       if (tbBadge) tbBadge.innerText = k.openTicketsCount || 0;
       const dbBadge = document.getElementById('badge-demos-count');
       if (dbBadge) dbBadge.innerText = k.pendingDemoRequestsCount || 0;
+    }
+
+    // ==========================================
+    // PACKAGE MANAGEMENT
+    // ==========================================
+    async function loadPackages() {
+      const tbody = document.getElementById('packages-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500 font-mono"><span class="inline-block animate-spin mr-1">↻</span> Loading packages...</td></tr>`;
+      try {
+        const res = await fetch('/api/admin/plans', { headers: headers() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load packages.');
+        packagesData = data.plans || [];
+        if (!packagesData.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500 font-mono">No packages found.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = packagesData.map(plan => `
+          <tr class="hover:bg-slate-900/40">
+            <td class="py-3 px-4"><div class="font-bold text-white">${escapeHtml(plan.name)}</div><div class="text-[10px] text-slate-500 font-mono">${escapeHtml(plan.id)}</div></td>
+            <td class="py-3 px-4 font-mono text-emerald-300">${escapeHtml(plan.currency)} ${(plan.priceCents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}<div class="text-[10px] text-slate-500">/${escapeHtml(plan.billingInterval)}</div></td>
+            <td class="py-3 px-4"><span class="text-white">${plan.includedSeats}</span> included<div class="text-[10px] text-slate-500">${escapeHtml(plan.currency)} ${(plan.seatPriceCents / 100).toFixed(2)} extra</div></td>
+            <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${escapeHtml(plan.providerPlanCode || 'Not configured')}</td>
+            <td class="py-3 px-4 font-mono">${plan.subscriberCount}</td>
+            <td class="py-3 px-4 text-right"><button onclick="editPackageById('${plan.id}')" class="px-3 py-1.5 rounded-lg border border-cyan-800 text-cyan-300 hover:bg-cyan-950 font-bold">Edit</button></td>
+          </tr>`).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-rose-400 font-mono">${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function editPackageById(id) {
+      const plan = packagesData.find(item => item.id === id);
+      if (plan) editPackage(plan);
+    }
+
+    function editPackage(plan) {
+      document.getElementById('package-editing-id').value = plan.id;
+      const idInput = document.getElementById('package-id');
+      idInput.value = plan.id;
+      idInput.disabled = true;
+      document.getElementById('package-name').value = plan.name;
+      document.getElementById('package-price').value = (plan.priceCents / 100).toFixed(2);
+      document.getElementById('package-currency').value = plan.currency;
+      document.getElementById('package-interval').value = plan.billingInterval;
+      document.getElementById('package-seats').value = plan.includedSeats;
+      document.getElementById('package-seat-price').value = (plan.seatPriceCents / 100).toFixed(2);
+      document.getElementById('package-provider-code').value = plan.providerPlanCode || '';
+      document.getElementById('package-save-btn').textContent = 'Save Changes';
+      document.getElementById('package-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function resetPackageForm() {
+      document.getElementById('package-form')?.reset();
+      document.getElementById('package-editing-id').value = '';
+      const idInput = document.getElementById('package-id');
+      idInput.disabled = false;
+      document.getElementById('package-seats').value = 1;
+      document.getElementById('package-seat-price').value = 0;
+      document.getElementById('package-save-btn').textContent = 'Create Package';
+    }
+
+    async function savePackage(event) {
+      event.preventDefault();
+      const editingId = document.getElementById('package-editing-id').value;
+      const payload = {
+        id: document.getElementById('package-id').value.trim(),
+        name: document.getElementById('package-name').value.trim(),
+        priceCents: Math.round(Number(document.getElementById('package-price').value) * 100),
+        currency: document.getElementById('package-currency').value,
+        billingInterval: document.getElementById('package-interval').value,
+        includedSeats: Number(document.getElementById('package-seats').value),
+        seatPriceCents: Math.round(Number(document.getElementById('package-seat-price').value) * 100),
+        providerPlanCode: document.getElementById('package-provider-code').value.trim()
+      };
+      const btn = document.getElementById('package-save-btn');
+      btn.disabled = true;
+      try {
+        const res = await fetch(editingId ? `/api/admin/plans/${encodeURIComponent(editingId)}` : '/api/admin/plans', {
+          method: editingId ? 'PATCH' : 'POST', headers: headers(), body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save package.');
+        showToast(editingId ? 'Package updated.' : 'Package created.', 'success');
+        resetPackageForm();
+        loadPackages();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     // ==========================================

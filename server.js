@@ -583,6 +583,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'UP', uptime: process.uptime(), database: 'SQLite (WAL Mode Connected)', paystackConfigured: Boolean(process.env.PAYSTACK_SECRET_KEY) });
 });
 
+app.get('/api/plans', (req, res) => {
+  const plans = db.prepare(`SELECT id, name, billing_interval AS billingInterval, price_cents AS priceCents, currency
+                            FROM plans ORDER BY price_cents ASC, name ASC`).all();
+  res.json({ plans });
+});
+
 app.post('/api/auth/signup', (req, res) => {
   try {
     const { name, email, password, workspace, role } = req.body;
@@ -3200,6 +3206,76 @@ app.get('/api/admin/metrics', requireSuperAdmin, (req, res) => {
 });
 
 // Organizations Directory & Management
+app.get('/api/admin/plans', requireSuperAdmin, (req, res) => {
+  try {
+    const plans = db.prepare(`
+      SELECT p.id, p.name, p.billing_interval AS billingInterval,
+             p.price_cents AS priceCents, p.base_price_cents AS basePriceCents,
+             p.seat_price_cents AS seatPriceCents, p.included_seats AS includedSeats,
+             p.currency, p.payment_provider AS paymentProvider,
+             p.paystack_plan_code AS providerPlanCode,
+             COUNT(s.id) AS subscriberCount
+      FROM plans p
+      LEFT JOIN subscriptions s ON s.plan_id = p.id
+      GROUP BY p.id
+      ORDER BY p.price_cents ASC, p.name ASC
+    `).all();
+    res.json({ plans });
+  } catch (error) {
+    console.error('Admin plans list error:', error);
+    res.status(500).json({ error: 'Failed to retrieve packages.' });
+  }
+});
+
+app.post('/api/admin/plans', requireSuperAdmin, (req, res) => {
+  try {
+    const { id: rawId, name, billingInterval = 'monthly', priceCents = 0, currency = 'USD', includedSeats = 1, seatPriceCents = 0, providerPlanCode = null } = req.body;
+    const planId = String(rawId || '').trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9_-]{1,39}$/.test(planId)) return res.status(400).json({ error: 'Package ID must be 2-40 lowercase letters, numbers, hyphens, or underscores.' });
+    if (!String(name || '').trim()) return res.status(400).json({ error: 'Package name is required.' });
+    if (!['monthly', 'annual', 'yearly'].includes(billingInterval)) return res.status(400).json({ error: 'Invalid billing interval.' });
+    if (!['USD', 'KES'].includes(currency)) return res.status(400).json({ error: 'Currency must be USD or KES.' });
+    const price = Number(priceCents);
+    const seats = Number(includedSeats);
+    const seatPrice = Number(seatPriceCents);
+    if (![price, seats, seatPrice].every(Number.isInteger) || price < 0 || seats < 1 || seatPrice < 0) return res.status(400).json({ error: 'Prices and included seats must be valid whole numbers.' });
+
+    db.prepare(`INSERT INTO plans (id, name, billing_interval, price_cents, base_price_cents, seat_price_cents, included_seats, currency, payment_provider, paystack_plan_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'paystack', ?)`)
+      .run(planId, String(name).trim(), billingInterval, price, price, seatPrice, seats, currency, providerPlanCode || null);
+    res.status(201).json({ success: true, plan: db.prepare('SELECT * FROM plans WHERE id = ?').get(planId) });
+  } catch (error) {
+    if (String(error.message).includes('UNIQUE')) return res.status(409).json({ error: 'A package with that ID already exists.' });
+    console.error('Admin plan create error:', error);
+    res.status(500).json({ error: 'Failed to create package.' });
+  }
+});
+
+app.patch('/api/admin/plans/:id', requireSuperAdmin, (req, res) => {
+  try {
+    const existing = db.prepare('SELECT * FROM plans WHERE id = ?').get(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Package not found.' });
+    const name = String(req.body.name ?? existing.name).trim();
+    const billingInterval = req.body.billingInterval ?? existing.billing_interval;
+    const currency = req.body.currency ?? existing.currency;
+    const price = Number(req.body.priceCents ?? existing.price_cents);
+    const seats = Number(req.body.includedSeats ?? existing.included_seats);
+    const seatPrice = Number(req.body.seatPriceCents ?? existing.seat_price_cents);
+    const providerPlanCode = req.body.providerPlanCode === undefined ? existing.paystack_plan_code : (req.body.providerPlanCode || null);
+    if (!name) return res.status(400).json({ error: 'Package name is required.' });
+    if (!['monthly', 'annual', 'yearly'].includes(billingInterval)) return res.status(400).json({ error: 'Invalid billing interval.' });
+    if (!['USD', 'KES'].includes(currency)) return res.status(400).json({ error: 'Currency must be USD or KES.' });
+    if (![price, seats, seatPrice].every(Number.isInteger) || price < 0 || seats < 1 || seatPrice < 0) return res.status(400).json({ error: 'Prices and included seats must be valid whole numbers.' });
+
+    db.prepare(`UPDATE plans SET name=?, billing_interval=?, price_cents=?, base_price_cents=?, seat_price_cents=?, included_seats=?, currency=?, paystack_plan_code=? WHERE id=?`)
+      .run(name, billingInterval, price, price, seatPrice, seats, currency, providerPlanCode, req.params.id);
+    res.json({ success: true, plan: db.prepare('SELECT * FROM plans WHERE id = ?').get(req.params.id) });
+  } catch (error) {
+    console.error('Admin plan update error:', error);
+    res.status(500).json({ error: 'Failed to update package.' });
+  }
+});
+
 app.get('/api/admin/organizations', requireSuperAdmin, (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);

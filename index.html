@@ -1827,8 +1827,8 @@ rules:
                                 <h3 class="text-2xl sm:text-3xl font-bold text-gray-900">Basic</h3>
                                 <p class="text-sm text-gray-600 mt-2">The complete Patchwork OS open-source experience, including every newly added community feature.</p>
                                 <div class="my-6 flex items-baseline gap-2">
-                                    <span class="text-4xl sm:text-5xl font-extrabold text-gray-900">Free</span>
-                                    <span class="text-gray-500 font-medium text-sm">open source</span>
+                                    <span id="basic-package-price" class="text-4xl sm:text-5xl font-extrabold text-gray-900">$5</span>
+                                    <span id="basic-package-interval" class="text-gray-500 font-medium text-sm">/ month</span>
                                 </div>
                                 <ul class="space-y-3 text-sm text-gray-700 mb-8">
                                     <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>All open-source features</span></li>
@@ -4425,9 +4425,28 @@ rules:
         });
 
         // Initialize Router and User Session on DOM Ready
+        async function loadPublicPackagePricing() {
+            try {
+                const response = await fetch('/api/plans');
+                if (!response.ok) return;
+                const data = await response.json();
+                const basic = (data.plans || []).find(plan => plan.id === 'developer');
+                const price = document.getElementById('basic-package-price');
+                const interval = document.getElementById('basic-package-interval');
+                if (basic && price) {
+                    const symbol = basic.currency === 'USD' ? '$' : `${basic.currency} `;
+                    price.textContent = `${symbol}${(basic.priceCents / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+                    if (interval) interval.textContent = `/ ${basic.billingInterval === 'monthly' ? 'month' : 'year'}`;
+                }
+            } catch (_) {
+                // Keep the server-rendered $5 fallback if pricing cannot be loaded.
+            }
+        }
+
         window.addEventListener('hashchange', handleRouting);
         document.addEventListener('DOMContentLoaded', () => {
             handleRouting();
+            loadPublicPackagePricing();
             updateROI();
             checkUserSession();
             renderTicketsList();
