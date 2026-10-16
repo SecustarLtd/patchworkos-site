@@ -111,7 +111,14 @@ else
 fi
 
 log "Building and starting the application"
-compose up -d --build
+compose up -d --build --force-recreate
+
+if [[ -f data/patchwork.db ]]; then
+  if ! docker exec patchworkos test -f /app/data/patchwork.db 2>/dev/null; then
+    docker cp data/patchwork.db patchworkos:/app/data/patchwork.db 2>/dev/null || true
+    compose restart patchworkos 2>/dev/null || true
+  fi
+fi
 
 log "Waiting for the application health endpoint"
 healthy=false
