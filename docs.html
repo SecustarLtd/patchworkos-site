@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer & Operator Documentation | Patchwork OS</title>
+    <meta name="description" content="Comprehensive developer and operator documentation for Patchwork OS (Oolab-labs/patchwork-os). Set up progressive runtime tiers, connect IDEs, AI coding agents, SaaS connectors, model drivers, and mobile oversight.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Inter', 'sans-serif'],
+                        mono: ['SF Mono', 'JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        apple: {
+                            bg: '#f5f5f7',
+                            dark: '#000000',
+                            card: '#1d1d1f',
+                            text: '#1d1d1f',
+                            subtext: '#86868b',
+                            blue: '#0071e3',
+                            blueHover: '#0077ed'
+                        },
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            400: '#2997ff',
+                            500: '#0071e3',
+                            600: '#0071e3',
+                            700: '#005bb5',
+                            800: '#1d1d1f',
+                            900: '#0f172a',
+                            950: '#050811'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .apple-glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+        .sidebar-link {
+            transition: all 0.15s ease;
+        }
+        .sidebar-link.active {
+            background-color: #eff6ff;
+            color: #0071e3;
+            font-weight: 600;
+            border-left-color: #0071e3;
+        }
+        .code-window {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+        }
+        .code-header {
+            background: #161b22;
+            border-bottom: 1px solid #21262d;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-[#0071e3] selection:text-white">
+
+    <!-- Top Navigation Bar with Clustered Audience Dropdowns -->
+    <header class="fixed top-0 inset-x-0 z-50 apple-glass-nav h-16">
+        <div class="max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <div class="w-8 h-8 rounded-lg bg-[#0f172a] text-white flex items-center justify-center shadow-sm">
+                        <i class="ph-fill ph-shield-check text-lg text-[#2997ff]"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-base tracking-tight text-slate-900">Patchwork<span class="text-slate-400 font-normal ml-0.5">OS</span></span>
+                        <span class="ml-1.5 px-2 py-0.5 text-[10px] font-mono font-semibold bg-blue-50 text-[#0071e3] border border-blue-200 rounded-full">DOCS</span>
+                    </div>
+                </a>
+
+                <!-- Clustered Audience Dropdowns in Header -->
+                <div class="hidden xl:flex items-center space-x-1 pl-3 border-l border-slate-200">
+                    <!-- Dropdown 1: By Role / Persona -->
+                    <div class="relative group">
+                        <button type="button" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1 transition-all cursor-pointer">
+                            <i class="ph-bold ph-users-three text-[#0071e3]"></i>
+                            <span>Setup by Role</span>
+                            <i class="ph-bold ph-caret-down text-[10px] text-slate-400 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+                        <div class="hidden group-hover:block absolute left-0 top-full pt-2 w-72 z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-2 space-y-1">
+                                <div class="px-2.5 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold">Progressive Runtime Tiers</div>
+                                <a href="#persona-solo" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <span class="w-5 h-5 rounded bg-blue-600 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Solo Developer</div>
+                                        <div class="text-[11px] text-slate-500">180+ IDE tools via MCP Bridge</div>
+                                    </div>
+                                </a>
+                                <a href="#persona-power" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <span class="w-5 h-5 rounded bg-emerald-600 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Power User / Tech Lead</div>
+                                        <div class="text-[11px] text-slate-500">Governed YAML recipes &amp; <code class="font-mono">/butler</code></div>
+                                    </div>
+                                </a>
+                                <a href="#persona-vps" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <span class="w-5 h-5 rounded bg-purple-600 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Headless VPS / Cloud Ops</div>
+                                        <div class="text-[11px] text-slate-500">24/7 Ubuntu systemd, Docker &amp; PM2</div>
+                                    </div>
+                                </a>
+                                <a href="#persona-team" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <span class="w-5 h-5 rounded bg-amber-500 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Multi-Member Ops Teams</div>
+                                        <div class="text-[11px] text-slate-500">Per-member auth &amp; receipt attribution</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown 2: Ecosystem & Connectors -->
+                    <div class="relative group">
+                        <button type="button" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1 transition-all cursor-pointer">
+                            <i class="ph-bold ph-plugs-connected text-emerald-600"></i>
+                            <span>Integrations</span>
+                            <i class="ph-bold ph-caret-down text-[10px] text-slate-400 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+                        <div class="hidden group-hover:block absolute left-0 top-full pt-2 w-72 z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-2 space-y-1">
+                                <div class="px-2.5 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold">Platform &amp; Ecosystem</div>
+                                <a href="#integration-agents" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <i class="ph-bold ph-cpu text-[#0071e3] text-sm mt-0.5"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">AI Coding Agents &amp; IDEs</div>
+                                        <div class="text-[11px] text-slate-500">Claude Code, Cursor, Gemini, Windsurf</div>
+                                    </div>
+                                </a>
+                                <a href="#integration-connectors" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <i class="ph-bold ph-plugs text-emerald-600 text-sm mt-0.5"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">13+ SaaS Connectors</div>
+                                        <div class="text-[11px] text-slate-500">OAuth 2.0 &amp; headless <code class="font-mono">0600</code> config</div>
+                                    </div>
+                                </a>
+                                <a href="#integration-models" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <i class="ph-bold ph-brain text-purple-600 text-sm mt-0.5"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Model Drivers &amp; Local MLX</div>
+                                        <div class="text-[11px] text-slate-500">Subprocess, Cloud LLMs, Ollama, MLX</div>
+                                    </div>
+                                </a>
+                                <a href="#integration-webhooks" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <i class="ph-bold ph-webhooks-logo text-amber-600 text-sm mt-0.5"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Inbound Webhooks</div>
+                                        <div class="text-[11px] text-slate-500">ADR 0009 event fanout &amp; triggers</div>
+                                    </div>
+                                </a>
+                                <a href="#integration-mobile" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <i class="ph-bold ph-device-mobile-camera text-rose-600 text-sm mt-0.5"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-900">Mobile Oversight (PWA)</div>
+                                        <div class="text-[11px] text-slate-500">VAPID push &amp; remote kill switch</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown 3: Platform Views (For Finance, Leaders & IT) -->
+                    <div class="relative group">
+                        <button type="button" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1 transition-all cursor-pointer">
+                            <i class="ph-bold ph-compass text-purple-600"></i>
+                            <span>Platform &amp; Verticals</span>
+                            <i class="ph-bold ph-caret-down text-[10px] text-slate-400 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+                        <div class="hidden group-hover:block absolute left-0 top-full pt-2 w-64 z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-2 space-y-1">
+                                <a href="/#business" class="block px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-semibold text-slate-800">The Decision Layer</a>
+                                <a href="/#developers" class="block px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-semibold text-slate-800">Developer CLI &amp; VPC Architecture</a>
+                                <a href="/#industries" class="block px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-semibold text-slate-800">Industry YAML Blueprints</a>
+                                <a href="/#pricing" class="block px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-semibold text-slate-800">Pricing &amp; ROI</a>
+                                <a href="/#support" class="block px-3 py-2 rounded-xl hover:bg-slate-50 text-xs font-semibold text-emerald-700">24/7 Support Center (99.999% SLA)</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Search Filter -->
+            <div class="flex-1 max-w-md hidden sm:block">
+                <div class="relative">
+                    <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input
+                        id="doc-search"
+                        type="text"
+                        oninput="filterDocSections(this.value)"
+                        placeholder="Filter documentation (e.g. MCP, Docker, OAuth, MLX, VAPID)..."
+                        class="w-full pl-9 pr-14 py-1.5 text-xs bg-slate-100/90 hover:bg-slate-100 focus:bg-white rounded-full border border-slate-200/80 focus:border-[#0071e3] focus:ring-2 focus:ring-blue-500/15 outline-none transition-all text-slate-800"
+                    >
+                    <kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200">/</kbd>
+                </div>
+            </div>
+
+            <!-- Right Links -->
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="https://github.com/Oolab-labs/patchwork-os" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-full shadow-xs transition-all">
+                    <i class="ph-bold ph-github-logo text-sm"></i>
+                    <span class="hidden sm:inline">GitHub</span>
+                </a>
+                <a href="/account" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-[#0071e3] hover:bg-[#0077ed] rounded-full shadow-xs transition-all">
+                    <i class="ph-bold ph-user-circle text-sm"></i>
+                    <span>Portal</span>
+                </a>
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100" aria-label="Toggle Docs Navigation">
+                    <i id="mobile-sidebar-icon" class="ph-bold ph-list text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout Grid -->
+    <div class="max-w-[1440px] w-full mx-auto flex-1 pt-16 flex relative">
+
+        <!-- Left Sticky Sidebar Navigation with Collapsible Audience Clusters -->
+        <aside id="docs-sidebar" class="fixed lg:sticky top-16 left-0 z-40 w-72 h-[calc(100vh-4rem)] bg-white lg:bg-transparent border-r border-slate-200/80 overflow-y-auto p-5 transition-transform -translate-x-full lg:translate-x-0 shrink-0">
+            <div class="space-y-5">
+                <!-- Quick Persona Switcher CTA -->
+                <div class="p-3.5 rounded-2xl bg-slate-900 text-white shadow-md">
+                    <div class="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-blue-400 mb-1">
+                        <span>Quick Install</span>
+                        <span class="px-1.5 py-0.2 bg-blue-500/20 rounded text-[10px]">@beta</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 bg-black/50 px-2.5 py-2 rounded-lg border border-white/10 font-mono text-[11px] text-emerald-300">
+                        <span class="truncate">npx patchwork-os@beta init</span>
+                        <button onclick="copyText('npx patchwork-os@beta init', this)" class="text-slate-400 hover:text-white shrink-0" title="Copy command">
+                            <i class="ph-bold ph-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Collapsible Cluster 1: Part 1 Navigation -->
+                <div>
+                    <button type="button" onclick="toggleSidebarCluster('side-part1')" class="w-full flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 px-2 mb-2 cursor-pointer">
+                        <span class="flex items-center gap-1.5"><i class="ph-fill ph-users-three text-[#0071e3]"></i> Part 1: Setup by Persona</span>
+                        <i id="icon-side-part1" class="ph-bold ph-caret-down text-xs transition-transform"></i>
+                    </button>
+                    <nav id="side-part1" class="space-y-0.5 border-l border-slate-200 ml-2">
+                        <a href="#overview" class="sidebar-link active block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            Progressive Adoption Model
+                        </a>
+                        <a href="#persona-solo" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            1. Solo Developer (MCP Bridge)
+                        </a>
+                        <a href="#persona-power" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            2. Power User / Tech Lead
+                        </a>
+                        <a href="#persona-vps" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            3. Headless VPS / Cloud Operator
+                        </a>
+                        <a href="#persona-team" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            4. Multi-Member Ops Teams
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Collapsible Cluster 2: Part 2 Navigation -->
+                <div>
+                    <button type="button" onclick="toggleSidebarCluster('side-part2')" class="w-full flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 px-2 mb-2 cursor-pointer">
+                        <span class="flex items-center gap-1.5"><i class="ph-fill ph-plugs-connected text-emerald-600"></i> Part 2: Integrations</span>
+                        <i id="icon-side-part2" class="ph-bold ph-caret-down text-xs transition-transform"></i>
+                    </button>
+                    <nav id="side-part2" class="space-y-0.5 border-l border-slate-200 ml-2">
+                        <a href="#integration-agents" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            1. AI Coding Agents & IDEs
+                        </a>
+                        <a href="#integration-connectors" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            2. SaaS Platform Connectors
+                        </a>
+                        <a href="#integration-models" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            3. Model Driver Integrations
+                        </a>
+                        <a href="#integration-webhooks" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            4. Inbound Webhooks & Fanout
+                        </a>
+                        <a href="#integration-mobile" class="sidebar-link block pl-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border-l-2 border-transparent -ml-[1px]">
+                            5. Mobile Oversight & PWA Push
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Reference Links -->
+                <div class="pt-4 border-t border-slate-200/80">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
+                        Architecture & ADRs
+                    </div>
+                    <div class="space-y-1 text-xs px-3">
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Webhook Fanout</span>
+                            <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">ADR 0009</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Cost-Aware Routing</span>
+                            <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">ADR 0015</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Decision Receipts</span>
+                            <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">ADR 0017</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Per-Member Auth</span>
+                            <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">ADR 0020/21</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Field Data Labels</span>
+                            <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">ADR 0024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Documentation Content -->
+        <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 sm:py-12 max-w-5xl">
+
+            <!-- Hero Header -->
+            <section id="overview" class="doc-section mb-14">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0071e3] text-xs font-semibold mb-4">
+                    <i class="ph-fill ph-book-open-text"></i>
+                    <span>Developer & Operator Reference Manual</span>
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
+                    Patchwork OS Runtime & Ecosystem Guide
+                </h1>
+                <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mb-8">
+                    Comprehensive developer and operator documentation for <strong>Patchwork OS</strong> (<code class="px-1.5 py-0.5 rounded bg-slate-200/70 font-mono text-sm text-slate-800">Oolab-labs/patchwork-os</code>), covering how to set up the runtime across different user personas and how to integrate it with IDEs, AI agents, third-party SaaS connectors, and mobile oversight.
+                </p>
+
+                <!-- Interactive Persona Matrix Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <a href="#persona-solo" class="group p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-[#0071e3] transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#0071e3] flex items-center justify-center mb-3 group-hover:bg-[#0071e3] group-hover:text-white transition-colors">
+                            <i class="ph-bold ph-terminal-window text-lg"></i>
+                        </div>
+                        <div class="text-[11px] font-mono uppercase text-slate-400 font-semibold">Tier 1</div>
+                        <div class="font-bold text-sm text-slate-900 mt-0.5">Solo Developer</div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">180+ real IDE tools via MCP bridge without daemon overhead.</p>
+                    </a>
+
+                    <a href="#persona-power" class="group p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-[#0071e3] transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <i class="ph-bold ph-gauge text-lg"></i>
+                        </div>
+                        <div class="text-[11px] font-mono uppercase text-slate-400 font-semibold">Tier 2</div>
+                        <div class="font-bold text-sm text-slate-900 mt-0.5">Power User / Lead</div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Full governed runtime, YAML recipes, approval gates &amp; Butler UI.</p>
+                    </a>
+
+                    <a href="#persona-vps" class="group p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-[#0071e3] transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="ph-bold ph-cloud-check text-lg"></i>
+                        </div>
+                        <div class="text-[11px] font-mono uppercase text-slate-400 font-semibold">Tier 3</div>
+                        <div class="font-bold text-sm text-slate-900 mt-0.5">Headless VPS Ops</div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">24/7 Ubuntu systemd, Docker Compose, or PM2 daemon deployment.</p>
+                    </a>
+
+                    <a href="#persona-team" class="group p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-[#0071e3] transition-all">
+                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                            <i class="ph-bold ph-shield-star text-lg"></i>
+                        </div>
+                        <div class="text-[11px] font-mono uppercase text-slate-400 font-semibold">Tier 4</div>
+                        <div class="font-bold text-sm text-slate-900 mt-0.5">Multi-Member Teams</div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">Per-member auth, cryptographic receipts &amp; strict data boundaries.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- ========================================================== -->
+            <!-- PART 1: SETTING UP PATCHWORK OS BY USER TYPE               -->
+            <!-- ========================================================== -->
+            <div class="mb-8 pb-4 border-b border-slate-200">
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-[#0071e3]">Part 1</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Setting Up Patchwork OS by User Type</h2>
+                <p class="text-sm sm:text-base text-slate-600 mt-1">
+                    Patchwork OS is designed around progressive adoption—from a single developer wiring an IDE to an autonomous, governed multi-member ops deployment.
+                </p>
+            </div>
+
+            <!-- 1. Solo Developer -->
+            <section id="persona-solo" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white font-mono font-bold text-sm flex items-center justify-center">1</span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Solo Developer (MCP IDE Bridge Only)</h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            Compat / Ungated Mode
+                        </span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-sm text-slate-700 mb-6">
+                        <strong class="text-slate-900">Use Case:</strong> You want to give Claude Code, Cursor, Windsurf, or Gemini CLI access to <strong>180+ real IDE tools</strong> (LSP symbol navigation, diagnostics, test runners, and debugger evaluation) without running background recipes or the web dashboard.
+                    </div>
+
+                    <div class="code-window mb-6">
+                        <div class="code-header">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                                <span class="text-xs font-mono text-slate-400 ml-2">bash — Solo IDE Bridge Setup</span>
+                            </div>
+                            <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 sm:p-5 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-slate-500"># 1. Install the binary globally</span>
+npm install -g patchwork-os@beta
+
+<span class="text-slate-500"># 2. Install the VS Code / Cursor / Windsurf companion extension</span>
+claude-ide-bridge install-extension
+
+<span class="text-slate-500"># 3. Start the bridge in your project workspace (compat/ungated mode)</span>
+patchwork --workspace . --no-dashboard
+
+<span class="text-slate-500"># 4. In a second terminal, connect Claude Code to the bridge</span>
+export CLAUDE_CODE_IDE_SKIP_VALID_CHECK=true
+claude --ide</code></pre>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs sm:text-sm text-emerald-950">
+                        <i class="ph-fill ph-check-circle text-emerald-600 text-lg shrink-0 mt-0.5"></i>
+                        <div>
+                            <strong>Verification:</strong> Run <code class="px-1.5 py-0.5 bg-white rounded border border-emerald-200 font-mono text-xs">/mcp</code> inside Claude Code or check <code class="px-1.5 py-0.5 bg-white rounded border border-emerald-200 font-mono text-xs">~/.claude/ide/</code> for the active lockfile (<code class="px-1.5 py-0.5 bg-white rounded border border-emerald-200 font-mono text-xs">isBridge: true</code>).
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Power User / Tech Lead -->
+            <section id="persona-power" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-mono font-bold text-sm flex items-center justify-center">2</span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Power User / Tech Lead (Full Local Governed Runtime + Butler UI)</h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Governed Profile
+                        </span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-sm text-slate-700 mb-6">
+                        <strong class="text-slate-900">Use Case:</strong> You want scheduled and event-driven YAML recipes (<code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">morning-brief</code>, <code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">incident-to-pr</code>, <code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">daily-status</code>), the blast-radius approval gate, earned worker autonomy, and the local Next.js dashboard (including the simplified <code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">/butler</code> interface).
+                    </div>
+
+                    <div class="code-window mb-6">
+                        <div class="code-header">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                                <span class="text-xs font-mono text-slate-400 ml-2">bash — Governed Local Runtime</span>
+                            </div>
+                            <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 sm:p-5 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-slate-500"># 1. Scaffold ~/.patchwork, seed starter recipes, and enable "governed" profile</span>
+npx patchwork-os@beta init
+
+<span class="text-slate-500"># 2. Smoke-test the runtime with zero external credentials required</span>
+patchwork recipe run daily-status
+
+<span class="text-slate-500"># 3. Launch the bridge + recipe daemon + local web dashboard</span>
+patchwork start</code></pre>
+                    </div>
+
+                    <h4 class="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-3">Interfaces Available</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-slate-900">Full Operator Dashboard</span>
+                                <i class="ph-bold ph-layout text-[#0071e3]"></i>
+                            </div>
+                            <code class="text-xs font-mono text-[#0071e3] bg-blue-50 px-2 py-0.5 rounded block w-fit mb-2">http://localhost:3200</code>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Recipes, Approvals, Workers, Decision Receipts, Replay Debugger, and Marketplace.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-slate-900">Butler Mode</span>
+                                <i class="ph-bold ph-sparkle text-amber-500"></i>
+                            </div>
+                            <code class="text-xs font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded block w-fit mb-2">http://localhost:3200/butler</code>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Streamlined, high-signal executive home view for non-technical or busy operators to review pending approvals, inbox digests, and worker status at a glance.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-slate-900">Interactive Terminal UI (TUI)</span>
+                                <i class="ph-bold ph-terminal text-purple-600"></i>
+                            </div>
+                            <code class="text-xs font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded block w-fit mb-2">patchwork</code>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Run <code class="font-mono">patchwork</code> with no arguments in any terminal for real-time keyboard-driven oversight.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Headless VPS / Always-On Cloud Operator -->
+            <section id="persona-vps" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-purple-600 text-white font-mono font-bold text-sm flex items-center justify-center">3</span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Headless VPS / Always-On Cloud Operator (Ubuntu / Docker / PM2)</h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                            24/7 Daemon Mode
+                        </span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-sm text-slate-700 mb-6">
+                        <strong class="text-slate-900">Use Case:</strong> Running Patchwork OS 24/7 on a remote Ubuntu VPS so webhooks, cron recipes, and mobile push approvals work even when your laptop is closed.
+                    </div>
+
+                    <!-- Option Tabs -->
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-slate-900 text-white font-mono text-xs rounded">Option A</span>
+                                <span>Native Systemd / Bootstrap Script (<code class="font-mono text-xs text-[#0071e3]">deploy/</code>)</span>
+                            </h4>
+                            <p class="text-xs text-slate-600 mb-3">The repository includes turnkey provisioning scripts in <code class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">deploy/</code>:</p>
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs font-mono text-slate-400">bash — Ubuntu 22.04 / 24.04 VPS Bootstrapper</span>
+                                    <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                        <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre class="p-4 sm:p-5 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-slate-500"># On a fresh Ubuntu 22.04/24.04 VPS:</span>
+git clone https://github.com/Oolab-labs/patchwork-os.git
+cd patchwork-os
+
+<span class="text-slate-500"># 1. Run the VPS bootstrapper (installs Node, Nginx, Certbot, and sets up env)</span>
+sudo bash deploy/bootstrap-new-vps.sh
+
+<span class="text-slate-500"># 2. Copy and configure your VPS environment variables</span>
+cp .env.vps.example ~/.patchwork/.env
+nano ~/.patchwork/.env
+
+<span class="text-slate-500"># 3. Install the systemd units (claude-ide-bridge@.service + dashboard)</span>
+sudo bash deploy/install-vps-service.sh</code></pre>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2.5">
+                                <i class="ph-bold ph-info text-[#0071e3]"></i> <strong>Note:</strong> You can also manage the processes via PM2 using <code class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">deploy/ecosystem.config.js.example</code> or macOS LaunchAgents via <code class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">deploy/macos/install-mac-bridge.sh</code>.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white font-mono text-xs rounded">Option B</span>
+                                <span>Docker Compose</span>
+                            </h4>
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs font-mono text-slate-400">bash — Containerized Deployment</span>
+                                    <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                        <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre class="p-4 sm:p-5 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code>cp .env.vps.example .env
+docker compose up -d --build</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Multi-Member Engineering & Ops Teams -->
+            <section id="persona-team" class="doc-section mb-16 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-amber-500 text-white font-mono font-bold text-sm flex items-center justify-center">4</span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Multi-Member Engineering & Ops Teams (Per-Member Auth & Boundaries)</h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            ADRs 0017, 0020, 0021, 0024
+                        </span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-sm text-slate-700 mb-6">
+                        <strong class="text-slate-900">Use Case:</strong> Multiple team members sharing a hosted/VPS Patchwork OS instance with individual accountability on decision receipts, per-member sessions, and data boundaries (ADRs 0020 &amp; 0021).
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="text-xs font-mono font-bold text-[#0071e3] uppercase mb-1">Step 1 • Roster</div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Configure Team Roster (<code class="font-mono text-xs">~/.patchwork/config.json</code>)</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Define member accounts and roles in your runtime configuration so each operator logs in with their own identity rather than a shared admin token.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="text-xs font-mono font-bold text-emerald-600 uppercase mb-1">Step 2 • ADR 0017</div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Actor Attribution on Receipts</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                When an operator approves or rejects a gated action in <code class="font-mono bg-white px-1 py-0.5 rounded border">/approvals</code>, the durable decision receipt (<code class="font-mono bg-white px-1 py-0.5 rounded border">~/.patchwork/receipts/</code>) cryptographically records the specific <code class="font-mono text-emerald-700">memberId</code> who authorized the blast radius.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="text-xs font-mono font-bold text-purple-600 uppercase mb-1">Step 3 • ADR 0024</div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Information & Control Boundaries</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Configure worker boundaries (<code class="font-mono bg-white px-1 py-0.5 rounded border">/workers</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border">automation-policy.json</code>) to enforce field-level data labels and strict forbidden tool lists that cannot be overridden even by human approvers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================== -->
+            <!-- PART 2: PLATFORM & ECOSYSTEM INTEGRATIONS                  -->
+            <!-- ========================================================== -->
+            <div class="mb-8 pb-4 border-b border-slate-200">
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-emerald-600">Part 2</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Platform & Ecosystem Integrations</h2>
+                <p class="text-sm sm:text-base text-slate-600 mt-1">
+                    Connect Patchwork OS across AI coding clients, 13+ first-party SaaS platforms, cloud &amp; local Apple Silicon model drivers, inbound webhooks, and mobile VAPID push oversight.
+                </p>
+            </div>
+
+            <!-- 1. AI Coding Agents & IDEs (MCP Integration) -->
+            <section id="integration-agents" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#0071e3] flex items-center justify-center">
+                            <i class="ph-bold ph-cpu text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">1. AI Coding Agents & IDEs (MCP Integration)</h3>
+                            <p class="text-xs sm:text-sm text-slate-500">Patchwork OS acts as a universal <strong>Model Context Protocol (MCP)</strong> server and governance proxy (<code class="font-mono text-xs">PreToolUse</code> hook) across major AI clients.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-200">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                                    <th class="py-3.5 px-4 font-bold w-1/4">Client / Platform</th>
+                                    <th class="py-3.5 px-4 font-bold w-1/4">Integration File / Method</th>
+                                    <th class="py-3.5 px-4 font-bold">Setup Command / Configuration</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr class="hover:bg-slate-50/60">
+                                    <td class="py-4 px-4 font-bold text-slate-900">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-fill ph-terminal-window text-[#0071e3] text-base"></i>
+                                            <span>Claude Code CLI</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 font-mono text-xs text-slate-700">
+                                        <code>~/.claude/settings.json</code> + <code>.claude-plugin</code>
+                                    </td>
+                                    <td class="py-4 px-4 text-slate-600 leading-relaxed">
+                                        <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">patchwork-os init</code> automatically registers the <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">PreToolUse</code> approval hook (<code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">claude-ide-bridge-plugin/scripts/pre-tool-use.sh</code>) so write-tier tools pause for approval.
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/60">
+                                    <td class="py-4 px-4 font-bold text-slate-900">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-fill ph-cursor-click text-purple-600 text-base"></i>
+                                            <span>Cursor</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 font-mono text-xs text-slate-700">
+                                        <code>.cursor/mcp.json</code> &amp; <code>.cursorrules</code>
+                                    </td>
+                                    <td class="py-4 px-4 text-slate-600 leading-relaxed">
+                                        Point Cursor's MCP settings to the local bridge SSE/WebSocket endpoint (<code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">http://localhost:3200/api/bridge</code>) and install the <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">.vsix</code> companion extension.
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/60">
+                                    <td class="py-4 px-4 font-bold text-slate-900">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-fill ph-sparkle text-emerald-600 text-base"></i>
+                                            <span>Gemini CLI</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 font-mono text-xs text-slate-700">
+                                        <code>.gemini/settings.json</code>
+                                    </td>
+                                    <td class="py-4 px-4 text-slate-600 leading-relaxed">
+                                        Pre-configured in <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">.gemini/settings.json</code> at the repo root to connect directly to the Patchwork MCP server.
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/60">
+                                    <td class="py-4 px-4 font-bold text-slate-900">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-fill ph-code-block text-amber-600 text-base"></i>
+                                            <span>Windsurf / Antigravity / VS Code</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 font-mono text-xs text-slate-700">
+                                        Companion Extension + MCP
+                                    </td>
+                                    <td class="py-4 px-4 text-slate-600 leading-relaxed">
+                                        Run <code class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-800">claude-ide-bridge install-extension</code> to load the IDE extension that exposes live LSP, diagnostics, and debug sessions to the bridge.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. SaaS Platform Connectors -->
+            <section id="integration-connectors" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <i class="ph-bold ph-plugs text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-bold text-slate-900">2. SaaS Platform Connectors (OAuth 2.0 & API Keys)</h3>
+                                <p class="text-xs sm:text-sm text-slate-500">Ships with 13+ first-party platform connectors (visible in <code class="font-mono text-xs">/connections</code> and <code class="font-mono text-xs">dashboard/public/connectors/</code>).</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            0600 Local Key Storage
+                        </span>
+                    </div>
+
+                    <!-- Supported Platforms Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                                <i class="ph-bold ph-git-pull-request text-[#0071e3]"></i> Engineering & Incident
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">github</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">gitlab</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">linear</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">jira</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">sentry</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                                <i class="ph-bold ph-chats-circle text-emerald-600"></i> Communication
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">slack</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">discord</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">gmail</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                                <i class="ph-bold ph-files text-purple-600"></i> Knowledge & Workspace
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">notion</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">confluence</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">google-drive</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">google-calendar</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                                <i class="ph-bold ph-briefcase text-amber-600"></i> CRM & Project Ops
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">hubspot</span>
+                                <span class="px-2 py-0.5 bg-white border border-slate-200 rounded font-mono text-xs text-slate-700">asana</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Methods -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Method A -->
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50">
+                            <div class="text-xs font-mono font-bold uppercase text-[#0071e3] mb-1">Method A</div>
+                            <h4 class="font-bold text-base text-slate-900 mb-3">Via the Web Dashboard (OAuth 2.0 Flow)</h4>
+                            <ol class="space-y-2.5 text-xs sm:text-sm text-slate-600 list-decimal list-inside">
+                                <li>Navigate to <code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border text-slate-800">http://localhost:3200/connections</code>.</li>
+                                <li>Click <strong>Add Connection</strong> (<code class="font-mono text-xs">AddConnectionModal</code>) and select your platform (e.g., GitHub, Slack, Linear, Google Calendar).</li>
+                                <li>The dashboard routes through <code class="font-mono text-xs bg-white px-1 py-0.5 rounded border">/api/connections/[connector]/auth</code> → provider OAuth screen → <code class="font-mono text-xs bg-white px-1 py-0.5 rounded border">/api/connections/[connector]/callback</code>.</li>
+                                <li>Credentials are stored locally with <code class="font-mono text-xs bg-emerald-50 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-200">0600</code> permissions inside <code class="font-mono text-xs">~/.patchwork/config.json</code> (never synced to an external cloud).</li>
+                                <li>Click <strong>Test Connection</strong> (<code class="font-mono text-xs">/api/connections/[connector]/test</code>) or check the <strong>Connector Health Panel</strong> to verify token scopes.</li>
+                            </ol>
+                        </div>
+
+                        <!-- Method B -->
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-xs font-mono font-bold uppercase text-emerald-600 mb-1">Method B</div>
+                                <h4 class="font-bold text-base text-slate-900 mb-1">Via Headless CLI / Config (<code class="font-mono text-xs">~/.patchwork/config.json</code>)</h4>
+                                <p class="text-xs text-slate-600">For headless servers or PAT/API-key authentication, inspect required scopes or add credentials directly:</p>
+                            </div>
+
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs font-mono text-slate-400">bash — Recipe Preflight Check</span>
+                                    <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                        <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto"><code><span class="text-slate-500"># Inspect which connectors and environment variables a recipe requires</span>
+patchwork recipe preflight ~/.patchwork/recipes/morning-brief.yaml</code></pre>
+                            </div>
+
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs font-mono text-slate-400">json — ~/.patchwork/config.json</span>
+                                    <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                        <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code>{
+  "profile": "governed",
+  "connectors": {
+    "github": { "token": "ghp_your_personal_access_token" },
+    "linear": { "apiKey": "lin_api_your_key" },
+    "slack": { "botToken": "xoxb-your-bot-token", "signingSecret": "..." },
+    "sentry": { "authToken": "sntrys_...", "org": "your-org" }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Model Driver Integrations -->
+            <section id="integration-models" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                                <i class="ph-bold ph-brain text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-bold text-slate-900">3. Model Driver Integrations (Cloud LLMs, Subprocess & Local Apple Silicon)</h3>
+                                <p class="text-xs sm:text-sm text-slate-500">Patchwork OS decouples <strong>recipes</strong> from the underlying <strong>model provider</strong> and supports cost-aware routing (ADR 0015).</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                            ADR 0015 Cost-Aware Routing
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono font-bold uppercase text-[#0071e3]">Zero-API-Key</span>
+                                <i class="ph-bold ph-terminal-window text-slate-400"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Subprocess Driver (<code class="font-mono text-xs">--driver subprocess</code>)</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Piggybacks on your existing authenticated local <code class="font-mono bg-white px-1 py-0.5 rounded border">claude</code> CLI subscription—no separate API key required.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono font-bold uppercase text-emerald-600">Multi-Cloud</span>
+                                <i class="ph-bold ph-cloud text-slate-400"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Cloud Model Drivers</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Configure <code class="font-mono bg-white px-1 py-0.5 rounded border">ANTHROPIC_API_KEY</code> (Claude Opus/Sonnet/Haiku), <code class="font-mono bg-white px-1 py-0.5 rounded border">OPENAI_API_KEY</code>, <code class="font-mono bg-white px-1 py-0.5 rounded border">GEMINI_API_KEY</code>, or <code class="font-mono bg-white px-1 py-0.5 rounded border">XAI_API_KEY</code> in <code class="font-mono text-xs">~/.patchwork/config.json</code>.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono font-bold uppercase text-purple-600">Air-Gapped Local</span>
+                                <i class="ph-bold ph-cpu text-slate-400"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">Ollama & Apple Silicon MLX</h4>
+                            <ul class="text-xs text-slate-600 space-y-1.5 leading-relaxed">
+                                <li><strong>Ollama:</strong> Point worker driver to <code class="font-mono bg-white px-1 py-0.5 rounded border">ollama/&lt;model-name&gt;</code> (<code class="font-mono">http://localhost:11434</code>).</li>
+                                <li><strong>Native MLX (<code class="font-mono">docs/mlx-integration.md</code>):</strong> Local MLX inference on macOS Apple Silicon for zero-egress recipe steps and counterfactual simulations.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Inbound Webhooks & Event Fanout -->
+            <section id="integration-webhooks" class="doc-section mb-14 scroll-mt-24">
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                <i class="ph-bold ph-webhooks-logo text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-bold text-slate-900">4. Inbound Webhooks & Event Fanout</h3>
+                                <p class="text-xs sm:text-sm text-slate-500">Trigger recipes automatically from external platforms (GitHub PRs, Sentry alerts, Linear updates, Slack events).</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            ADR 0009 Fanout Receiver
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mt-4">
+                        <div class="lg:col-span-7 space-y-3 text-xs sm:text-sm text-slate-600">
+                            <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                                <div>
+                                    Expose your Patchwork bridge endpoint via Nginx (<code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">deploy/nginx-claude-bridge.conf.template</code>) or a secure tunnel (<code class="font-mono text-xs bg-white px-1.5 py-0.5 rounded border">deploy/macos/com.patchwork.tunnel.plist.template</code>).
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                                <div>
+                                    Point the external service's webhook URL to your Patchwork webhook fanout receiver (<strong>ADR 0009</strong>).
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                                <div>
+                                    Bind the event trigger inside your declarative recipe YAML.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5">
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs font-mono text-slate-400">yaml — Recipe Webhook Trigger</span>
+                                    <button onclick="copyCodeBlock(this)" class="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/10 transition-colors">
+                                        <i class="ph-bold ph-copy"></i> <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre class="p-4 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code>triggers:
+  - type: webhook
+    source: github
+    event: pull_request.opened</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Mobile Oversight & PWA Push Notifications -->
+            <section id="integration-mobile" class="doc-section mb-16 scroll-mt-24">
+                <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center">
+                                <i class="ph-bold ph-device-mobile-camera text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-bold">5. Mobile Oversight & PWA Push Notifications</h3>
+                                <p class="text-xs sm:text-sm text-slate-400">Approve or halt high-blast-radius agent actions from your phone using Web Push (VAPID) and the Progressive Web App (<code class="font-mono text-xs text-blue-300">docs/mobile-oversight.md</code>).</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-red-500/20 text-red-300 border border-red-500/30 flex items-center gap-1.5">
+                            <i class="ph-fill ph-warning-octagon"></i> Remote Kill Switch Ready
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="text-xs font-mono text-blue-400 font-bold mb-1">Step 01</div>
+                            <div class="font-bold text-sm mb-1">Open Dashboard URL</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Access your Patchwork Dashboard on mobile via Tailscale, Cloudflare Tunnel, or your Nginx HTTPS domain.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="text-xs font-mono text-blue-400 font-bold mb-1">Step 02</div>
+                            <div class="font-bold text-sm mb-1">Install PWA</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Tap <strong>Install App / Add to Home Screen</strong> (powered by <code class="font-mono text-[11px] text-blue-300">manifest.json</code> and <code class="font-mono text-[11px] text-blue-300">sw.js</code>).
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="text-xs font-mono text-blue-400 font-bold mb-1">Step 03</div>
+                            <div class="font-bold text-sm mb-1">Enable Push</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Go to <strong>Settings → Mobile Oversight</strong> (<code class="font-mono text-[11px] text-blue-300">MobileSection.tsx</code>) and toggle <strong>Enable Push Notifications</strong>.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="text-xs font-mono text-blue-400 font-bold mb-1">Step 04</div>
+                            <div class="font-bold text-sm mb-1">VAPID Handshake</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Registers device against <code class="font-mono text-[11px] text-emerald-300">/api/push/subscribe</code> using local VAPID keys (<code class="font-mono text-[11px] text-emerald-300">/api/push/vapid-key</code>).
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="text-xs font-mono text-emerald-400 font-bold mb-1">Step 05</div>
+                            <div class="font-bold text-sm mb-1">Test & Verify</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Click <strong>Send Test Notification</strong> (<code class="font-mono text-[11px] text-emerald-300">/api/push/test</code>). Risky steps link straight to <code class="font-mono text-[11px] text-amber-300">/approvals/[callId]</code> with <strong>Emergency Kill Switch</strong> (<code class="font-mono text-[11px] text-red-300">/api/relay/halt</code>).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer Navigation -->
+            <footer class="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-shield-check text-[#0071e3] text-base"></i>
+                    <span><strong>Patchwork OS</strong> — Local-First AI Runtime &amp; Decision Layer</span>
+                </div>
+                <div class="flex items-center gap-5">
+                    <a href="/" class="hover:text-slate-900">Home</a>
+                    <a href="/#developers" class="hover:text-slate-900">Developer CLI</a>
+                    <a href="/#pricing" class="hover:text-slate-900">Pricing</a>
+                    <a href="/account" class="hover:text-slate-900">Customer Portal</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        function copyCodeBlock(btn) {
+            const pre = btn.closest('.code-window').querySelector('pre');
+            if (!pre) return;
+            navigator.clipboard.writeText(pre.innerText).then(() => {
+                const span = btn.querySelector('span');
+                const orig = span.textContent;
+                span.textContent = 'Copied!';
+                btn.classList.add('text-emerald-400');
+                setTimeout(() => {
+                    span.textContent = orig;
+                    btn.classList.remove('text-emerald-400');
+                }, 1800);
+            });
+        }
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = btn.querySelector('i');
+                icon.className = 'ph-bold ph-check text-emerald-400';
+                setTimeout(() => {
+                    icon.className = 'ph-bold ph-copy';
+                }, 1600);
+            });
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('docs-sidebar');
+            const icon = document.getElementById('mobile-sidebar-icon');
+            sidebar.classList.toggle('-translate-x-full');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                icon.className = 'ph-bold ph-list text-xl';
+            } else {
+                icon.className = 'ph-bold ph-x text-xl';
+            }
+        }
+
+        function toggleSidebarCluster(clusterId) {
+            const nav = document.getElementById(clusterId);
+            const icon = document.getElementById('icon-' + clusterId);
+            if (!nav) return;
+            nav.classList.toggle('hidden');
+            if (icon) {
+                icon.style.transform = nav.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        }
+
+        function filterDocSections(query) {
+            const q = (query || '').toLowerCase().trim();
+            document.querySelectorAll('.doc-section').forEach(sec => {
+                if (!q || sec.innerText.toLowerCase().includes(q)) {
+                    sec.style.display = '';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+        }
+
+        // Keyboard shortcut '/' for search focus
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                const search = document.getElementById('doc-search');
+                if (search) search.focus();
+            }
+        });
+
+        // Active sidebar scroll spy
+        const sections = document.querySelectorAll('.doc-section');
+        const navLinks = document.querySelectorAll('.sidebar-link');
+        window.addEventListener('scroll', () => {
+            let current = 'overview';
+            sections.forEach(sec => {
+                const top = sec.offsetTop - 120;
+                if (window.scrollY >= top) {
+                    current = sec.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

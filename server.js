@@ -14,6 +14,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -35,6 +36,12 @@ const PAYSTACK_API = 'https://api.paystack.co';
 
 if (process.env.PAYSTACK_GROWTH_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='growth'").run(process.env.PAYSTACK_GROWTH_PLAN_CODE);
 if (process.env.PAYSTACK_ENTERPRISE_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='enterprise'").run(process.env.PAYSTACK_ENTERPRISE_PLAN_CODE);
+
+const DASHBOARD_SESSION_SECRET = process.env.DASHBOARD_SESSION_SECRET || 'f0d97253e5c3c8b14a795f98a978a42b636e25d50e48d3bc65fc5cd005d72e24';
+const DASHBOARD_SESSION_COOKIE_NAME = 'patchwork_session';
+const DASHBOARD_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const PATCHWORK_DASHBOARD_URL = process.env.PATCHWORK_DASHBOARD_URL || 'http://127.0.0.1:3200';
+const SECUSTAR_URL = process.env.SECUSTAR_URL || 'http://127.0.0.1:3001';
 
 if (!JWT_SECRET) {
   console.error('[FATAL] JWT_SECRET must be configured in production.');
@@ -81,12 +88,122 @@ function issueRefreshToken(userId) {
     .run(id('rt'), userId, hash(token), new Date(Date.now() + REFRESH_TOKEN_DAYS * 86400000).toISOString());
   return token;
 }
+function parseCookies(req) {
+  const list = {};
+  const rc = req.headers.cookie;
+  if (!rc) return list;
+  rc.split(';').forEach((cookie) => {
+    const parts = cookie.split('=');
+    const name = parts.shift().trim();
+    if (name) {
+      list[name] = decodeURIComponent(parts.join('='));
+    }
+  });
+  return list;
+}
+
+function signDashboardSessionCookie(user) {
+  const memberId = `user_${user.id}`;
+  const expiresAt = Date.now() + DASHBOARD_SESSION_TTL_MS;
+  const payload = `v2.${memberId}.${expiresAt}`;
+  const hmac = crypto.createHmac('sha256', DASHBOARD_SESSION_SECRET).update(payload).digest('base64url');
+  return `${payload}.${hmac}`;
+}
+
+function verifyDashboardSessionCookie(cookieValue) {
+  if (!cookieValue || typeof cookieValue !== 'string') return null;
+  const parts = cookieValue.split('.');
+  if (parts.length === 4 && parts[0] === 'v2') {
+    const memberId = parts[1];
+    const expiresAt = parseInt(parts[2], 10);
+    const sig = parts[3];
+    if (Date.now() > expiresAt) return null;
+    const payload = `v2.${memberId}.${parts[2]}`;
+    const expectedSig = crypto.createHmac('sha256', DASHBOARD_SESSION_SECRET).update(payload).digest('base64url');
+    try {
+      if (crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) {
+        const match = memberId.match(/^user_(\d+)$/);
+        return match ? parseInt(match[1], 10) : memberId;
+      }
+    } catch (_) {}
+  }
+  return null;
+}
+
+function setDashboardSessionCookie(res, user) {
+  const cookieValue = signDashboardSessionCookie(user);
+  const maxAgeSec = Math.floor(DASHBOARD_SESSION_TTL_MS / 1000);
+  const isProd = process.env.NODE_ENV === 'production';
+  const cookieHeader = `${DASHBOARD_SESSION_COOKIE_NAME}=${cookieValue}; Path=/; Max-Age=${maxAgeSec}; HttpOnly; SameSite=Lax${isProd ? '; Secure' : ''}`;
+  res.setHeader('Set-Cookie', cookieHeader);
+}
+
+function clearDashboardSessionCookie(res) {
+  const isProd = process.env.NODE_ENV === 'production';
+  const cookieHeader = `${DASHBOARD_SESSION_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${isProd ? '; Secure' : ''}`;
+  res.setHeader('Set-Cookie', cookieHeader);
+}
+
+function syncRosterToPatchworkHome() {
+  try {
+    const os = require('os');
+    const patchworkHome = process.env.PATCHWORK_HOME?.trim() || path.join(os.homedir(), '.patchwork');
+    if (!fs.existsSync(patchworkHome)) {
+      fs.mkdirSync(patchworkHome, { recursive: true });
+    }
+    const membersPath = path.join(patchworkHome, 'members.json');
+    const members = db.prepare(`
+      SELECT u.id, u.name, u.email, om.role, om.org_id, u.is_superadmin
+      FROM users u
+      LEFT JOIN organization_members om ON om.user_id = u.id
+      ORDER BY u.id ASC
+    `).all();
+
+    const roleMap = {
+      owner: ['owner', 'admin', 'approver'],
+      admin: ['admin', 'approver'],
+      member: ['operator', 'approver'],
+      viewer: ['auditor']
+    };
+
+    const rosterList = members.map(m => {
+      const assignedRoles = m.is_superadmin ? ['owner', 'admin', 'approver'] : (roleMap[m.role] || ['operator', 'approver']);
+      return {
+        id: `user_${m.id}`,
+        displayName: m.name || m.email,
+        kind: 'human',
+        roles: assignedRoles,
+        email: m.email,
+        active: true
+      };
+    });
+
+    if (rosterList.length === 0) {
+      rosterList.push({
+        id: 'local-owner',
+        displayName: 'Workspace owner',
+        kind: 'human',
+        roles: ['owner'],
+        active: true
+      });
+    }
+
+    fs.writeFileSync(membersPath, JSON.stringify({ members: rosterList }, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('[RosterSync] Warning syncing members.json:', err.message);
+  }
+}
+
+// Initial sync on boot
+syncRosterToPatchworkHome();
+
 function buildAuthResponse(user, membership) {
   return {
     accessToken: issueAccessToken(user, membership),
     refreshToken: issueRefreshToken(user.id),
     user: safeUser(user, membership),
-    isSuperadmin: Boolean(user.is_superadmin)
+    isSuperadmin: Boolean(user.is_superadmin),
+    redirectUrl: process.env.PATCHWORK_POST_AUTH_REDIRECT || '/plan'
   };
 }
 function membershipFor(userId, orgId) {
@@ -96,8 +213,33 @@ function membershipFor(userId, orgId) {
 function authenticate(req, res, next) {
   req.auth = null;
   const header = req.headers.authorization;
-  const token = (header && header.startsWith('Bearer ')) ? header.slice(7).trim() : (req.query.token ? String(req.query.token).trim() : null);
-  if (!token) return next();
+  let token = (header && header.startsWith('Bearer ')) ? header.slice(7).trim() : (req.query.token ? String(req.query.token).trim() : null);
+
+  if (!token) {
+    const cookies = parseCookies(req);
+    const sessionCookie = cookies[DASHBOARD_SESSION_COOKIE_NAME];
+    if (sessionCookie) {
+      const verifiedUserId = verifyDashboardSessionCookie(sessionCookie);
+      if (verifiedUserId) {
+        const user = db.prepare('SELECT * FROM users WHERE id = ?').get(verifiedUserId);
+        if (user) {
+          const membership = db.prepare('SELECT * FROM organization_members WHERE user_id=? ORDER BY joined_at LIMIT 1').get(user.id);
+          if (membership || user.is_superadmin) {
+            req.auth = {
+              type: 'jwt',
+              userId: user.id,
+              orgId: membership ? membership.org_id : 'org_patchwork_hq',
+              role: membership ? membership.role : 'owner',
+              user,
+              isSuperadmin: Boolean(user.is_superadmin)
+            };
+            return next();
+          }
+        }
+      }
+    }
+    return next();
+  }
   try {
     if (token.startsWith('pw_live_')) {
       const key = db.prepare('SELECT * FROM api_keys WHERE key_hash = ?').get(hashApiKey(token));
@@ -618,6 +760,8 @@ app.post('/api/auth/signup', (req, res) => {
     });
     const user = db.prepare('SELECT * FROM users WHERE id=?').get(create());
     const membership = membershipFor(user.id, orgId);
+    setDashboardSessionCookie(res, user);
+    syncRosterToPatchworkHome();
     res.status(201).json({ message: 'Workspace successfully provisioned on a 14-day Growth trial.', ...buildAuthResponse(user, membership) });
   } catch (error) { res.status(500).json({ error: 'Failed to create account.' }); }
 });
@@ -633,6 +777,8 @@ app.post('/api/auth/login', (req, res) => {
     if (hq) membership = { org_id: hq.id, role: 'owner' };
   }
   if (!membership) return res.status(403).json({ error: 'No active workspace membership found.' });
+  setDashboardSessionCookie(res, user);
+  syncRosterToPatchworkHome();
   res.json({ message: 'Authentication successful.', ...buildAuthResponse(user, membership) });
 });
 
@@ -648,9 +794,14 @@ app.post('/api/auth/refresh', (req, res) => {
     const hq = db.prepare("SELECT * FROM organizations WHERE id='org_patchwork_hq'").get();
     if (hq) membership = { org_id: hq.id, role: 'owner' };
   }
+  setDashboardSessionCookie(res, user);
   res.json(buildAuthResponse(user, membership));
 });
-app.post('/api/auth/logout', requireAuth, (req, res) => { if (req.body.refreshToken) db.prepare('UPDATE auth_refresh_tokens SET revoked_at=CURRENT_TIMESTAMP WHERE token_hash=?').run(hash(req.body.refreshToken)); res.status(204).end(); });
+app.post('/api/auth/logout', requireAuth, (req, res) => {
+  if (req.body.refreshToken) db.prepare('UPDATE auth_refresh_tokens SET revoked_at=CURRENT_TIMESTAMP WHERE token_hash=?').run(hash(req.body.refreshToken));
+  clearDashboardSessionCookie(res);
+  res.status(204).end();
+});
 app.get('/api/auth/me', requireAuth, (req, res) => res.json({ user: safeUser(req.auth.user, { org_id: req.auth.orgId, role: req.auth.role }) }));
 app.post('/api/auth/demo-login', (req, res) => res.status(403).json({ error: 'Demo login is disabled for the secure billing portal.' }));
 
@@ -3973,8 +4124,539 @@ const jobCronRunner = setInterval(() => {
 }, 60000);
 jobCronRunner.unref();
 
+// ==========================================
+// RUNTIME INTEROPERABILITY & BRIDGE TELEMETRY
+// ==========================================
+
+app.get('/api/runtime/context', authenticate, (req, res) => {
+  if (!req.auth) return res.status(401).json({ error: 'Authentication required for runtime context.' });
+  const org = db.prepare('SELECT * FROM organizations WHERE id=?').get(req.auth.orgId);
+  const sub = subscriptionFor(req.auth.orgId);
+  const quota = getQuotaUsage(req.auth.orgId);
+  const members = db.prepare('SELECT COUNT(*) as count FROM organization_members WHERE org_id=?').get(req.auth.orgId);
+  res.json({
+    user: safeUser(req.auth.user, { org_id: req.auth.orgId, role: req.auth.role }),
+    organization: org ? { id: org.id, name: org.name, slug: org.slug } : null,
+    subscription: sub ? {
+      planId: sub.plan_id,
+      status: sub.status,
+      isTrial: Boolean(sub.is_trial),
+      trialEnd: sub.trial_end,
+      currentPeriodEnd: sub.current_period_end
+    } : null,
+    quotas: quota.quotas,
+    overage: quota.overage,
+    memberCount: members ? members.count : 1,
+    dashboardUrl: PATCHWORK_DASHBOARD_URL
+  });
+});
+
+app.get('/api/runtime/bridge-status', async (req, res) => {
+  try {
+    const configDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
+    const ideDir = path.join(configDir, 'ide');
+    let lockFiles = [];
+    if (fs.existsSync(ideDir)) {
+      lockFiles = fs.readdirSync(ideDir).filter(f => f.endsWith('.lock'));
+    }
+
+    if (lockFiles.length === 0) {
+      return res.json({
+        running: false,
+        port: null,
+        workspace: null,
+        clientsCount: 0,
+        pendingApprovalsCount: 0,
+        message: 'No IDE bridge lockfile detected in ~/.claude/ide/'
+      });
+    }
+
+    let bestLock = null;
+    for (const file of lockFiles) {
+      try {
+        const raw = fs.readFileSync(path.join(ideDir, file), 'utf-8');
+        const parsed = JSON.parse(raw);
+        const port = parsed.port || parseInt(path.basename(file, '.lock'), 10);
+        if (port && parsed.authToken) {
+          if (parsed.pid) {
+            try {
+              process.kill(parsed.pid, 0);
+            } catch {
+              continue; // skip stale lock
+            }
+          }
+          bestLock = { ...parsed, port };
+          break;
+        }
+      } catch (_) {}
+    }
+
+    if (!bestLock) {
+      return res.json({
+        running: false,
+        port: null,
+        clientsCount: 0,
+        pendingApprovalsCount: 0,
+        message: 'Bridge lockfile unreadable'
+      });
+    }
+
+    const http = require('node:http');
+    const bridgeReq = http.request({
+      hostname: '127.0.0.1',
+      port: bestLock.port,
+      path: '/api/approvals',
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${bestLock.authToken}`,
+        'Accept': 'application/json'
+      },
+      timeout: 1500
+    }, (bridgeRes) => {
+      let body = '';
+      bridgeRes.on('data', chunk => body += chunk);
+      bridgeRes.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          const pendingCount = Array.isArray(data.approvals) 
+            ? data.approvals.filter(a => a.status === 'pending').length 
+            : 0;
+          return res.json({
+            running: true,
+            port: bestLock.port,
+            workspace: bestLock.workspace || null,
+            pendingApprovalsCount: pendingCount,
+            totalApprovals: Array.isArray(data.approvals) ? data.approvals.length : 0,
+            authToken: bestLock.authToken ? 'present' : 'none'
+          });
+        } catch (_) {
+          return res.json({ running: true, port: bestLock.port, pendingApprovalsCount: 0 });
+        }
+      });
+    });
+
+    bridgeReq.on('error', () => {
+      if (res.headersSent) return;
+      res.json({
+        running: false,
+        port: bestLock.port,
+        message: 'Bridge port recorded in lockfile is not accepting connections.'
+      });
+    });
+    bridgeReq.on('timeout', () => {
+      bridgeReq.destroy();
+      if (res.headersSent) return;
+      res.json({
+        running: false,
+        port: bestLock.port,
+        message: 'Bridge health probe timed out.'
+      });
+    });
+    bridgeReq.end();
+  } catch (err) {
+    if (!res.headersSent) {
+      res.json({ running: false, error: err.message });
+    }
+  }
+});
+
+app.get('/api/runtime/emergency-halt', authenticate, (req, res) => {
+  try {
+    const patchworkHome = process.env.PATCHWORK_HOME?.trim() || path.join(os.homedir(), '.patchwork');
+    const flagsPath = path.join(patchworkHome, 'config', 'flags.json');
+    let isHalted = false;
+    if (fs.existsSync(flagsPath)) {
+      try {
+        const currentFlags = JSON.parse(fs.readFileSync(flagsPath, 'utf-8'));
+        isHalted = currentFlags?.flags?.['kill-switch.writes'] === true || currentFlags?.['kill-switch.writes'] === true;
+      } catch {}
+    }
+    res.json({ halted: isHalted });
+  } catch (err) {
+    res.json({ halted: false });
+  }
+});
+
+app.post('/api/runtime/emergency-halt', authenticate, (req, res) => {
+  if (!req.auth) return res.status(401).json({ error: 'Authentication required.' });
+  if (!['owner', 'admin'].includes(req.auth.role) && !req.auth.isSuperadmin) {
+    return res.status(403).json({ error: 'Only owners and admins can trigger emergency halt.' });
+  }
+
+  const { halted, reason } = req.body || {};
+  const isHalted = typeof halted === 'boolean' ? halted : true;
+
+  try {
+    const patchworkHome = process.env.PATCHWORK_HOME?.trim() || path.join(os.homedir(), '.patchwork');
+    const configDir = path.join(patchworkHome, 'config');
+    if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
+    const flagsPath = path.join(configDir, 'flags.json');
+    let currentFlags = { flags: {} };
+    if (fs.existsSync(flagsPath)) {
+      try {
+        currentFlags = JSON.parse(fs.readFileSync(flagsPath, 'utf-8'));
+        if (!currentFlags.flags) currentFlags.flags = {};
+      } catch {
+        currentFlags = { flags: {} };
+      }
+    }
+    currentFlags.flags['kill-switch.writes'] = isHalted;
+    fs.writeFileSync(flagsPath, JSON.stringify(currentFlags, null, 2), 'utf-8');
+
+    audit(req.auth.orgId, isHalted ? 'emergency_halt_engaged' : 'emergency_halt_released', {
+      reason: reason || 'Triggered via Control Plane',
+      actor: safeUser(req.auth.user, { org_id: req.auth.orgId, role: req.auth.role })
+    }, req.auth.userId);
+
+    dispatchWebhooks(req.auth.orgId, isHalted ? 'system.emergency_halt.engaged' : 'system.emergency_halt.released', {
+      halted: isHalted,
+      reason: reason || 'Triggered via Control Plane',
+      timestamp: new Date().toISOString()
+    }).catch(e => console.warn('[WebhookDispatch] Error firing emergency halt webhook:', e.message));
+
+    // Mirror to Secustar if running
+    fetch(`${SECUSTAR_URL}/api/control/halt`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': req.headers.cookie || ''
+      },
+      body: JSON.stringify({ halted: isHalted })
+    }).catch(() => {});
+
+    res.json({ success: true, halted: isHalted });
+  } catch (err) {
+    console.error('[EmergencyHalt] Error toggling emergency halt:', err);
+    res.status(500).json({ error: 'Failed to toggle emergency halt.' });
+  }
+});
+
+const recentOmnichannelRecipeEvents = [];
+
+app.post('/api/runtime/events', authenticate, (req, res) => {
+  const isLoopbackOmnichannel =
+    req.headers['x-omnichannel-source'] === 'secustar-control-plane' &&
+    (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1');
+
+  if (!req.auth && !isLoopbackOmnichannel) {
+    return res.status(401).json({ error: 'Authentication required to ingest runtime events.' });
+  }
+  const { eventType, unitsConsumed, details, ...rest } = req.body || {};
+  if (!eventType) return res.status(400).json({ error: 'eventType is required.' });
+
+  try {
+    if (String(eventType).startsWith('recipe.')) {
+      recentOmnichannelRecipeEvents.unshift({
+        eventType,
+        ...rest,
+        details: details || rest,
+        receivedAt: new Date().toISOString()
+      });
+      if (recentOmnichannelRecipeEvents.length > 50) recentOmnichannelRecipeEvents.length = 50;
+    }
+
+    if (req.auth) {
+      if (unitsConsumed && Number(unitsConsumed) > 0) {
+        recordUsage(req.auth.orgId, 'reconciliation_rows', Number(unitsConsumed));
+      }
+
+      const eventPayload = typeof details === 'object' ? JSON.stringify(details) : JSON.stringify(rest || {});
+      logAudit(req.auth.userId, req.auth.orgId, `runtime.${eventType}`, req.ip, eventPayload);
+
+      dispatchWebhooks(req.auth.orgId, `runtime.${eventType}`, {
+        eventType,
+        unitsConsumed: unitsConsumed || 0,
+        actor: safeUser(req.auth.user, { org_id: req.auth.orgId, role: req.auth.role }),
+        timestamp: new Date().toISOString(),
+        details: details || rest || {}
+      }).catch(e => console.warn('[WebhookDispatch] Error firing runtime event webhook:', e.message));
+    }
+
+    res.status(201).json({ success: true, eventType, recorded: true });
+  } catch (err) {
+    console.error('[RuntimeEvents] Error ingesting runtime event:', err);
+    res.status(500).json({ error: 'Failed to record runtime event.' });
+  }
+});
+
+app.get('/api/runtime/recipes', async (req, res) => {
+  try {
+    const patchworkHome = process.env.PATCHWORK_HOME?.trim() || path.join(os.homedir(), '.patchwork');
+    const recipesDir = path.join(patchworkHome, 'recipes');
+    const recipeMap = new Map();
+
+    // 1. Query Secustar (:3001) for recipes + linked agents if running
+    try {
+      const secRes = await fetch(`${SECUSTAR_URL}/api/patchwork/recipes`, {
+        signal: AbortSignal.timeout(2500)
+      });
+      if (secRes.ok) {
+        const secData = await secRes.json();
+        const list = Array.isArray(secData?.recipes) ? secData.recipes : [];
+        for (const r of list) {
+          if (r && r.name) recipeMap.set(r.name, r);
+        }
+      }
+    } catch {}
+
+    // 2. Also scan ~/.patchwork/recipes on disk directly so recipes are always available even if Secustar is offline
+    if (fs.existsSync(recipesDir)) {
+      const files = fs.readdirSync(recipesDir).filter(f => /\.(ya?ml|json)$/i.test(f));
+      for (const file of files) {
+        const name = file.replace(/\.(ya?ml|json)$/i, '');
+        if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(name)) continue;
+        if (!recipeMap.has(name)) {
+          let description = '';
+          let trigger = 'manual';
+          try {
+            const raw = fs.readFileSync(path.join(recipesDir, file), 'utf-8');
+            const descMatch = raw.match(/^description:\s*["']?(.+?)["']?\s*$/m);
+            if (descMatch) description = descMatch[1];
+            const trigMatch = raw.match(/^\s*type:\s*(\S+)\s*$/m);
+            if (trigMatch) trigger = trigMatch[1];
+          } catch {}
+          recipeMap.set(name, {
+            name,
+            description,
+            trigger,
+            enabled: !fs.existsSync(path.join(recipesDir, `${name}.disabled`)),
+            linkedAgents: []
+          });
+        }
+      }
+    }
+
+    const recipes = Array.from(recipeMap.values()).sort((a, b) => {
+      // Sort recipes that have linked Secustar agents or start with recipe- first!
+      const aLinked = Array.isArray(a.linkedAgents) ? a.linkedAgents.length : 0;
+      const bLinked = Array.isArray(b.linkedAgents) ? b.linkedAgents.length : 0;
+      if (aLinked !== bLinked) return bLinked - aLinked;
+      const aAuto = String(a.name).startsWith('recipe-') ? 1 : 0;
+      const bAuto = String(b.name).startsWith('recipe-') ? 1 : 0;
+      if (aAuto !== bAuto) return bAuto - aAuto;
+      return String(a.name).localeCompare(String(b.name));
+    });
+
+    res.json({
+      ok: true,
+      count: recipes.length,
+      linkedRecipesCount: recipes.filter(r => (r.linkedAgents && r.linkedAgents.length > 0) || String(r.name).startsWith('recipe-')).length,
+      recipes,
+      recentEvents: recentOmnichannelRecipeEvents.slice(0, 15)
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message, recipes: [] });
+  }
+});
+
 // Route mapping
+app.get('/docs', (req, res) => res.sendFile(path.join(__dirname, 'docs.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/account', (req, res) => res.sendFile(path.join(__dirname, 'account.html')));
+
+// Post-auth /plan destination route
+app.get('/plan', (req, res) => {
+  const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  res.redirect(302, `/dashboard/plan${query}`);
+});
+
+function forwardProxyRequest(req, res, targetBaseUrl, serviceName, devCommand) {
+  const http = require('node:http');
+  const https = require('node:https');
+
+  const sendStandby = () => {
+    if (!res.headersSent) {
+      res.status(502).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>${serviceName} Standby</title>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Inter', sans-serif; background: #000000; color: #f3f4f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+            .card { background: #111827; border: 1px solid #1f2937; padding: 2.5rem; border-radius: 1.25rem; max-width: 540px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); }
+            .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; border: 1px solid rgba(56, 189, 248, 0.2); }
+            h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: #fff; }
+            p { color: #9ca3af; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+            .code-box { background: #0b0f19; border: 1px solid #1f2937; padding: 0.85rem 1.25rem; border-radius: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #60a5fa; margin-bottom: 1.75rem; text-align: left; }
+            .actions { display: flex; gap: 0.75rem; justify-content: center; }
+            .btn { background: #0071e3; color: white; padding: 0.7rem 1.4rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+            .btn:hover { background: #0077ed; }
+            .btn-secondary { background: #1f2937; color: #d1d5db; }
+            .btn-secondary:hover { background: #374151; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <span class="badge">RUNTIME PROXY GATEWAY</span>
+            <h1>${serviceName} Standby</h1>
+            <p>The service is configured for <code>${targetBaseUrl}</code> but is currently offline or starting up.</p>
+            <div class="code-box">
+              <span style="color:#6b7280"># Start the service:</span><br/>
+              ${devCommand}
+            </div>
+            <div class="actions">
+              <a href="/account" class="btn btn-secondary">Go to Account Portal</a>
+              <a href="javascript:location.reload()" class="btn">Retry Connection</a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+  };
+
+  try {
+    const targetUrl = new URL(req.originalUrl || req.url, targetBaseUrl);
+
+    const headers = { ...req.headers };
+    headers.host = targetUrl.host;
+    headers['x-forwarded-host'] = req.headers.host || `localhost:${PORT}`;
+    headers['x-forwarded-proto'] = req.protocol || 'http';
+
+    const clientIp = req.ip || (req.socket && req.socket.remoteAddress) || '127.0.0.1';
+    if (headers['x-forwarded-for']) {
+      headers['x-forwarded-for'] = `${headers['x-forwarded-for']}, ${clientIp}`;
+    } else {
+      headers['x-forwarded-for'] = clientIp;
+    }
+
+    // Clean undefined/null headers to prevent ERR_HTTP_INVALID_HEADER_VALUE in Node
+    for (const key of Object.keys(headers)) {
+      if (headers[key] === undefined || headers[key] === null) {
+        delete headers[key];
+      }
+    }
+
+    const client = targetUrl.protocol === 'https:' ? https : http;
+    const proxyReq = client.request({
+      hostname: targetUrl.hostname,
+      port: targetUrl.port || (targetUrl.protocol === 'https:' ? 443 : 80),
+      path: targetUrl.pathname + targetUrl.search,
+      method: req.method,
+      headers: headers
+    }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', () => {
+      sendStandby();
+    });
+
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+      if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+        const bodyData = JSON.stringify(req.body);
+        proxyReq.setHeader('content-length', Buffer.byteLength(bodyData));
+        proxyReq.setHeader('content-type', 'application/json');
+        proxyReq.write(bodyData);
+        proxyReq.end();
+      } else {
+        req.pipe(proxyReq);
+      }
+    } else {
+      req.pipe(proxyReq);
+    }
+  } catch (err) {
+    sendStandby();
+  }
+}
+
+// Secustar-specific /dashboard/* routes (C-Suite Executive Suite, Agents, Projects, Governance)
+const SECUSTAR_DASHBOARD_PATHS = [
+  '/dashboard/ceo',
+  '/dashboard/director',
+  '/dashboard/investor',
+  '/dashboard/cto',
+  '/dashboard/coo',
+  '/dashboard/marketing',
+  '/dashboard/sales',
+  '/dashboard/agents',
+  '/dashboard/projects',
+  '/dashboard/board',
+  '/dashboard/reports',
+  '/dashboard/controls',
+  '/dashboard/costs',
+  '/dashboard/audit',
+  '/dashboard/tools',
+  '/dashboard/policies',
+  '/dashboard/schedules',
+  '/dashboard/evals',
+  '/dashboard/memory',
+  '/dashboard/team',
+  '/dashboard/chat',
+];
+
+const SECUSTAR_API_PATHS = [
+  '/war-room',
+  '/review',
+  '/api/war-room',
+  '/api/agents',
+  '/api/agent',
+  '/api/tasks',
+  '/api/evals',
+  '/api/patchwork',
+  '/api/projects',
+  '/api/audit',
+  '/api/analytics',
+  '/api/activity',
+  '/api/changes',
+  '/api/control',
+  '/api/dashboard',
+  '/api/events',
+  '/api/git',
+  '/api/memory',
+  '/api/notifications',
+  '/api/opsera',
+  '/api/orchestrator',
+  '/api/runs',
+  '/api/schedules',
+  '/api/team',
+  '/api/webhooks',
+  '/api/worker',
+];
+
+// Reverse proxy for Secustar Executive Suite, War Room, Review Queue, and APIs
+app.use([...SECUSTAR_DASHBOARD_PATHS, ...SECUSTAR_API_PATHS], (req, res) => {
+  forwardProxyRequest(
+    req,
+    res,
+    SECUSTAR_URL,
+    'Secustar Command Center & Executive Suite',
+    'cd c:\\Users\\omu\\projects\\secustar<br/>npm run dev'
+  );
+});
+
+// Reverse proxy for /dashboard and remaining /dashboard/* (Patchwork OS Runtime Dashboard)
+app.use('/dashboard', (req, res) => {
+  forwardProxyRequest(
+    req,
+    res,
+    PATCHWORK_DASHBOARD_URL,
+    'Patchwork OS Runtime Dashboard',
+    'cd c:\\Users\\omu\\projects\\patchwork-os\\dashboard<br/>npm run dev'
+  );
+});
+
+// Forward Next.js static asset requests from Secustar when referer is a Secustar route
+app.use('/_next', (req, res, next) => {
+  const referer = req.headers.referer || '';
+  const isSecustarReferer =
+    referer.includes('/war-room') ||
+    referer.includes('/review') ||
+    SECUSTAR_DASHBOARD_PATHS.some((p) => referer.includes(p));
+  if (isSecustarReferer) {
+    return forwardProxyRequest(
+      req,
+      res,
+      SECUSTAR_URL,
+      'Secustar Command Center & Executive Suite',
+      'cd c:\\Users\\omu\\projects\\secustar<br/>npm run dev'
+    );
+  }
+  next();
+});
+
 app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.listen(PORT, () => console.log(`Patchwork OS is listening on port ${PORT}`));

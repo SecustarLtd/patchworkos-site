@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patchwork OS | Secure Enterprise Automation</title>
+    <title>Patchwork OS | Local-First AI Runtime & Decision Layer</title>
+    <meta name="description" content="Patchwork OS is the decision layer between agent impulse and action. A local-first runtime where AI automates real work across your editor, GitHub, Slack, and 45+ tools—while risky actions stop to ask you first.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -270,47 +271,262 @@
                     <span class="font-bold text-base sm:text-lg tracking-tight text-[#1d1d1f]">Patchwork<span class="text-[#86868b] font-normal ml-0.5">OS</span></span>
                 </a>
                 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:space-x-5 lg:space-x-7 items-center">
-                    <div class="relative">
-                        <a href="#home" class="nav-link hover:text-black transition-colors relative py-1 text-xs lg:text-sm font-medium">Overview</a>
+                <!-- Clustered Desktop Navigation with Audience-Focused Dropdowns -->
+                <div class="hidden md:flex md:space-x-1 lg:space-x-2 items-center">
+                    
+                    <!-- Cluster 1: Product & Governance (Executives, Product & Security Leads) -->
+                    <div class="relative group" data-nav-cluster="product">
+                        <button type="button" onclick="toggleNavCluster('product', event)" class="nav-cluster-trigger nav-link hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-full transition-all flex items-center gap-1 text-xs lg:text-sm font-medium cursor-pointer">
+                            <span>Product &amp; Governance</span>
+                            <i class="ph-bold ph-caret-down text-[11px] text-gray-500 transition-transform duration-200 group-hover:rotate-180"></i>
+                        </button>
+                        <div id="nav-cluster-product" class="nav-cluster-panel hidden group-hover:block absolute left-0 top-full pt-2 w-80 z-50">
+                            <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/90 p-2.5 space-y-1">
+                                <div class="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-gray-400 font-semibold flex items-center justify-between">
+                                    <span>Core Runtime &amp; Safety</span>
+                                    <span class="text-[#0071e3]">For Leaders &amp; Ops</span>
+                                </div>
+                                <a href="#home" onclick="closeAllNavClusters()" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#0071e3] flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-[#0071e3] group-hover/item:text-white transition-colors">
+                                        <i class="ph-bold ph-compass text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">Platform Overview</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">Local-first AI runtime &amp; progressive autonomy</div>
+                                    </div>
+                                </a>
+                                <a href="#business" onclick="closeAllNavClusters()" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                                        <i class="ph-bold ph-shield-check text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">The Decision Layer</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">Blast-radius approval gates &amp; cryptographic receipts</div>
+                                    </div>
+                                </a>
+                                <a href="/docs#persona-power" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
+                                        <i class="ph-bold ph-sparkle text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">Butler Executive Mode</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">High-signal home view (<code class="font-mono text-[10px]">/butler</code>) for busy operators</div>
+                                    </div>
+                                </a>
+                                <a href="/docs#integration-mobile" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-rose-600 group-hover/item:text-white transition-colors">
+                                        <i class="ph-bold ph-device-mobile-camera text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">Mobile Oversight &amp; Kill Switch</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">VAPID push approvals &amp; emergency halt from phone</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="relative">
-                        <a href="#business" class="nav-link hover:text-black transition-colors relative py-1 whitespace-nowrap text-xs lg:text-sm font-medium">For Business</a>
+
+                    <!-- Cluster 2: Developers & Docs (Solo Devs, Platform Engineers, DevSecOps) -->
+                    <div class="relative group" data-nav-cluster="developers">
+                        <button type="button" onclick="toggleNavCluster('developers', event)" class="nav-cluster-trigger nav-link hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-full transition-all flex items-center gap-1 text-xs lg:text-sm font-medium cursor-pointer">
+                            <span>Developers &amp; Docs</span>
+                            <span class="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-blue-50 text-[#0071e3] border border-blue-200 rounded-full">MCP</span>
+                            <i class="ph-bold ph-caret-down text-[11px] text-gray-500 transition-transform duration-200 group-hover:rotate-180"></i>
+                        </button>
+                        <div id="nav-cluster-developers" class="nav-cluster-panel hidden group-hover:block absolute left-0 top-full pt-2 w-[440px] z-50">
+                            <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/90 p-3">
+                                <div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-gray-400 font-semibold flex items-center justify-between border-b border-gray-100 mb-2">
+                                    <span>Engineering &amp; Runtime Setup</span>
+                                    <span class="text-[#0071e3]">180+ IDE Tools</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="#developers" onclick="closeAllNavClusters()" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-bold ph-terminal-window text-[#0071e3] text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Developer Architecture</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">MCP bridge, YAML recipes &amp; VPC</div>
+                                        </div>
+                                    </a>
+                                    <a href="/docs" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors bg-blue-50/40 border border-blue-100">
+                                        <i class="ph-bold ph-book-open-text text-[#0071e3] text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-[#0071e3]">Full Documentation</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">Complete Persona &amp; Integration Guide</div>
+                                        </div>
+                                    </a>
+                                    <a href="/docs#persona-solo" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-bold ph-code text-purple-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Solo Dev (MCP Bridge)</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">Claude Code, Cursor &amp; Windsurf</div>
+                                        </div>
+                                    </a>
+                                    <a href="/docs#persona-vps" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-bold ph-cloud-check text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Headless VPS &amp; Docker</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">24/7 Ubuntu systemd &amp; PM2 ops</div>
+                                        </div>
+                                    </a>
+                                    <a href="/docs#integration-connectors" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-bold ph-plugs-connected text-amber-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">13+ SaaS Connectors</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">GitHub, Linear, Slack, Sentry OAuth</div>
+                                        </div>
+                                    </a>
+                                    <a href="/docs#integration-models" class="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-bold ph-cpu text-rose-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Model Drivers &amp; MLX</div>
+                                            <div class="text-[11px] text-gray-500 leading-snug">Subprocess, Cloud LLMs &amp; Apple MLX</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between px-2">
+                                    <span class="text-[11px] font-mono text-gray-500">Quick start: <code class="text-gray-900 font-semibold">npx patchwork-os@beta init</code></span>
+                                    <a href="#signup" onclick="closeAllNavClusters()" class="text-[11px] font-bold text-[#0071e3] hover:underline flex items-center gap-1">
+                                        Launch Sandbox <i class="ph-bold ph-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="relative">
-                        <a href="#developers" class="nav-link hover:text-black transition-colors relative py-1 whitespace-nowrap text-xs lg:text-sm font-medium">For Developers</a>
+
+                    <!-- Cluster 3: Solutions & Verticals (CFOs, Controllers, FinOps & Domain Leads) -->
+                    <div class="relative group" data-nav-cluster="solutions">
+                        <button type="button" onclick="toggleNavCluster('solutions', event)" class="nav-cluster-trigger nav-link hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-full transition-all flex items-center gap-1 text-xs lg:text-sm font-medium cursor-pointer">
+                            <span>Solutions &amp; Verticals</span>
+                            <i class="ph-bold ph-caret-down text-[11px] text-gray-500 transition-transform duration-200 group-hover:rotate-180"></i>
+                        </button>
+                        <div id="nav-cluster-solutions" class="nav-cluster-panel hidden group-hover:block absolute left-0 top-full pt-2 w-96 z-50">
+                            <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/90 p-3">
+                                <div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-gray-400 font-semibold flex items-center justify-between border-b border-gray-100 mb-2">
+                                    <span>Industry YAML Blueprints</span>
+                                    <span class="text-emerald-600">For Finance &amp; Ops</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('fintech'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-credit-card text-[#0071e3] text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Fintech &amp; Payments</div>
+                                            <div class="text-[10px] text-gray-500">3-way settlement &amp; BAI2</div>
+                                        </div>
+                                    </a>
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('ecommerce'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-shopping-bag text-blue-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Retail &amp; E-Commerce</div>
+                                            <div class="text-[10px] text-gray-500">Shopify, Amazon &amp; BNPL</div>
+                                        </div>
+                                    </a>
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('saas'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-cloud-arrow-up text-purple-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">B2B SaaS &amp; AI</div>
+                                            <div class="text-[10px] text-gray-500">ASC 606 &amp; usage billing</div>
+                                        </div>
+                                    </a>
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('healthcare'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-heartbeat text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Healthcare &amp; Biotech</div>
+                                            <div class="text-[10px] text-gray-500">HIPAA VPC &amp; 835 ERA</div>
+                                        </div>
+                                    </a>
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('logistics'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-truck text-amber-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Logistics &amp; 3PL</div>
+                                            <div class="text-[10px] text-gray-500">PO, BOL &amp; freight audit</div>
+                                        </div>
+                                    </a>
+                                    <a href="#industries" onclick="closeAllNavClusters(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('manufacturing'); }, 50);" class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                        <i class="ph-fill ph-factory text-rose-600 text-base mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <div class="text-xs font-bold text-gray-900">Manufacturing</div>
+                                            <div class="text-[10px] text-gray-500">Multi-ERP &amp; GRNI close</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="mt-2 pt-2 border-t border-gray-100 text-right px-2">
+                                    <a href="#industries" onclick="closeAllNavClusters()" class="text-[11px] font-bold text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                                        Explore All Vertical Blueprints <i class="ph-bold ph-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Direct Link: Pricing -->
                     <div class="relative">
-                        <a href="#industries" class="nav-link hover:text-black transition-colors relative py-1 whitespace-nowrap text-xs lg:text-sm font-medium">Industries</a>
-                    </div>
-                    <div class="relative">
-                        <a href="#pricing" class="nav-link hover:text-black transition-colors relative flex items-center gap-1.5 py-1 whitespace-nowrap text-xs lg:text-sm font-medium">
-                            Pricing
+                        <a href="#pricing" class="nav-link hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-full transition-all relative flex items-center gap-1.5 whitespace-nowrap text-xs lg:text-sm font-medium">
+                            <span>Pricing</span>
                             <span class="px-1.5 py-0.5 text-[9px] font-semibold bg-black/5 text-[#1d1d1f] rounded-full uppercase tracking-wider">ROI</span>
                         </a>
                     </div>
-                    <div class="relative">
-                        <a href="#support" class="nav-link hover:text-black transition-colors relative flex items-center gap-1.5 py-1 whitespace-nowrap text-xs lg:text-sm font-medium">
-                            Support
+
+                    <!-- Cluster 4: Enterprise & Support (IT Admins, Procurement, On-Call Teams) -->
+                    <div class="relative group" data-nav-cluster="resources">
+                        <button type="button" onclick="toggleNavCluster('resources', event)" class="nav-cluster-trigger nav-link hover:text-black hover:bg-black/5 px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 text-xs lg:text-sm font-medium cursor-pointer">
+                            <span>Enterprise &amp; Support</span>
                             <span class="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" title="99.999% SLA Uptime"></span>
-                        </a>
+                            <i class="ph-bold ph-caret-down text-[11px] text-gray-500 transition-transform duration-200 group-hover:rotate-180"></i>
+                        </button>
+                        <div id="nav-cluster-resources" class="nav-cluster-panel hidden group-hover:block absolute right-0 top-full pt-2 w-80 z-50">
+                            <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/90 p-2.5 space-y-1">
+                                <div class="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-gray-400 font-semibold flex items-center justify-between">
+                                    <span>Operations &amp; Billing</span>
+                                    <span class="text-emerald-600">99.999% SLA</span>
+                                </div>
+                                <a href="#support" onclick="closeAllNavClusters()" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                                        <i class="ph-bold ph-lifebuoy text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">24/7 Support &amp; SLA Center</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">1-hour P1 dispatch, ticket lookup &amp; SOC2 pack</div>
+                                    </div>
+                                </a>
+                                <a href="#contact" onclick="closeAllNavClusters()" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#0071e3] flex items-center justify-center shrink-0 mt-0.5">
+                                        <i class="ph-bold ph-chats-teardrop text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">Contact Solutions Architecture</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">Scope private VPC, custom connectors &amp; demos</div>
+                                    </div>
+                                </a>
+                                <a href="/docs#persona-team" class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-blue-50/70 transition-colors">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 mt-0.5">
+                                        <i class="ph-bold ph-users-three text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-900">Multi-Member Team Governance</div>
+                                        <div class="text-[11px] text-gray-500 leading-snug">Per-member auth, ADRs 0020/21 &amp; data boundaries</div>
+                                    </div>
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="/account" class="flex items-start gap-3 p-2.5 rounded-xl bg-blue-50/60 hover:bg-blue-100/70 transition-colors">
+                                    <div class="w-8 h-8 rounded-lg bg-[#0071e3] text-white flex items-center justify-center shrink-0 mt-0.5">
+                                        <i class="ph-bold ph-user-circle text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-[#0071e3]">Account, Seats &amp; Billing Portal</div>
+                                        <div class="text-[11px] text-gray-600 leading-snug">Manage subscriptions, quotas, API keys &amp; invoices</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="relative">
-                        <a href="#contact" class="nav-link hover:text-black transition-colors relative py-1 whitespace-nowrap text-xs lg:text-sm font-medium">Contact</a>
-                    </div>
-                    <div class="relative">
-                        <a href="/account" class="nav-link text-[#0071e3] hover:text-[#005bb5] transition-colors relative flex items-center gap-1.5 py-1 whitespace-nowrap text-xs lg:text-sm font-bold">
-                            <i class="ph-bold ph-user-circle text-base"></i> Account & Billing
-                        </a>
-                    </div>
+
                 </div>
                 
                 <!-- Right Action Buttons -->
                 <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
                     <!-- Guest State Actions -->
                     <div id="nav-guest-actions" class="flex items-center gap-2 sm:gap-2.5">
-                        <a href="/account" class="text-xs font-semibold text-[#0071e3] hover:underline px-2.5 py-1.5 rounded-lg transition-colors hidden sm:inline-block">
+                        <a href="/account" class="text-xs font-semibold text-[#0071e3] hover:underline px-2.5 py-1.5 rounded-lg transition-colors hidden xl:inline-block">
                             Billing Portal
                         </a>
                         <button onclick="openSignInModal()" class="text-xs font-semibold text-[#1d1d1f] hover:text-[#0071e3] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer hidden sm:inline-block">
@@ -362,6 +578,9 @@
                                 <a href="/account" class="flex items-center gap-2 p-2 rounded-xl hover:bg-blue-50 font-semibold text-[#0071e3]">
                                     <i class="ph-bold ph-credit-card text-base"></i> Account, Plans & Payments
                                 </a>
+                                <a href="/docs" class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 font-medium text-gray-800">
+                                    <i class="ph-bold ph-book-open-text text-base text-[#0071e3]"></i> Developer &amp; Operator Docs
+                                </a>
                                 <a href="#signup" onclick="toggleUserDropdown()" class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 font-medium text-gray-800">
                                     <i class="ph-bold ph-terminal-window text-base text-[#0071e3]"></i> Sandbox Workspace
                                 </a>
@@ -386,30 +605,80 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation Drawer -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-b border-gray-200/80 px-6 pt-4 pb-8 space-y-1 shadow-2xl max-h-[calc(100vh-3.5rem)] overflow-y-auto">
-            <a href="#home" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">Overview</a>
-            <a href="#business" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">For Business (CFOs)</a>
-            <a href="#developers" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">For Developers (CTOs)</a>
-            <a href="#industries" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">Industries We Serve</a>
-            <a href="#pricing" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">Platform Pricing & ROI</a>
-            <a href="#support" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3] flex items-center justify-between">
-                <span>Enterprise Support</span>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">99.999% SLA</span>
-            </a>
-            <a href="#contact" onclick="closeMobileMenu()" class="block py-2.5 border-b border-gray-100 text-base font-semibold text-[#1d1d1f] hover:text-[#0071e3]">Contact Architecture Team</a>
-            <a href="#signup" onclick="closeMobileMenu()" class="block py-2.5 text-base font-semibold text-[#0071e3]">Developer Sandbox & Sign Up</a>
+        <!-- Clustered Mobile Navigation Drawer (Accordion by Target Audience) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-b border-gray-200/80 px-5 pt-3 pb-8 space-y-2 shadow-2xl max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+            
+            <!-- Mobile Cluster 1: Product & Governance -->
+            <div class="border-b border-gray-100 pb-2">
+                <button type="button" onclick="toggleMobileCluster('mob-product')" class="w-full flex items-center justify-between py-2 text-left font-bold text-sm text-[#1d1d1f]">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-shield-check text-[#0071e3]"></i> Product &amp; Governance</span>
+                    <i id="icon-mob-product" class="ph-bold ph-caret-down text-xs text-gray-400 transition-transform"></i>
+                </button>
+                <div id="mob-product" class="pl-6 pt-1 space-y-1.5 text-xs">
+                    <a href="#home" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Platform Overview</a>
+                    <a href="#business" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">The Decision Layer &amp; Receipts</a>
+                    <a href="/docs#persona-power" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Butler Executive Mode (<code class="font-mono">/butler</code>)</a>
+                    <a href="/docs#integration-mobile" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Mobile Oversight &amp; Kill Switch</a>
+                </div>
+            </div>
 
-            <div class="pt-4 space-y-2">
-                <button onclick="closeMobileMenu(); openSignUpModal();" class="w-full py-3 bg-[#0071e3] text-white font-semibold rounded-full shadow-sm hover:bg-[#0077ed] flex items-center justify-center gap-2">
+            <!-- Mobile Cluster 2: Developers & Docs -->
+            <div class="border-b border-gray-100 pb-2">
+                <button type="button" onclick="toggleMobileCluster('mob-devs')" class="w-full flex items-center justify-between py-2 text-left font-bold text-sm text-[#1d1d1f]">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-terminal-window text-purple-600"></i> Developers &amp; Docs</span>
+                    <i id="icon-mob-devs" class="ph-bold ph-caret-down text-xs text-gray-400 transition-transform"></i>
+                </button>
+                <div id="mob-devs" class="pl-6 pt-1 space-y-1.5 text-xs">
+                    <a href="/docs" onclick="closeMobileMenu()" class="block py-1.5 text-[#0071e3] font-bold">Full Developer &amp; Operator Docs →</a>
+                    <a href="#developers" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">For Developers &amp; 180 MCP Tools</a>
+                    <a href="/docs#persona-solo" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Solo Dev (MCP IDE Bridge Setup)</a>
+                    <a href="/docs#persona-vps" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Headless VPS, Docker &amp; Systemd</a>
+                    <a href="/docs#integration-connectors" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">13+ SaaS Platform Connectors</a>
+                    <a href="/docs#integration-models" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Model Drivers &amp; Apple Silicon MLX</a>
+                </div>
+            </div>
+
+            <!-- Mobile Cluster 3: Solutions & Verticals -->
+            <div class="border-b border-gray-100 pb-2">
+                <button type="button" onclick="toggleMobileCluster('mob-solutions')" class="w-full flex items-center justify-between py-2 text-left font-bold text-sm text-[#1d1d1f]">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-buildings text-emerald-600"></i> Solutions &amp; Verticals</span>
+                    <i id="icon-mob-solutions" class="ph-bold ph-caret-down text-xs text-gray-400 transition-transform"></i>
+                </button>
+                <div id="mob-solutions" class="hidden pl-6 pt-1 space-y-1.5 text-xs">
+                    <a href="#industries" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">All Industry YAML Blueprints</a>
+                    <a href="#industries" onclick="closeMobileMenu(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('fintech'); }, 50);" class="block py-1.5 text-gray-600">Fintech &amp; High-Volume Payments</a>
+                    <a href="#industries" onclick="closeMobileMenu(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('ecommerce'); }, 50);" class="block py-1.5 text-gray-600">Retail, D2C &amp; Marketplaces</a>
+                    <a href="#industries" onclick="closeMobileMenu(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('saas'); }, 50);" class="block py-1.5 text-gray-600">B2B SaaS &amp; AI Companies</a>
+                    <a href="#industries" onclick="closeMobileMenu(); setTimeout(() => { if(typeof selectIndustryTab==='function') selectIndustryTab('healthcare'); }, 50);" class="block py-1.5 text-gray-600">Healthcare &amp; Life Sciences</a>
+                </div>
+            </div>
+
+            <!-- Mobile Cluster 4: Enterprise, Support & Billing -->
+            <div class="border-b border-gray-100 pb-2">
+                <button type="button" onclick="toggleMobileCluster('mob-enterprise')" class="w-full flex items-center justify-between py-2 text-left font-bold text-sm text-[#1d1d1f]">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-lifebuoy text-amber-600"></i> Enterprise, Support &amp; Billing</span>
+                    <i id="icon-mob-enterprise" class="ph-bold ph-caret-down text-xs text-gray-400 transition-transform"></i>
+                </button>
+                <div id="mob-enterprise" class="hidden pl-6 pt-1 space-y-1.5 text-xs">
+                    <a href="#pricing" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Platform Pricing &amp; ROI</a>
+                    <a href="#support" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">24/7 Support Center (99.999% SLA)</a>
+                    <a href="#contact" onclick="closeMobileMenu()" class="block py-1.5 text-gray-700 hover:text-[#0071e3] font-medium">Contact Solutions Architecture</a>
+                    <a href="/account" onclick="closeMobileMenu()" class="block py-1.5 text-[#0071e3] font-bold">Account, Seats &amp; Billing Portal →</a>
+                </div>
+            </div>
+
+            <div class="pt-3 space-y-2">
+                <button onclick="closeMobileMenu(); openSignUpModal();" class="w-full py-3 bg-[#0071e3] text-white font-semibold rounded-full shadow-sm hover:bg-[#0077ed] flex items-center justify-center gap-2 text-sm">
                     <i class="ph-bold ph-rocket-launch"></i> Create Free Account
                 </button>
-                <button onclick="closeMobileMenu(); openSignInModal();" class="w-full py-2.5 bg-gray-100 text-[#1d1d1f] font-semibold rounded-full hover:bg-gray-200 text-sm">
-                    Sign In
-                </button>
-                <button onclick="closeMobileMenu(); openDemoModal();" class="w-full py-2.5 bg-black text-white font-semibold rounded-full hover:bg-gray-900 text-sm">
-                    Book an Enterprise Demo
-                </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="closeMobileMenu(); openSignInModal();" class="w-full py-2.5 bg-gray-100 text-[#1d1d1f] font-semibold rounded-full hover:bg-gray-200 text-xs">
+                        Sign In
+                    </button>
+                    <button onclick="closeMobileMenu(); openDemoModal();" class="w-full py-2.5 bg-black text-white font-semibold rounded-full hover:bg-gray-900 text-xs">
+                        Book Demo
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -425,65 +694,63 @@
                 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center w-full">
                     <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-black/10 text-[#1d1d1f] text-xs font-medium mb-5 sm:mb-6 shadow-sm">
                         <span class="flex h-2 w-2 shrink-0 rounded-full bg-[#0071e3]"></span>
-                        <span>Patchwork OS Enterprise</span>
+                        <span>Local-First AI Runtime &amp; Decision Layer</span>
                     </div>
                     <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold text-[#1d1d1f] tracking-tight mb-4 sm:mb-6 leading-[1.06] max-w-4xl mx-auto">
-                        Financial close.<br />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#1d1d1f] via-[#0071e3] to-[#2997ff]">Reimagined to the core.</span>
+                        AI that works while you're away.<br />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#1d1d1f] via-[#0071e3] to-[#2997ff]">Stops before anything risky happens.</span>
                     </h1>
                     <p class="text-base sm:text-xl md:text-2xl text-[#86868b] font-normal max-w-2xl mx-auto mb-7 sm:mb-9 leading-snug">
-                        Pro-grade reconciliation. Audit-ready peace of mind for CFOs. Zero-maintenance infrastructure for engineering. All for one flat annual rate.
+                        Give AI agents the power to automate real work across your editor, GitHub, Slack, Gmail, and 45+ tools. Reversible things flow freely. Anything consequential stops and asks you first.
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-12 sm:mb-16">
-                        <button onclick="openDemoModal()" class="px-6 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-sm sm:text-base transition-all shadow-sm cursor-pointer">
-                            Book a Demo
-                        </button>
-                        <a href="#pricing" class="text-[#0071e3] hover:underline font-medium text-sm sm:text-base inline-flex items-center gap-1">
-                            Calculate your ROI <i class="ph-bold ph-caret-right text-xs"></i>
+                        <a href="#developers" class="px-6 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-sm sm:text-base transition-all shadow-sm cursor-pointer inline-flex items-center gap-2">
+                            <i class="ph-bold ph-terminal"></i> Install via npm (MIT)
+                        </a>
+                        <a href="#business" class="text-[#0071e3] hover:underline font-medium text-sm sm:text-base inline-flex items-center gap-1">
+                            Explore the Decision Layer <i class="ph-bold ph-caret-right text-xs"></i>
                         </a>
                     </div>
 
                     <!-- Responsive Apple-Style Bento Showcase: Comic Strip -->
                     <div class="max-w-5xl mx-auto mb-12 sm:mb-16 bento-card p-5 sm:p-8 md:p-10 text-left">
                         <div class="text-[11px] font-semibold uppercase tracking-widest text-[#86868b] mb-5 sm:mb-6 flex items-center justify-center gap-2">
-                            <i class="ph-fill ph-film-strip text-[#0071e3] text-base shrink-0"></i>
-                            <span>Day 29 Month-End Close Comparison</span>
+                            <i class="ph-fill ph-shield-check text-[#0071e3] text-base shrink-0"></i>
+                            <span>Unconstrained Autonomous AI vs. The Patchwork Decision Gate</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
                             <!-- Left Panel: Legacy Chaos -->
                             <div class="bg-[#fff5f5] border border-red-200/60 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row md:flex-col lg:flex-row items-center gap-5 text-center sm:text-left md:text-center lg:text-left relative overflow-hidden">
                                 <svg viewBox="0 0 120 110" class="w-24 h-20 sm:w-28 sm:h-24 shrink-0 mx-auto sm:mx-0">
-                                    <!-- Flaming Spreadsheet -->
+                                    <!-- Flaming Console & Bug -->
                                     <g class="animate-panic">
                                         <rect x="12" y="28" width="54" height="66" rx="4" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>
                                         <line x1="12" y1="44" x2="66" y2="44" stroke="#fca5a5" stroke-width="2"/>
                                         <line x1="12" y1="60" x2="66" y2="60" stroke="#fca5a5" stroke-width="2"/>
                                         <line x1="34" y1="28" x2="34" y2="94" stroke="#fca5a5" stroke-width="2"/>
-                                        <text x="16" y="40" font-size="8" font-family="monospace" fill="#dc2626" font-weight="bold">#REF!</text>
-                                        <text x="37" y="55" font-size="8" font-family="monospace" fill="#dc2626" font-weight="bold">#ERR</text>
-                                        <text x="16" y="73" font-size="7" font-family="monospace" fill="#dc2626" font-weight="bold">v19_FINAL</text>
-                                        <!-- Fire on sheet -->
+                                        <text x="16" y="40" font-size="8" font-family="monospace" fill="#dc2626" font-weight="bold">git push -f</text>
+                                        <text x="16" y="55" font-size="8" font-family="monospace" fill="#dc2626" font-weight="bold">DROP DB</text>
+                                        <text x="16" y="73" font-size="7" font-family="monospace" fill="#dc2626" font-weight="bold">EmailSent:70%OFF</text>
+                                        <!-- Fire -->
                                         <path d="M 22 28 Q 30 6 40 22 Q 48 2 56 20 Q 65 10 60 28 Z" fill="#f97316"/>
                                         <path d="M 28 28 Q 36 14 42 24 Q 48 12 52 28 Z" fill="#fde047"/>
                                     </g>
-                                    <!-- Panicked Accountant -->
+                                    <!-- Panicked Engineer -->
                                     <g class="animate-panic" style="animation-delay: 0.1s;">
                                         <circle cx="90" cy="54" r="14" fill="#fde68a" stroke="#78350f" stroke-width="2"/>
                                         <circle cx="85" cy="51" r="3.5" fill="#fff"/><circle cx="85" cy="51" r="1.5" fill="#000"/>
                                         <circle cx="95" cy="51" r="3.5" fill="#fff"/><circle cx="95" cy="51" r="1.5" fill="#000"/>
                                         <ellipse cx="90" cy="60" rx="4" ry="5" fill="#991b1b"/>
                                         <path d="M 80 42 L 76 32 M 86 40 L 85 29 M 93 40 L 95 29 M 99 42 L 105 33" stroke="#78350f" stroke-width="2.5" stroke-linecap="round"/>
-                                        <path d="M 76 62 Q 68 48 78 44" fill="none" stroke="#fde68a" stroke-width="4" stroke-linecap="round"/>
-                                        <path d="M 104 62 Q 112 48 102 44" fill="none" stroke="#fde68a" stroke-width="4" stroke-linecap="round"/>
                                     </g>
                                     <path d="M 73 40 Q 70 46 73 48 Q 76 46 73 40 Z" fill="#38bdf8" class="animate-sweat"/>
                                     <path d="M 108 38 Q 105 44 108 46 Q 111 44 108 38 Z" fill="#38bdf8" class="animate-sweat" style="animation-delay: 0.5s;"/>
                                 </svg>
                                 <div class="min-w-0 w-full">
-                                    <span class="px-2.5 py-0.5 text-[10px] font-semibold uppercase bg-red-100 text-red-800 rounded-full inline-block">Legacy Suites</span>
-                                    <h4 class="font-bold text-[#1d1d1f] mt-1.5 text-base">The 2:00 AM VLOOKUP</h4>
+                                    <span class="px-2.5 py-0.5 text-[10px] font-semibold uppercase bg-red-100 text-red-800 rounded-full inline-block">Unconstrained Agent</span>
+                                    <h4 class="font-bold text-[#1d1d1f] mt-1.5 text-base">The 2:00 AM Horror Story</h4>
                                     <p class="text-xs text-[#86868b] mt-1 leading-relaxed break-words">
-                                        Hunting down $0.04 rounding errors across 47 tabs of <code class="text-red-600 font-mono break-all">Q4_Close_REAL_FINAL_v9.xlsx</code> while paying $150k/yr.
+                                        An autonomous agent hallucinates a customer discount, force-pushes broken code to main, and runs away with API credits.
                                     </p>
                                 </div>
                             </div>
@@ -500,9 +767,9 @@
                                         <path d="M 22 47 Q 25 43 28 47" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
                                         <path d="M 38 47 Q 41 43 44 47" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
                                         <rect x="21" y="54" width="24" height="8" rx="2" fill="#000000"/>
-                                        <text x="24" y="60.5" font-size="6" font-family="monospace" fill="#30d158" font-weight="bold">100% OK</text>
+                                        <text x="23" y="60.5" font-size="5.5" font-family="monospace" fill="#30d158" font-weight="bold">GATE: ON</text>
                                     </g>
-                                    <!-- Chilling CFO with Sunglasses & Tropical Drink -->
+                                    <!-- Relaxed Operator -->
                                     <g class="animate-hammock">
                                         <path d="M 56 84 Q 85 98 112 74" fill="none" stroke="#0071e3" stroke-width="4" stroke-linecap="round"/>
                                         <circle cx="84" cy="52" r="14" fill="#fde68a" stroke="#78350f" stroke-width="2"/>
@@ -510,16 +777,13 @@
                                         <rect x="86" y="46" width="10" height="6" rx="1" fill="#0f172a"/>
                                         <line x1="83" y1="48" x2="86" y2="48" stroke="#0f172a" stroke-width="2"/>
                                         <path d="M 79 58 Q 84 63 90 58" fill="none" stroke="#78350f" stroke-width="2" stroke-linecap="round"/>
-                                        <circle cx="104" cy="70" r="8" fill="#78350f"/>
-                                        <line x1="104" y1="64" x2="98" y2="52" stroke="#ec4899" stroke-width="2"/>
-                                        <path d="M 91 54 Q 98 45 106 52 Z" fill="#f43f5e"/>
                                     </g>
                                 </svg>
                                 <div class="min-w-0 w-full">
                                     <span class="px-2.5 py-0.5 text-[10px] font-semibold uppercase bg-blue-100 text-[#0071e3] rounded-full inline-block">Patchwork OS</span>
-                                    <h4 class="font-bold text-[#1d1d1f] mt-1.5 text-base">The 4:59 PM Friday Close</h4>
+                                    <h4 class="font-bold text-[#1d1d1f] mt-1.5 text-base">Ask Before Acting</h4>
                                     <p class="text-xs text-[#86868b] mt-1 leading-relaxed">
-                                        Agents reconcile 2M+ rows automatically, export the SOC2 Big Four pack, and ping Slack so everyone goes home on time.
+                                        Reversible reads flow in milliseconds. Consequential writes pause in your approval queue with the full diff attached. You sleep soundly.
                                     </p>
                                 </div>
                             </div>
@@ -528,34 +792,34 @@
                     
                     <!-- Apple Bento 3-Up Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 max-w-6xl mx-auto text-left">
-                        <!-- Business Path -->
+                        <!-- Operators Path -->
                         <a href="#business" class="group bento-card flex flex-col justify-between p-7 sm:p-9">
                             <div>
-                                <div class="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-2">For CFOs & Controllers</div>
-                                <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] mb-3">Peace of mind.<br/>Built right in.</h2>
-                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">Cut month-end close from 8 days to 2 days with guaranteed 1-hour SLAs and Big Four audit packs.</p>
+                                <div class="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-2">For Operators &amp; Founders</div>
+                                <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] mb-3">Autopilot without<br/>the anxiety.</h2>
+                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">Morning briefs from commits, calendar, and Linear. Inbound emails drafted in your voice. Routine work runs while you sleep, gated by one-tap approval.</p>
                             </div>
-                            <span class="text-[#0071e3] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">Explore the CFO perspective <i class="ph-bold ph-caret-right"></i></span>
+                            <span class="text-[#0071e3] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">Explore the Decision Layer <i class="ph-bold ph-caret-right"></i></span>
                         </a>
 
                         <!-- Developer Path -->
                         <a href="#developers" class="group flex flex-col justify-between p-7 sm:p-9 bg-[#000000] rounded-[28px] text-white shadow-xl hover:-translate-y-1 transition-all">
                             <div>
-                                <div class="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-2">For CTOs & Engineering</div>
-                                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Finance as Code.<br/>Zero plumbing.</h2>
-                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">Declarative YAML and GitOps workflows, backed by single-tenant VPCs, SAML SSO, and 48-hr hotfixes.</p>
+                                <div class="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-2">For Developers &amp; IDEs</div>
+                                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Eyes and hands<br/>in your editor.</h2>
+                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">180 MCP tools give Claude Code, Cursor, and Windsurf live LSP diagnostics, refactoring, and terminal tools. Automation as YAML recipes.</p>
                             </div>
-                            <span class="text-[#2997ff] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">Explore the CTO perspective <i class="ph-bold ph-caret-right"></i></span>
+                            <span class="text-[#2997ff] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">Explore the Developer Bridge <i class="ph-bold ph-caret-right"></i></span>
                         </a>
 
-                        <!-- Enterprise Subscription Path -->
+                        <!-- Enterprise & Governance Path -->
                         <a href="#pricing" class="sm:col-span-2 lg:col-span-1 group bento-card flex flex-col justify-between p-7 sm:p-9 bg-gradient-to-b from-white to-[#f5f5f7]">
                             <div>
-                                <div class="text-xs font-semibold uppercase tracking-wider text-[#0071e3] mb-2">Flat-Rate Pricing</div>
-                                <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] mb-3">$30k a year.<br/>No growth tax.</h2>
-                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">Unlimited transactions and users. Calculate your exact annual savings against legacy $150k+ suites.</p>
+                                <div class="text-xs font-semibold uppercase tracking-wider text-[#0071e3] mb-2">Security &amp; Governance</div>
+                                <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] mb-3">Trust is earned,<br/>never assumed.</h2>
+                                <p class="text-[#86868b] mb-6 text-sm leading-relaxed">Named workers earn autonomy over time. Reversible actions run instantly; risky writes require receipts. Instant kill switch (`patchwork panic`).</p>
                             </div>
-                            <span class="text-[#0071e3] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">Calculate your ROI <i class="ph-bold ph-caret-right"></i></span>
+                            <span class="text-[#0071e3] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-sm">View Safety &amp; Governance <i class="ph-bold ph-caret-right"></i></span>
                         </a>
                     </div>
 
@@ -564,36 +828,36 @@
                         <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-10">
                             <div class="lg:w-5/12 space-y-4">
                                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#2997ff] text-xs font-mono uppercase tracking-wider">
-                                    <i class="ph-fill ph-cpu"></i> PW-M1 Neural Architecture
+                                    <i class="ph-fill ph-shield-check"></i> Blast-Radius Decision Architecture
                                 </div>
                                 <h3 class="text-2xl sm:text-4xl font-bold tracking-tight leading-tight">
-                                    2.4 Million rows per second.<br/>
-                                    <span class="text-[#86868b]">Zero human bottlenecks.</span>
+                                    Ask before acting.<br/>
+                                    <span class="text-[#86868b]">Every decision leaves a receipt.</span>
                                 </h3>
                                 <p class="text-sm sm:text-base text-[#86868b] leading-relaxed">
-                                    Watch how Patchwork OS ingests raw, messy ERP ledgers, payment webhooks, and bank BAI2 feeds simultaneously—matching 99.98% of transactions in real time and outputting cryptographic Big Four audit packs.
+                                    Patchwork OS sits directly between your AI agent's reasoning and real-world system actions. Every tool call is categorized by blast radius: reversible operations flow instantly, risky writes wait in the approval queue with evidence attached, and forbidden actions are blocked.
                                 </p>
                                 <div class="grid grid-cols-3 gap-3 pt-2">
                                     <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
-                                        <div class="text-lg sm:text-xl font-bold text-[#2997ff]">16-Core</div>
-                                        <div class="text-[11px] text-[#86868b]">Matching Engine</div>
+                                        <div class="text-lg sm:text-xl font-bold text-[#2997ff]">4ms</div>
+                                        <div class="text-[11px] text-[#86868b]">Reversible Latency</div>
                                     </div>
                                     <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
-                                        <div class="text-lg sm:text-xl font-bold text-[#30d158]">0.02ms</div>
-                                        <div class="text-[11px] text-[#86868b]">Row Latency</div>
+                                        <div class="text-lg sm:text-xl font-bold text-[#30d158]">100%</div>
+                                        <div class="text-[11px] text-[#86868b]">Local-First</div>
                                     </div>
                                     <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
-                                        <div class="text-lg sm:text-xl font-bold text-white">SHA-256</div>
-                                        <div class="text-[11px] text-[#86868b]">Audit Proofs</div>
+                                        <div class="text-lg sm:text-xl font-bold text-white">Durable</div>
+                                        <div class="text-[11px] text-[#86868b]">Receipts &amp; Traces</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Apple Silicon Style SVG Pipeline Graphic -->
+                            <!-- Decision Gate SVG Graphic -->
                             <div class="lg:w-7/12 w-full bg-[#111113] border border-white/10 rounded-3xl p-4 sm:p-6">
                                 <svg viewBox="0 0 620 270" class="w-full h-auto">
                                     <defs>
-                                        <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <linearGradient id="gateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                                             <stop offset="0%" stop-color="#1d1d1f"/>
                                             <stop offset="50%" stop-color="#2c2c2e"/>
                                             <stop offset="100%" stop-color="#000000"/>
@@ -606,85 +870,92 @@
                                             <stop offset="0%" stop-color="#2997ff"/>
                                             <stop offset="100%" stop-color="#30d158"/>
                                         </linearGradient>
+                                        <linearGradient id="beamAmber" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#f59e0b"/>
+                                            <stop offset="100%" stop-color="#fbbf24"/>
+                                        </linearGradient>
                                     </defs>
 
-                                    <!-- Left Input Nodes -->
+                                    <!-- Left Input Nodes (Triggers & Agents) -->
                                     <g>
-                                        <rect x="14" y="24" width="128" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
+                                        <rect x="14" y="24" width="134" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
                                         <circle cx="36" cy="48" r="10" fill="#0071e3" fill-opacity="0.25"/>
-                                        <text x="32" y="52" font-size="10" fill="#2997ff" font-family="monospace" font-weight="bold">DB</text>
-                                        <text x="54" y="44" font-size="11" fill="#ffffff" font-weight="bold">NetSuite / SAP</text>
-                                        <text x="54" y="58" font-size="9" fill="#86868b" font-family="monospace">GL Journal Stream</text>
+                                        <text x="30" y="52" font-size="10" fill="#2997ff" font-family="monospace" font-weight="bold">AI</text>
+                                        <text x="54" y="44" font-size="11" fill="#ffffff" font-weight="bold">Coding Agents</text>
+                                        <text x="54" y="58" font-size="9" fill="#86868b" font-family="monospace">Claude, Cursor, IDE</text>
 
-                                        <rect x="14" y="110" width="128" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
+                                        <rect x="14" y="110" width="134" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
                                         <circle cx="36" cy="134" r="10" fill="#a855f7" fill-opacity="0.25"/>
-                                        <text x="30" y="138" font-size="9" fill="#c084fc" font-family="monospace" font-weight="bold">API</text>
-                                        <text x="54" y="130" font-size="11" fill="#ffffff" font-weight="bold">Stripe / Adyen</text>
-                                        <text x="54" y="144" font-size="9" fill="#86868b" font-family="monospace">Webhook Payouts</text>
+                                        <text x="29" y="138" font-size="9" fill="#c084fc" font-family="monospace" font-weight="bold">EVT</text>
+                                        <text x="54" y="130" font-size="11" fill="#ffffff" font-weight="bold">Triggers &amp; Cron</text>
+                                        <text x="54" y="144" font-size="9" fill="#86868b" font-family="monospace">Git, File, Webhook</text>
 
-                                        <rect x="14" y="196" width="128" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
+                                        <rect x="14" y="196" width="134" height="48" rx="12" fill="#1d1d1f" stroke="#3a3a3c" stroke-width="1.5"/>
                                         <circle cx="36" cy="220" r="10" fill="#f59e0b" fill-opacity="0.25"/>
-                                        <text x="29" y="224" font-size="9" fill="#fbbf24" font-family="monospace" font-weight="bold">SWF</text>
-                                        <text x="54" y="216" font-size="11" fill="#ffffff" font-weight="bold">Global Banks</text>
-                                        <text x="54" y="230" font-size="9" fill="#86868b" font-family="monospace">BAI2 / MT940 SFTP</text>
+                                        <text x="28" y="224" font-size="9" fill="#fbbf24" font-family="monospace" font-weight="bold">YAML</text>
+                                        <text x="54" y="216" font-size="11" fill="#ffffff" font-weight="bold">Recipes &amp; Workers</text>
+                                        <text x="54" y="230" font-size="9" fill="#86868b" font-family="monospace">45+ App Connectors</text>
                                     </g>
 
-                                    <!-- Animated Data Traces (Inputs -> Chip) -->
-                                    <path d="M 142 48 C 190 48, 195 105, 232 105" fill="none" stroke="#2c2c2e" stroke-width="3"/>
-                                    <path d="M 142 48 C 190 48, 195 105, 232 105" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
+                                    <!-- Animated Data Traces (Inputs -> Decision Gate) -->
+                                    <path d="M 148 48 C 195 48, 200 105, 238 105" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 148 48 C 195 48, 200 105, 238 105" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
 
-                                    <path d="M 142 134 L 232 134" fill="none" stroke="#2c2c2e" stroke-width="3"/>
-                                    <path d="M 142 134 L 232 134" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
+                                    <path d="M 148 134 L 238 134" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 148 134 L 238 134" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
 
-                                    <path d="M 142 220 C 190 220, 195 165, 232 165" fill="none" stroke="#2c2c2e" stroke-width="3"/>
-                                    <path d="M 142 220 C 190 220, 195 165, 232 165" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
+                                    <path d="M 148 220 C 195 220, 200 165, 238 165" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 148 220 C 195 220, 200 165, 238 165" fill="none" stroke="url(#beamBlue)" stroke-width="3" class="animate-data-stream"/>
 
-                                    <!-- Center Apple Silicon-Style Patchwork Chip -->
+                                    <!-- Center Decision Gate Core -->
                                     <g class="animate-chip-glow">
-                                        <!-- Silicon Pins -->
-                                        <rect x="252" y="54" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="276" y="54" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="300" y="54" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="324" y="54" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="348" y="54" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="252" y="204" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="276" y="204" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="300" y="204" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="324" y="204" width="8" height="12" rx="2" fill="#636366"/>
-                                        <rect x="348" y="204" width="8" height="12" rx="2" fill="#636366"/>
+                                        <rect x="238" y="60" width="144" height="150" rx="20" fill="url(#gateGrad)" stroke="#48484a" stroke-width="2"/>
+                                        <rect x="250" y="72" width="120" height="126" rx="14" fill="#000000" stroke="#0071e3" stroke-width="1.2" stroke-opacity="0.8"/>
+                                        
+                                        <!-- Gate Status Badge -->
+                                        <rect x="264" y="86" width="92" height="20" rx="6" fill="#0071e3" fill-opacity="0.2" stroke="#0071e3" stroke-width="1"/>
+                                        <text x="310" y="99" text-anchor="middle" font-size="8.5" fill="#2997ff" font-family="monospace" font-weight="bold">POLICY GATE</text>
 
-                                        <!-- Main Die Package -->
-                                        <rect x="232" y="64" width="146" height="142" rx="22" fill="url(#chipGrad)" stroke="#48484a" stroke-width="2.5"/>
-                                        <rect x="246" y="78" width="118" height="114" rx="14" fill="#000000" stroke="#2997ff" stroke-width="1.2" stroke-opacity="0.6"/>
-                                        <!-- Internal Neural Cores Grid -->
-                                        <rect x="256" y="88" width="44" height="22" rx="4" fill="#0071e3" fill-opacity="0.25" stroke="#0071e3" stroke-width="1"/>
-                                        <rect x="308" y="88" width="44" height="22" rx="4" fill="#0071e3" fill-opacity="0.25" stroke="#0071e3" stroke-width="1"/>
-                                        <rect x="256" y="160" width="44" height="22" rx="4" fill="#30d158" fill-opacity="0.2" stroke="#30d158" stroke-width="1"/>
-                                        <rect x="308" y="160" width="44" height="22" rx="4" fill="#30d158" fill-opacity="0.2" stroke="#30d158" stroke-width="1"/>
+                                        <text x="310" y="132" text-anchor="middle" font-size="13" fill="#ffffff" font-weight="bold" letter-spacing="-0.3">PATCHWORK</text>
+                                        <text x="310" y="148" text-anchor="middle" font-size="9" fill="#30d158" font-family="monospace" font-weight="bold">BLAST RADIUS</text>
+                                        <text x="310" y="162" text-anchor="middle" font-size="7.5" fill="#86868b" font-family="monospace">CLASSIFIER</text>
 
-                                        <!-- Apple-style Chip Branding -->
-                                        <text x="305" y="132" text-anchor="middle" font-size="14" fill="#ffffff" font-weight="bold" letter-spacing="-0.5">PATCHWORK</text>
-                                        <text x="305" y="148" text-anchor="middle" font-size="9.5" fill="#2997ff" font-family="monospace" font-weight="bold">NEURAL ENGINE</text>
+                                        <rect x="260" y="174" width="30" height="14" rx="3" fill="#30d158" fill-opacity="0.2"/>
+                                        <text x="275" y="184" text-anchor="middle" font-size="7" fill="#30d158" font-family="monospace" font-weight="bold">READ</text>
+
+                                        <rect x="295" y="174" width="30" height="14" rx="3" fill="#f59e0b" fill-opacity="0.2"/>
+                                        <text x="310" y="184" text-anchor="middle" font-size="7" fill="#fbbf24" font-family="monospace" font-weight="bold">RISK</text>
+
+                                        <rect x="330" y="174" width="30" height="14" rx="3" fill="#ef4444" fill-opacity="0.2"/>
+                                        <text x="345" y="184" text-anchor="middle" font-size="7" fill="#f87171" font-family="monospace" font-weight="bold">HALT</text>
                                     </g>
 
-                                    <!-- Animated Data Traces (Chip -> Outputs) -->
-                                    <path d="M 378 112 C 425 112, 430 66, 472 66" fill="none" stroke="#2c2c2e" stroke-width="3"/>
-                                    <path d="M 378 112 C 425 112, 430 66, 472 66" fill="none" stroke="url(#beamGreen)" stroke-width="3" class="animate-data-stream"/>
+                                    <!-- Animated Data Traces (Gate -> Outputs) -->
+                                    <path d="M 382 105 C 425 105, 430 66, 468 66" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 382 105 C 425 105, 430 66, 468 66" fill="none" stroke="url(#beamGreen)" stroke-width="3" class="animate-data-stream"/>
 
-                                    <path d="M 378 158 C 425 158, 430 202, 472 202" fill="none" stroke="#2c2c2e" stroke-width="3"/>
-                                    <path d="M 378 158 C 425 158, 430 202, 472 202" fill="none" stroke="url(#beamGreen)" stroke-width="3" class="animate-data-stream"/>
+                                    <path d="M 382 134 L 468 134" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 382 134 L 468 134" fill="none" stroke="url(#beamAmber)" stroke-width="3" class="animate-data-stream"/>
+
+                                    <path d="M 382 165 C 425 165, 430 202, 468 202" fill="none" stroke="#2c2c2e" stroke-width="3"/>
+                                    <path d="M 382 165 C 425 165, 430 202, 468 202" fill="none" stroke="url(#beamGreen)" stroke-width="3" class="animate-data-stream"/>
 
                                     <!-- Right Output Nodes -->
                                     <g>
-                                        <rect x="472" y="34" width="134" height="64" rx="14" fill="#071f12" stroke="#30d158" stroke-width="1.5"/>
-                                        <text x="488" y="58" font-size="10" fill="#30d158" font-family="monospace" font-weight="bold">✓ 99.98% MATCHED</text>
-                                        <text x="488" y="74" font-size="11.5" fill="#ffffff" font-weight="bold">Auto-Posted GL</text>
-                                        <text x="488" y="88" font-size="9" fill="#86868b" font-family="monospace">Zero human touch</text>
+                                        <rect x="468" y="24" width="138" height="52" rx="12" fill="#071f12" stroke="#30d158" stroke-width="1.5"/>
+                                        <text x="484" y="44" font-size="9" fill="#30d158" font-family="monospace" font-weight="bold">⚡ REVERSIBLE: PASS</text>
+                                        <text x="484" y="58" font-size="11" fill="#ffffff" font-weight="bold">Executes in 4ms</text>
+                                        <text x="484" y="70" font-size="8" fill="#86868b" font-family="monospace">Reads, LSP, diagnostics</text>
 
-                                        <rect x="472" y="170" width="134" height="64" rx="14" fill="#0c192c" stroke="#2997ff" stroke-width="1.5"/>
-                                        <text x="488" y="194" font-size="10" fill="#2997ff" font-family="monospace" font-weight="bold">🔒 SOC2 CERTIFIED</text>
-                                        <text x="488" y="210" font-size="11.5" fill="#ffffff" font-weight="bold">Big Four Pack</text>
-                                        <text x="488" y="224" font-size="9" fill="#86868b" font-family="monospace">1-Click PDF + Hash</text>
+                                        <rect x="468" y="108" width="138" height="52" rx="12" fill="#261a06" stroke="#f59e0b" stroke-width="1.5"/>
+                                        <text x="484" y="128" font-size="9" fill="#fbbf24" font-family="monospace" font-weight="bold">⏳ RISKY: HOLD</text>
+                                        <text x="484" y="142" font-size="11" fill="#ffffff" font-weight="bold">Approval Queue</text>
+                                        <text x="484" y="154" font-size="8" fill="#86868b" font-family="monospace">Write file, push, email</text>
+
+                                        <rect x="468" y="192" width="138" height="52" rx="12" fill="#0c192c" stroke="#2997ff" stroke-width="1.5"/>
+                                        <text x="484" y="212" font-size="9" fill="#2997ff" font-family="monospace" font-weight="bold">📜 RECEIPT WRITTEN</text>
+                                        <text x="484" y="226" font-size="11" fill="#ffffff" font-weight="bold">Durable Trace</text>
+                                        <text x="484" y="238" font-size="8" fill="#86868b" font-family="monospace">patchwork judgments</text>
                                     </g>
                                 </svg>
                             </div>
@@ -780,67 +1051,68 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs sm:text-sm font-medium mb-6">
                         <span class="flex h-2 w-2 shrink-0 rounded-full bg-brand-500 animate-pulse"></span>
-                        <span>The CFO & Finance Director's Perspective</span>
+                        <span>The Decision Layer Architecture</span>
                     </div>
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight max-w-4xl mx-auto">
-                        "I Buy Software for <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-blue-400">Peace of Mind</span>, Not Just Features."
+                        "You Don't Have an Automation Problem.<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-blue-400">You Have a Decision Problem.</span>"
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                        The modern architecture of Patchwork OS drops month-end close from 8 days to 2 days. Here is why finance leaders rely on our enterprise platform when managing their most critical financial operations.
+                        Every AI horror story ends the same way: an action nobody stopped to question. Patchwork OS sits between the agent's impulse and the real world—ensuring routine work flows freely while consequential actions stop to ask you first.
                     </p>
                 </div>
             </section>
 
-            <!-- 4 Pillars of Why CFOs Subscribe -->
+            <!-- 4 Pillars of the Decision Layer -->
             <section class="py-14 sm:py-20 bg-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-                        <span class="text-brand-600 font-bold text-xs sm:text-sm uppercase tracking-wider">Production Readiness</span>
-                        <h2 class="text-2xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">Why Finance Leaders Choose Patchwork</h2>
-                        <p class="text-base sm:text-lg text-gray-600">Deploying software that handles your company's financial lifeline requires guarantees, strict SLAs, and uncompromising compliance.</p>
+                        <span class="text-brand-600 font-bold text-xs sm:text-sm uppercase tracking-wider">Governed Autonomy</span>
+                        <h2 class="text-2xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">The Four Pillars of Supervised AI Work</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Deploy agents with complete peace of mind across your codebase, communications, operations, and infrastructure.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <!-- Pillar 1 -->
                         <div class="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-brand-400 hover:shadow-lg transition-all">
                             <div class="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center mb-5 sm:mb-6">
-                                <i class="ph-fill ph-lifebuoy text-brand-700 text-2xl"></i>
+                                <i class="ph-fill ph-shield-check text-brand-700 text-2xl"></i>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">1. The "Insurance Policy" (SLAs & 24/7 Support)</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">1. Ask Before Acting (Blast-Radius Gating)</h3>
                             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                If your reconciliation engine goes down on Day 29 of the month, you need direct accountability. We provide a guaranteed <strong>1-hour response time SLA</strong> with 24/7 dedicated enterprise support from financial engineering experts.
+                                Every action is classified by blast radius: can it be undone, and how much breaks if it's wrong? Reversible queries and diagnostics run immediately. Risky actions—code commits, database mutations, customer emails—wait in the <strong>Approval Queue</strong> with evidence attached.
                             </p>
                         </div>
 
                         <!-- Pillar 2 -->
                         <div class="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-brand-400 hover:shadow-lg transition-all">
                             <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-5 sm:mb-6">
-                                <i class="ph-fill ph-file-lock text-blue-700 text-2xl"></i>
+                                <i class="ph-fill ph-chart-line-up text-blue-700 text-2xl"></i>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">2. Compliance & Big Four SOC2 Readiness</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">2. Trust is Earned, Never Assumed (Autonomy Ramp)</h3>
                             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                Your platform must be secure, but auditors demand <em>proof</em>. Patchwork includes advanced immutable audit-logging modules, strict Role-Based Access Control (RBAC), and one-click compliance reporting formatted specifically for Big Four auditors.
+                                Workers—named agents with defined jobs—start strictly supervised. They earn autonomy gradually through a verifiable track record per action type. Good at filing issues ≠ allowed to push code. One bad call outweighs a hundred successes. You always hold the ceiling.
                             </p>
                         </div>
 
                         <!-- Pillar 3 -->
                         <div class="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-brand-400 hover:shadow-lg transition-all">
                             <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-5 sm:mb-6">
-                                <i class="ph-fill ph-Chart-line-down text-emerald-700 text-2xl"></i>
+                                <i class="ph-fill ph-receipt text-emerald-700 text-2xl"></i>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">3. Predictable Flat Pricing (No Growth Tax)</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">3. Every Decision Leaves a Receipt (Audit Traces)</h3>
                             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                Legacy vendors tax your growth—the more transactions you process, the higher your monthly bill climbs. Patchwork OS operates on a <strong>flat, predictable annual platform fee</strong>. You know exactly what it will cost this year and next.
+                                What was done, why it was allowed, and how it turned out. Durable, replayable, and explainable via the traces dashboard and <code class="text-emerald-700 font-mono text-xs">patchwork judgments</code>. When you approve an action, you find out later whether you were right.
                             </p>
                         </div>
 
                         <!-- Pillar 4 -->
                         <div class="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-brand-400 hover:shadow-lg transition-all">
                             <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-5 sm:mb-6">
-                                <i class="ph-fill ph-plugs-connected text-purple-700 text-2xl"></i>
+                                <i class="ph-fill ph-lock-key text-purple-700 text-2xl"></i>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">4. Officially Maintained ERP & Bank Connectors</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-3">4. 100% Local-First &amp; Zero Vendor Lock-In</h3>
                             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                                Your team shouldn't spend time building or fixing integrations for every bank and ERP. The Enterprise tier unlocks plug-and-play, officially maintained connectors for <strong>NetSuite, SAP, Workday, and major global banks</strong> with guaranteed schema-change updates.
+                                All recipes, credentials, connector tokens, logs, and receipts live locally under <code class="text-purple-700 font-mono text-xs">~/.patchwork</code>. No third-party servers sit in your execution path. Connect to Anthropic, OpenAI, Gemini, or fully air-gapped local Ollama models.
                             </p>
                         </div>
                     </div>
@@ -849,19 +1121,19 @@
                         <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
                             <div class="lg:w-5/12 space-y-4">
                                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#0071e3] text-xs font-semibold">
-                                    <i class="ph-fill ph-chart-polar"></i> Live CFO Close Cockpit
+                                    <i class="ph-fill ph-gauge"></i> Workflow Velocity Cockpit
                                 </div>
                                 <h3 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f]">
-                                    Visualizing the 8-Day to 2-Day Close Compression
+                                    Autonomous Work Acceleration
                                 </h3>
                                 <p class="text-sm sm:text-base text-[#86868b] leading-relaxed">
-                                    Instead of waiting until Day 8 for controllers to finish manual VLOOKUPs, Patchwork streams continuous daily reconciliation so your executive sign-off happens by Day 2 at 4:00 PM.
+                                    Instead of engineers, operators, and finance teams spending 15+ hours a week on manual triage, status tracking, and repetitive syncs, Patchwork coordinates tasks autonomously—stopping only for a single tap when an action is consequential.
                                 </p>
                                 <div class="space-y-3 pt-2">
                                     <div>
                                         <div class="flex justify-between text-xs font-semibold mb-1">
-                                            <span class="text-red-600">Legacy Cloud Suites (8 Business Days)</span>
-                                            <span class="font-mono text-gray-500">192 Hours</span>
+                                            <span class="text-red-600">Manual Operations &amp; Unsupervised Scripts</span>
+                                            <span class="font-mono text-gray-500">15+ Hours / Week</span>
                                         </div>
                                         <div class="w-full h-3 bg-red-100 rounded-full overflow-hidden">
                                             <div class="h-full bg-red-500 rounded-full w-full"></div>
@@ -869,11 +1141,11 @@
                                     </div>
                                     <div>
                                         <div class="flex justify-between text-xs font-semibold mb-1">
-                                            <span class="text-[#0071e3]">Patchwork OS Continuous Close (2 Business Days)</span>
-                                            <span class="font-mono text-[#0071e3] font-bold">48 Hours (-75%)</span>
+                                            <span class="text-[#0071e3]">Patchwork Governed Autopilot</span>
+                                            <span class="font-mono text-[#0071e3] font-bold">&lt; 30 Mins / Week (-95%)</span>
                                         </div>
                                         <div class="w-full h-3 bg-blue-100 rounded-full overflow-hidden">
-                                            <div class="h-full bg-gradient-to-r from-[#0071e3] to-[#30d158] rounded-full w-1/4"></div>
+                                            <div class="h-full bg-gradient-to-r from-[#0071e3] to-[#30d158] rounded-full w-[10%]"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -884,9 +1156,9 @@
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
                                     <div class="flex items-center gap-2">
                                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                        <span class="text-xs font-bold text-gray-900">Q4 Global Consolidation Telemetry</span>
+                                        <span class="text-xs font-bold text-gray-900">Task Velocity &amp; Decision Stream</span>
                                     </div>
-                                    <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-semibold">SOC2 Audit Trail: Active</span>
+                                    <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-semibold">Audit Stream: Active</span>
                                 </div>
                                 <svg viewBox="0 0 540 185" class="w-full h-auto">
                                     <!-- Grid Lines -->
@@ -901,23 +1173,23 @@
 
                                     <!-- Legacy Slow Curve (Red Dashed) -->
                                     <path d="M 45 152 Q 220 145, 340 100 T 510 28" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5 5"/>
-                                    <text x="375" y="112" font-size="9.5" fill="#ef4444" font-weight="bold">Legacy Close (Day 8)</text>
+                                    <text x="360" y="112" font-size="9.5" fill="#ef4444" font-weight="bold">Manual Backlog (Friday 8pm)</text>
 
                                     <!-- Patchwork Fast Curve (Blue/Green Area + Line) -->
                                     <path d="M 45 152 C 95 140, 130 35, 185 25 L 510 25 L 510 155 L 45 155 Z" fill="#0071e3" fill-opacity="0.08"/>
                                     <path d="M 45 152 C 95 140, 130 35, 185 25 L 510 25" fill="none" stroke="#0071e3" stroke-width="3.5" stroke-linecap="round"/>
 
-                                    <!-- Milestone Callout Pin at Day 2 -->
+                                    <!-- Milestone Callout Pin -->
                                     <circle cx="185" cy="25" r="6" fill="#30d158" stroke="#ffffff" stroke-width="2"/>
-                                    <rect x="135" y="42" width="142" height="36" rx="8" fill="#1d1d1f"/>
-                                    <text x="145" y="58" font-size="9.5" fill="#30d158" font-family="monospace" font-weight="bold">✓ DAY 2: BOOKS CLOSED</text>
-                                    <text x="145" y="70" font-size="8.5" fill="#ffffff">CFO Sign-Off Complete</text>
+                                    <rect x="135" y="42" width="146" height="36" rx="8" fill="#1d1d1f"/>
+                                    <text x="145" y="58" font-size="9.5" fill="#30d158" font-family="monospace" font-weight="bold">✓ TASKS COMPLETED</text>
+                                    <text x="145" y="70" font-size="8.5" fill="#ffffff">Approval Queue: 0 Pending</text>
 
                                     <!-- X-Axis Labels -->
-                                    <text x="45" y="174" font-size="9" fill="#64748b" font-family="monospace">Day 1</text>
-                                    <text x="172" y="174" font-size="9" fill="#0071e3" font-family="monospace" font-weight="bold">Day 2</text>
-                                    <text x="330" y="174" font-size="9" fill="#64748b" font-family="monospace">Day 5</text>
-                                    <text x="485" y="174" font-size="9" fill="#ef4444" font-family="monospace">Day 8</text>
+                                    <text x="45" y="174" font-size="9" fill="#64748b" font-family="monospace">Trigger</text>
+                                    <text x="165" y="174" font-size="9" fill="#0071e3" font-family="monospace" font-weight="bold">Auto Triage &amp; Queue</text>
+                                    <text x="330" y="174" font-size="9" fill="#64748b" font-family="monospace">In-Flight</text>
+                                    <text x="475" y="174" font-size="9" fill="#ef4444" font-family="monospace">Manual Chase</text>
                                 </svg>
                             </div>
                         </div>
@@ -933,38 +1205,38 @@
                                 <line x1="25" y1="64" x2="60" y2="64" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
                                 <!-- Laser Scanner Line -->
                                 <line x1="12" y1="32" x2="73" y2="32" stroke="#10b981" stroke-width="3" class="animate-laser"/>
-                                <!-- Big SOC2 Stamp -->
+                                <!-- Big OK Stamp -->
                                 <g class="animate-stamp">
                                     <rect x="22" y="70" width="42" height="16" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-                                    <text x="26" y="81" font-size="8" font-family="monospace" fill="#15803d" font-weight="bold">SOC2 OK</text>
+                                    <text x="26" y="81" font-size="8" font-family="monospace" fill="#15803d" font-weight="bold">VERIFIED</text>
                                 </g>
-                                <!-- Stern Big-4 Auditor Turning Happy -->
+                                <!-- Happy Security Lead -->
                                 <circle cx="130" cy="52" r="20" fill="#fde68a" stroke="#78350f" stroke-width="2.5"/>
-                                <!-- Monocle / Glasses -->
+                                <!-- Glasses -->
                                 <circle cx="122" cy="48" r="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
                                 <circle cx="138" cy="48" r="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
                                 <line x1="128" y1="48" x2="132" y2="48" stroke="#0284c7" stroke-width="2"/>
-                                <!-- Happy Auditor Smile -->
+                                <!-- Smile -->
                                 <path d="M 122 60 Q 130 68 138 60" fill="none" stroke="#78350f" stroke-width="2.5" stroke-linecap="round"/>
-                                <!-- Floating Heart / Thumbs Up Badge -->
+                                <!-- Thumbs Up Badge -->
                                 <circle cx="158" cy="30" r="12" fill="#10b981" class="animate-bounce"/>
                                 <path d="M 153 30 L 157 34 L 164 26" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" class="animate-bounce"/>
                             </svg>
                         </div>
                         <div>
                             <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-2">
-                                <i class="ph-fill ph-sparkle"></i> Rare Sighting: A Smiling Auditor
+                                <i class="ph-fill ph-receipt"></i> Receipts &amp; Explainability
                             </div>
-                            <h3 class="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Make Your Big Four Auditors Fall in Love With You</h3>
+                            <h3 class="text-lg sm:text-2xl font-bold text-gray-900 mb-2">Every Decision Leaves a Durable Receipt</h3>
                             <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
-                                Instead of spending 3 weeks digging through email threads for screenshot approvals, hand your external auditors a cryptographic, one-click Patchwork SOC2 pack. Side effects may include stunned silence and markedly lower audit overage bills.
+                                Instead of wondering which autonomous prompt triggered an outage or an unvetted email, Patchwork creates an immutable trace: what was proposed, the evidence attached, who approved it, and the execution result. Auditing becomes a 1-click inspection via <code class="text-brand-700 font-mono text-xs">patchwork judgments</code>.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- CFO ROI Callout Box -->
+            <!-- Leadership Quote Box -->
             <section class="py-14 sm:py-20 bg-brand-950 relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
                 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -972,58 +1244,43 @@
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-6 pb-6 sm:pb-8 mb-6 sm:mb-8 border-b border-brand-700/50">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-brand-500 flex items-center justify-center text-white font-extrabold text-lg sm:text-2xl shadow-lg">
-                                    CFO
+                                    VP
                                 </div>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-brand-300">Executive Bottom Line</span>
-                                    <h3 class="text-xl sm:text-2xl font-bold text-white">The Real-World Enterprise ROI</h3>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-brand-300">Engineering &amp; Operations Leadership</span>
+                                    <h3 class="text-xl sm:text-2xl font-bold text-white">Why Teams Run on Patchwork</h3>
                                 </div>
                             </div>
-                            <a href="#pricing" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 sm:py-2.5 bg-brand-500 hover:bg-brand-400 text-brand-950 font-bold rounded-xl text-sm transition-colors">
-                                Calculate Your Savings <i class="ph-bold ph-arrow-right ml-2"></i>
+                            <a href="#developers" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 sm:py-2.5 bg-brand-500 hover:bg-brand-400 text-brand-950 font-bold rounded-xl text-sm transition-colors">
+                                Explore Developer CLI <i class="ph-bold ph-arrow-right ml-2"></i>
                             </a>
                         </div>
 
                         <blockquote class="text-base sm:text-xl md:text-2xl text-gray-100 leading-relaxed font-light italic mb-8 sm:mb-10">
-                            "We pay Patchwork OS <strong>$30,000 a year</strong> for the Enterprise tier. It directly replaced a rigid legacy system that cost us <strong>$150,000 a year</strong>, saves my controllers <strong>40 hours every month</strong>, cuts our close from 8 days to 2 days, and guarantees our Big Four audit compliance. It is the easiest check I write all year."
+                            "Patchwork OS is the missing governance layer for our AI workflows. Our engineers use Claude Code and Cursor across real production repositories with 180 IDE tools, while our operations team automates daily briefs and triage without fear of an agent running away. Reversible work moves at lightning speed; risky actions stop and ask first."
                         </blockquote>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                             <div class="bg-brand-950/60 p-4 sm:p-5 rounded-2xl border border-brand-800">
-                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">$120k/yr</div>
-                                <div class="text-xs sm:text-sm text-gray-300">Direct Licensing Savings vs. Legacy Vendor</div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">0</div>
+                                <div class="text-xs sm:text-sm text-gray-300">Unsupervised Outages or Rogue Writes</div>
                             </div>
                             <div class="bg-brand-950/60 p-4 sm:p-5 rounded-2xl border border-brand-800 relative overflow-hidden">
-                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1 flex items-center">
-                                    <span>8d &rarr; 2d</span>
-                                    <div class="ml-2 w-9 h-9 sm:w-10 sm:h-10 relative shrink-0">
-                                        <svg viewBox="0 0 100 100" class="w-full h-full animate-rocket-snail absolute top-0 left-0 drop-shadow-lg">
-                                            <!-- Snail body -->
-                                            <path d="M 20 80 Q 50 80 70 80 Q 90 80 90 60 Q 90 40 70 60 L 50 60" fill="#0d9488" stroke="#042f2e" stroke-width="2" stroke-linecap="round"/>
-                                            <circle cx="85" cy="55" r="3" fill="#fff" />
-                                            <circle cx="86" cy="55" r="1" fill="#000" />
-                                            <!-- Shell / Calendar -->
-                                            <rect x="25" y="30" width="35" height="35" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-                                            <text x="32" y="55" font-size="20" font-family="monospace" fill="#ef4444" font-weight="bold">31</text>
-                                            <path d="M 30 35 L 55 35" stroke="#ef4444" stroke-width="4"/>
-                                            <!-- Rocket -->
-                                            <rect x="15" y="40" width="20" height="10" rx="3" fill="#64748b"/>
-                                            <polygon points="15,40 5,45 15,50" fill="#ef4444"/>
-                                            <!-- Flame -->
-                                            <g class="animate-flame">
-                                                <path d="M 5 45 Q -10 35 -20 45 Q -10 55 5 45" fill="#fbbf24"/>
-                                                <path d="M 5 45 Q -5 40 -10 45 Q -5 50 5 45" fill="#ef4444"/>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="text-xs sm:text-sm text-gray-300">Month-End Close Acceleration</div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">100%</div>
+                                <div class="text-xs sm:text-sm text-gray-300">Decisions Backed by Verifiable Receipts</div>
                             </div>
                             <div class="bg-brand-950/60 p-4 sm:p-5 rounded-2xl border border-brand-800">
-                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">40 hrs/mo</div>
-                                <div class="text-xs sm:text-sm text-gray-300">Saved for Senior Financial Controllers</div>
+                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">180+</div>
+                                <div class="text-xs sm:text-sm text-gray-300">Pre-Built MCP IDE Tools (LSP, Git, Debugger)</div>
                             </div>
                             <div class="bg-brand-950/60 p-4 sm:p-5 rounded-2xl border border-brand-800">
+                                <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">45+</div>
+                                <div class="text-xs sm:text-sm text-gray-300">Governed Enterprise Service Connectors</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
                                 <div class="text-2xl sm:text-3xl font-extrabold text-brand-400 mb-1">1-Hour</div>
                                 <div class="text-xs sm:text-sm text-gray-300">Guaranteed Critical SLA Response</div>
                             </div>
@@ -1036,57 +1293,50 @@
             <section class="py-14 sm:py-20 bg-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center mb-10 sm:mb-12">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">How Patchwork Enterprise Compares</h2>
-                        <p class="text-sm sm:text-base text-gray-600 mt-2">See why modern finance teams are migrating away from legacy cloud suites.</p>
+                        <span class="text-brand-600 font-bold text-xs sm:text-sm uppercase tracking-wider">Competitive Landscape</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">How Patchwork OS Compares</h2>
+                        <p class="text-sm sm:text-base text-gray-600 mt-2 max-w-2xl mx-auto">Why modern teams choose Patchwork over brittle linear triggers, unconstrained agent scripts, and legacy screen-scraping bots.</p>
                     </div>
 
                     <!-- Mobile Stacked Cards (< 768px) -->
                     <div class="md:hidden space-y-4">
                         <div class="rounded-2xl border border-gray-200 p-4 bg-white shadow-sm">
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Annual Cost</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Safety &amp; Human Governance</div>
                             <div class="p-3 rounded-xl bg-brand-50 border border-brand-200 mb-2">
                                 <div class="text-[11px] font-bold uppercase text-brand-700">Patchwork OS</div>
-                                <div class="text-sm font-bold text-brand-950">Flat $30k/yr (Predictable)</div>
+                                <div class="text-sm font-bold text-brand-950">Blast-Radius Approval Queue + Kill Switch (`patchwork panic`)</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-gray-50 mb-2">
+                                <div class="text-[11px] font-bold uppercase text-gray-500">Linear Automation (Zapier/Make)</div>
+                                <div class="text-sm text-gray-600">No semantic triage; fails silently or fires bad mutations</div>
                             </div>
                             <div class="p-3 rounded-xl bg-gray-50">
-                                <div class="text-[11px] font-bold uppercase text-gray-500">Legacy Financial Suites</div>
-                                <div class="text-sm font-medium text-red-600">$150k+/yr (Scales with volume)</div>
+                                <div class="text-[11px] font-bold uppercase text-gray-500">Agent Frameworks (CrewAI/LangGraph)</div>
+                                <div class="text-sm text-red-600">Unconstrained autonomous loops; no native approval queue UI</div>
                             </div>
                         </div>
 
                         <div class="rounded-2xl border border-gray-200 p-4 bg-white shadow-sm">
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Support & SLA</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Data Privacy &amp; Sovereignty</div>
                             <div class="p-3 rounded-xl bg-brand-50 border border-brand-200 mb-2">
                                 <div class="text-[11px] font-bold uppercase text-brand-700">Patchwork OS</div>
-                                <div class="text-sm font-bold text-brand-950">24/7 Dedicated + 1-Hr SLA</div>
+                                <div class="text-sm font-bold text-brand-950">100% Local-First; credentials and logs live in ~/.patchwork</div>
                             </div>
                             <div class="p-3 rounded-xl bg-gray-50">
-                                <div class="text-[11px] font-bold uppercase text-gray-500">Legacy Financial Suites</div>
-                                <div class="text-sm text-gray-600">Tiered paid support tickets</div>
+                                <div class="text-[11px] font-bold uppercase text-gray-500">Linear Platforms (Zapier/Workato)</div>
+                                <div class="text-sm text-gray-600">Vendor multi-tenant cloud storage for all tokens &amp; payloads</div>
                             </div>
                         </div>
 
                         <div class="rounded-2xl border border-gray-200 p-4 bg-white shadow-sm">
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Audit & SOC2 Exports</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Developer Experience &amp; IDE Bridge</div>
                             <div class="p-3 rounded-xl bg-brand-50 border border-brand-200 mb-2">
                                 <div class="text-[11px] font-bold uppercase text-brand-700">Patchwork OS</div>
-                                <div class="text-sm font-bold text-brand-950">Automated Big Four Packs + RBAC</div>
+                                <div class="text-sm font-bold text-brand-950">180 MCP tools; Claude Code, Cursor, Windsurf support; YAML recipes</div>
                             </div>
                             <div class="p-3 rounded-xl bg-gray-50">
-                                <div class="text-[11px] font-bold uppercase text-gray-500">Legacy Financial Suites</div>
-                                <div class="text-sm text-gray-600">Proprietary black-box exports</div>
-                            </div>
-                        </div>
-
-                        <div class="rounded-2xl border border-gray-200 p-4 bg-white shadow-sm">
-                            <div class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Data Sovereignty</div>
-                            <div class="p-3 rounded-xl bg-brand-50 border border-brand-200 mb-2">
-                                <div class="text-[11px] font-bold uppercase text-brand-700">Patchwork OS</div>
-                                <div class="text-sm font-bold text-brand-950">On-Prem or Single-Tenant Isolated VPC</div>
-                            </div>
-                            <div class="p-3 rounded-xl bg-gray-50">
-                                <div class="text-[11px] font-bold uppercase text-gray-500">Legacy Financial Suites</div>
-                                <div class="text-sm text-gray-600">Multi-tenant vendor cloud</div>
+                                <div class="text-[11px] font-bold uppercase text-gray-500">Legacy RPA (UiPath)</div>
+                                <div class="text-sm text-gray-600">Fragile desktop screen-scraping bots with months of consulting</div>
                             </div>
                         </div>
                     </div>
@@ -1097,31 +1347,42 @@
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr>
-                                        <th class="py-4 px-6 bg-gray-50 font-bold text-gray-900 border-b border-gray-200 w-1/3">Evaluation Criteria</th>
-                                        <th class="py-4 px-6 bg-brand-50 font-bold text-brand-900 border-b border-brand-200 w-1/3 text-lg">Patchwork OS</th>
-                                        <th class="py-4 px-6 bg-gray-50 font-bold text-gray-700 border-b border-gray-200 w-1/3">Legacy Financial Suites</th>
+                                        <th class="py-4 px-5 bg-gray-50 font-bold text-gray-900 border-b border-gray-200 w-1/4">Capability</th>
+                                        <th class="py-4 px-5 bg-brand-50 font-bold text-brand-900 border-b border-brand-200 w-1/4 text-base">Patchwork OS</th>
+                                        <th class="py-4 px-5 bg-gray-50 font-bold text-gray-700 border-b border-gray-200 w-1/4">Linear Automation (Zapier/Make)</th>
+                                        <th class="py-4 px-5 bg-gray-50 font-bold text-gray-700 border-b border-gray-200 w-1/4">Agent SDKs (CrewAI/LangGraph)</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200 text-sm lg:text-base">
+                                <tbody class="divide-y divide-gray-200 text-sm">
                                     <tr>
-                                        <td class="py-4 px-6 font-semibold text-gray-900">Annual Cost</td>
-                                        <td class="py-4 px-6 bg-brand-50/30 text-brand-900 font-bold">Flat $30k/yr (Predictable)</td>
-                                        <td class="py-4 px-6 text-red-600 font-medium">$150k+/yr (Scales with volume)</td>
+                                        <td class="py-4 px-5 font-semibold text-gray-900">Safety &amp; Oversight</td>
+                                        <td class="py-4 px-5 bg-brand-50/30 text-brand-900 font-bold">Blast-radius approval queue + instant panic write-block</td>
+                                        <td class="py-4 px-5 text-gray-600">Brittle linear steps; errors fail silently</td>
+                                        <td class="py-4 px-5 text-red-600 font-medium">Unconstrained loops; no out-of-the-box approval UI</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-4 px-6 font-semibold text-gray-900">Support & SLA</td>
-                                        <td class="py-4 px-6 bg-brand-50/30 text-brand-900 font-semibold">24/7 Dedicated + 1-Hr SLA</td>
-                                        <td class="py-4 px-6 text-gray-600">Tiered paid support tickets</td>
+                                        <td class="py-4 px-5 font-semibold text-gray-900">Agent Autonomy Ramp</td>
+                                        <td class="py-4 px-5 bg-brand-50/30 text-brand-900 font-bold">Trust is earned; track record per action type</td>
+                                        <td class="py-4 px-5 text-gray-600">None (Fixed triggers)</td>
+                                        <td class="py-4 px-5 text-gray-600">Manual code scaffolding required</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-4 px-6 font-semibold text-gray-900">Audit & SOC2 Exports</td>
-                                        <td class="py-4 px-6 bg-brand-50/30 text-brand-900 font-semibold">Automated Big Four Packs + RBAC</td>
-                                        <td class="py-4 px-6 text-gray-600">Proprietary black-box exports</td>
+                                        <td class="py-4 px-5 font-semibold text-gray-900">Data Sovereignty</td>
+                                        <td class="py-4 px-5 bg-brand-50/30 text-brand-900 font-bold">100% Local-First / Private VPC (Your keys, zero cloud storage)</td>
+                                        <td class="py-4 px-5 text-gray-600">Vendor cloud hosts all payloads &amp; secrets</td>
+                                        <td class="py-4 px-5 text-gray-600">Depends on custom hosting</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-4 px-6 font-semibold text-gray-900">Data Sovereignty</td>
-                                        <td class="py-4 px-6 bg-brand-50/30 text-brand-900 font-semibold">On-Prem or Single-Tenant Isolated VPC</td>
-                                        <td class="py-4 px-6 text-gray-600">Multi-tenant vendor cloud</td>
+                                        <td class="py-4 px-5 font-semibold text-gray-900">Developer Tooling</td>
+                                        <td class="py-4 px-5 bg-brand-50/30 text-brand-900 font-bold">180 MCP tools (LSP, Git, Debugger) for Claude Code, Cursor, Windsurf</td>
+                                        <td class="py-4 px-5 text-gray-600">Proprietary browser web GUI only</td>
+                                        <td class="py-4 px-5 text-gray-600">Python scripts without IDE companion extension</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4 px-5 font-semibold text-gray-900">Decision Receipts</td>
+                                        <td class="py-4 px-5 bg-brand-50/30 text-brand-900 font-bold">Durable, replayable traces via <code class="text-brand-700 font-mono text-xs">patchwork judgments</code></td>
+                                        <td class="py-4 px-5 text-gray-600">Ephemeral task history</td>
+                                        <td class="py-4 px-5 text-gray-600">Standard console logging</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1170,19 +1431,19 @@
                             </div>
 
                             <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
-                                "I Don't Want to Maintain the Plumbing; <span class="text-brand-400">I Want to Build the House.</span>"
+                                "Eyes and Hands in Your Editor; <span class="text-brand-400">Governance on Every Tool Call.</span>"
                             </h1>
                             <p class="text-base sm:text-lg text-gray-400 mb-8 leading-relaxed">
-                                Engineers love Patchwork OS because it treats <strong>Finance as Code</strong>—using YAML, GitOps, and Python instead of clunky enterprise GUIs. You can deploy our secure, managed infrastructure in an afternoon. Here is why engineering leaders champion Patchwork over building internal tools.
+                                Patchwork OS gives coding assistants like Claude Code, Cursor, and Windsurf 180 pre-built Model Context Protocol (MCP) tools for diagnostics, LSP refactoring, and terminal control—wrapped in a blast-radius policy gate.
                             </p>
                             <div class="flex flex-wrap gap-4">
                                 <a href="#pricing" class="w-full sm:w-auto justify-center px-6 py-3.5 sm:py-3 bg-brand-500 text-gray-950 font-bold rounded-lg hover:bg-brand-400 transition-colors flex items-center gap-2">
-                                    View Platform Features <i class="ph-bold ph-arrow-right"></i>
+                                    Explore MCP Tools &amp; Recipes <i class="ph-bold ph-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                         
-                        <!-- YAML Code Snippet block showing Enterprise config -->
+                        <!-- YAML Code Snippet block showing recipe config -->
                         <div class="bg-[#1e1e1e] rounded-2xl border border-gray-700 shadow-2xl overflow-hidden min-w-0 w-full max-w-full">
                             <div class="bg-[#2d2d2d] px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 border-b border-gray-700">
                                 <div class="flex items-center gap-2 min-w-0">
@@ -1191,30 +1452,33 @@
                                         <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
                                         <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
                                     </div>
-                                    <span class="text-gray-300 text-[11px] sm:text-xs font-mono ml-1 truncate">patchwork-enterprise.yaml</span>
+                                    <span class="text-gray-300 text-[11px] sm:text-xs font-mono ml-1 truncate">ci-triage-recipe.yaml</span>
                                 </div>
-                                <span class="px-2 py-0.5 text-[9px] sm:text-[10px] font-mono bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded shrink-0">ENTERPRISE</span>
+                                <span class="px-2 py-0.5 text-[9px] sm:text-[10px] font-mono bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded shrink-0">YAML RECIPE</span>
                             </div>
                             <div class="p-3 sm:p-4 overflow-x-auto w-full">
-                                <pre class="text-[11px] sm:text-xs md:text-sm leading-relaxed whitespace-pre overflow-x-auto"><code class="language-yaml">name: "Production EOD Reconciliation"
-runtime:
-  mode: "private_managed_vpc" # Isolated
-  auth_provider: "okta_saml_sso" # 10-min setup
-  telemetry: "datadog_apm_exporter"
+                                <pre class="text-[11px] sm:text-xs md:text-sm leading-relaxed whitespace-pre overflow-x-auto"><code class="language-yaml">name: "overnight-ci-triage"
+trigger:
+  on: "github.workflow_run"
+  status: "failure"
 
-connectors:
-  erp: "@patchwork-enterprise/netsuite-v2"
-  bank: "@patchwork-enterprise/global-swift"
+workers:
+  triage-agent:
+    model: "claude-3-7-sonnet"
+    autonomy: "supervised" # Trust ramp
 
 execution:
-  - step: match_ledger
-    agent: patchwork_local_llm
-    confidence_threshold: 0.99
-    audit_export: "soc2_big4_immutable"
+  - step: inspect_logs
+    tool: "github.get_workflow_logs"
+    risk: reversible # Runs in 4ms
 
-  - step: human_signoff
-    rbac_role: "senior_controller"
-    notify: "slack_finance_ops"</code></pre>
+  - step: isolate_root_cause
+    prompt: "Analyze stack trace and identify breaking commit"
+
+  - step: file_issue
+    tool: "linear.create_issue"
+    risk: consequential # Pauses in Approval Queue
+    notify: "slack_eng_ops"</code></pre>
                             </div>
                         </div>
                     </div>
@@ -1225,9 +1489,9 @@ execution:
             <section class="py-14 sm:py-20 bg-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-                        <span class="text-blue-600 font-mono font-bold text-xs sm:text-sm uppercase tracking-wider">Zero-Maintenance Infrastructure</span>
-                        <h2 class="text-2xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">Why Engineers Demand the Enterprise Tier</h2>
-                        <p class="text-base sm:text-lg text-gray-600">Your engineering team's time is your most expensive asset. Don't burn sprint cycles building internal auth, observability, or fixing broken payroll APIs.</p>
+                        <span class="text-blue-600 font-mono font-bold text-xs sm:text-sm uppercase tracking-wider">Zero-Friction Developer Runtime</span>
+                        <h2 class="text-2xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">Why Engineers Run on Patchwork OS</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Give your AI agents real power across code and cloud services without burning cycles worrying about blown deploys.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
@@ -1236,13 +1500,13 @@ execution:
                             <div>
                                 <div class="flex items-center justify-between gap-2 mb-5 sm:mb-6">
                                     <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
-                                        <i class="ph-bold ph-key text-blue-400 text-2xl"></i>
+                                        <i class="ph-bold ph-terminal text-blue-400 text-2xl"></i>
                                     </div>
-                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">10-Minute Setup</span>
+                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">180 MCP Tools</span>
                                 </div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-3">1. Enterprise SSO, SAML & SCIM</h3>
+                                <h3 class="text-lg sm:text-xl font-bold mb-3">1. IDE Bridge for Coding Agents</h3>
                                 <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
-                                    "I am not managing local user accounts and password resets for 50 accountants. Patchwork gives me instant <strong>Okta and Azure AD integration</strong> out of the box. It takes 10 minutes to configure, and InfoSec signs off immediately."
+                                    Connect Claude Code, Cursor, Windsurf, or Antigravity directly to your workspace. Full access to LSP symbols, diagnostics, type signatures, refactoring previews, and terminal controls.
                                 </p>
                             </div>
                         </div>
@@ -1252,13 +1516,13 @@ execution:
                             <div>
                                 <div class="flex items-center justify-between gap-2 mb-5 sm:mb-6">
                                     <div class="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center shrink-0">
-                                        <i class="ph-bold ph-cloud-check text-brand-400 text-2xl"></i>
+                                        <i class="ph-bold ph-file-code text-brand-400 text-2xl"></i>
                                     </div>
-                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">Zero DevOps Overhead</span>
+                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">Automation as Code</span>
                                 </div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-3">2. Private Managed VPC (Hybrid Option)</h3>
+                                <h3 class="text-lg sm:text-xl font-bold mb-3">2. Declarative YAML Recipes</h3>
                                 <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
-                                    "While we love data privacy, managing GPU infrastructure for AI models takes DevOps bandwidth we don't have. Patchwork offers a <strong>Single-Tenant Cryptographically Isolated VPC</strong>—giving us on-prem security with zero SaaS maintenance."
+                                    Write workflows as plain YAML: triggers (cron, file save, git commit, test failure, webhook) paired with multi-model agent steps. Version control them in Git like dotfiles.
                                 </p>
                             </div>
                         </div>
@@ -1268,13 +1532,13 @@ execution:
                             <div>
                                 <div class="flex items-center justify-between gap-2 mb-5 sm:mb-6">
                                     <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center shrink-0">
-                                        <i class="ph-bold ph-activity text-purple-400 text-2xl"></i>
+                                        <i class="ph-bold ph-cpu text-purple-400 text-2xl"></i>
                                     </div>
-                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">OpenTelemetry + Datadog</span>
+                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">Multi-Model</span>
                                 </div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-3">3. Out-of-the-Box Telemetry & Monitoring</h3>
+                                <h3 class="text-lg sm:text-xl font-bold mb-3">3. Cloud &amp; Local Model Adapters</h3>
                                 <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
-                                    "When a reconciliation agent fails, I need to know why immediately. Patchwork includes a pre-built telemetry exporter that plugs directly into our <strong>Datadog and Grafana</strong> instances with full tracing, error rates, and latency metrics."
+                                    Freedom of model choice. Point individual recipe steps to Anthropic Claude, OpenAI GPT-4o, Google Gemini, Grok, or fully offline Ollama endpoints with zero code refactoring.
                                 </p>
                             </div>
                         </div>
@@ -1286,11 +1550,11 @@ execution:
                                     <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
                                         <i class="ph-bold ph-lightning text-amber-400 text-2xl"></i>
                                     </div>
-                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">48-Hr Hotfix SLA</span>
+                                    <span class="text-xs font-mono text-gray-400 bg-gray-800 px-2.5 py-1 rounded">Instant Panic Button</span>
                                 </div>
-                                <h3 class="text-lg sm:text-xl font-bold mb-3">4. Priority Connector Patches</h3>
+                                <h3 class="text-lg sm:text-xl font-bold mb-3">4. Kill Switch (`patchwork panic`)</h3>
                                 <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
-                                    "When the API of our localized payroll provider changed and broke our workflow, we escalated it. The Patchwork engineering team shipped a patched connector in <strong>48 hours</strong>, ensuring our financial sprint was uninterrupted."
+                                    A single command immediately blocks all write-tier tool calls across all running bridges. Reads keep functioning, and in-flight reasoning is not killed—giving you instant write protection.
                                 </p>
                             </div>
                         </div>
@@ -1436,19 +1700,19 @@ execution:
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/15 border border-brand-400/30 text-brand-300 text-xs sm:text-sm font-semibold mb-6">
                         <i class="ph-fill ph-buildings text-brand-400"></i>
-                        <span>Purpose-Built Industry Blueprints</span>
+                        <span>Purpose-Built Workflows & Vertical Blueprints</span>
                     </div>
                     <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight max-w-4xl mx-auto">
-                        Built for Industries Where <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-300">Every Cent & Second Counts.</span>
+                        Built for Workflows Where <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-300">Reliability, Security & Speed Matter.</span>
                     </h1>
                     <p class="text-base sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-10">
-                        Legacy financial suites force every business into the same rigid mold—and charge massive overages when transaction volume spikes. Patchwork OS ships with pre-built YAML blueprints tailored to your vertical.
+                        Rigid SaaS tools and brittle bot scripts force teams into endless manual babysitting. Patchwork OS ships with declarative YAML recipes, IDE tools, and blast-radius gates tailored to your mission-critical operations.
                     </p>
 
                     <!-- Funny Cartoon: Multi-Industry Conveyor Belt Machine -->
                     <div class="max-w-3xl mx-auto bg-gray-900/90 border border-brand-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl">
                         <div class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-brand-400 mb-3 flex items-center justify-center gap-2">
-                            <i class="ph-fill ph-gear-six animate-spin"></i> Universal Industry Reconciliation Engine
+                            <i class="ph-fill ph-gear-six animate-spin"></i> Universal Multi-Domain Workflow & Policy Runtime
                         </div>
                         <svg viewBox="0 0 360 110" class="w-full h-24 sm:h-32 mx-auto">
                             <!-- Conveyor Belt Base -->
@@ -1459,15 +1723,15 @@ execution:
                             <circle cx="250" cy="85" r="4" fill="#94a3b8" class="animate-spin"/>
                             <circle cx="325" cy="85" r="4" fill="#94a3b8" class="animate-spin"/>
 
-                            <!-- Messy Input Items on Left (Cart, Pill, Truck, Card) -->
+                            <!-- Messy Input Items on Left (Alert, Code, Ticket, Payload) -->
                             <g class="animate-panic">
-                                <!-- Shopping Cart / Retail -->
+                                <!-- CI Alert / Code -->
                                 <rect x="28" y="45" width="26" height="24" rx="4" fill="#3b82f6"/>
-                                <text x="34" y="61" font-size="11" fill="#fff" font-family="monospace" font-weight="bold">SKU</text>
-                                <!-- Cargo Box / Logistics -->
+                                <text x="31" y="61" font-size="10" fill="#fff" font-family="monospace" font-weight="bold">GIT</text>
+                                <!-- Ops / Logistics BOL -->
                                 <rect x="64" y="48" width="26" height="22" rx="3" fill="#f59e0b"/>
-                                <text x="68" y="63" font-size="9" fill="#fff" font-family="monospace" font-weight="bold">BOL</text>
-                                <!-- Fintech Stripe/Card -->
+                                <text x="68" y="63" font-size="9" fill="#fff" font-family="monospace" font-weight="bold">OPS</text>
+                                <!-- API / Event stream -->
                                 <rect x="100" y="46" width="28" height="22" rx="4" fill="#ec4899"/>
                                 <text x="105" y="60" font-size="9" fill="#fff" font-family="monospace" font-weight="bold">API</text>
                             </g>
@@ -1480,15 +1744,15 @@ execution:
                             <circle cx="180" cy="67" r="4" fill="#4ade80"/>
                             <circle cx="195" cy="67" r="4" fill="#38bdf8"/>
 
-                            <!-- Clean Standardized Audit Packs Coming Out Right -->
+                            <!-- Clean Standardized Receipts & Actions Coming Out Right -->
                             <g class="animate-bounce" style="animation-duration: 2.4s;">
                                 <rect x="242" y="42" width="38" height="30" rx="4" fill="#10b981" stroke="#047857" stroke-width="2"/>
-                                <text x="247" y="60" font-size="8" fill="#fff" font-family="monospace" font-weight="bold">SOC2</text>
+                                <text x="246" y="60" font-size="7.5" fill="#fff" font-family="monospace" font-weight="bold">PASS</text>
                                 <rect x="292" y="42" width="38" height="30" rx="4" fill="#10b981" stroke="#047857" stroke-width="2"/>
-                                <text x="297" y="60" font-size="8" fill="#fff" font-family="monospace" font-weight="bold">100%</text>
+                                <text x="294" y="60" font-size="7.5" fill="#fff" font-family="monospace" font-weight="bold">RECEIPT</text>
                             </g>
                         </svg>
-                        <p class="text-xs text-gray-400 mt-2">Raw, messy industry data goes in on the left; audit-ready, Big-Four certified general ledger entries come out on the right.</p>
+                        <p class="text-xs text-gray-400 mt-2">Messy webhooks, CI failures, customer events, and feeds go in on the left; audited decisions, verified actions, and immutable receipts come out on the right.</p>
                     </div>
                 </div>
             </section>
@@ -1605,7 +1869,7 @@ rules:
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center max-w-3xl mx-auto mb-12">
                         <h2 class="text-2xl sm:text-4xl font-bold text-gray-900">Every Vertical We Transform</h2>
-                        <p class="text-sm sm:text-base text-gray-600 mt-2">If your finance team is drowning in multi-system spreadsheets—or paying legacy vendors six figures just to match rows—Patchwork OS was built for you.</p>
+                        <p class="text-sm sm:text-base text-gray-600 mt-2">Whether you're balancing mission-critical DevOps triage, customer pipelines, or high-volume financial reconciliation, Patchwork OS gives your team verifiable execution with zero guesswork.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -1800,13 +2064,13 @@ rules:
                     </svg>
 
                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider mb-5 sm:mb-6">
-                        Transparent Commercial Pricing
+                        Simple Pricing for Everyone
                     </div>
                     <h1 class="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-5 sm:mb-6">
-                        No Transaction Taxes. <span class="text-brand-600">Just Predictability.</span>
+                        One Platform. <span class="text-brand-600">More Ways to Work.</span>
                     </h1>
                     <p class="text-base sm:text-xl text-gray-600 max-w-3xl mx-auto">
-                        Traditional legacy suites penalize you for growing. Patchwork OS operates on a flat, transparent platform fee—giving you absolute certainty for your budget.
+                        Patchwork OS gives individuals, growing teams, and established organizations the tools to organize work, automate repeatable processes, connect systems, and build solutions their way.
                     </p>
                 </div>
             </section>
@@ -1818,28 +2082,28 @@ rules:
                         <!-- Basic Package -->
                         <article class="rounded-2xl sm:rounded-3xl border-2 border-brand-500 p-6 sm:p-8 bg-white shadow-xl relative flex flex-col">
                             <div class="absolute -top-3.5 left-6 bg-brand-600 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow">
-                                Everything Open Source
+                                For Individuals & Teams
                             </div>
                             <div class="pt-3">
                                 <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-5">
                                     <i class="ph-bold ph-code text-2xl"></i>
                                 </div>
                                 <h3 class="text-2xl sm:text-3xl font-bold text-gray-900">Basic</h3>
-                                <p class="text-sm text-gray-600 mt-2">The complete Patchwork OS open-source experience, including every newly added community feature.</p>
+                                <p class="text-sm text-gray-600 mt-2">A flexible starting point for anyone who wants to organize work, automate tasks, and turn ideas into dependable workflows.</p>
                                 <div class="my-6 flex items-baseline gap-2">
                                     <span id="basic-package-price" class="text-4xl sm:text-5xl font-extrabold text-gray-900">$5</span>
                                     <span id="basic-package-interval" class="text-gray-500 font-medium text-sm">/ month</span>
                                 </div>
                                 <ul class="space-y-3 text-sm text-gray-700 mb-8">
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>All open-source features</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>All newly added community features</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Reconciliation workflows and automation</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Developer APIs, integrations, and self-hosting</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Community updates and documentation</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Every open-source and newly added feature</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Flexible workflows for projects, operations, and data</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Automation for repetitive work</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>APIs, integrations, and self-hosting</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-600 mt-0.5 shrink-0 text-lg"></i><span>Community updates, templates, and documentation</span></li>
                                 </ul>
                             </div>
                             <a href="#signup" class="mt-auto w-full py-3.5 px-6 rounded-xl bg-brand-600 text-white font-bold text-center hover:bg-brand-700 shadow-lg shadow-brand-600/20 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
-                                Get Started with Basic <i class="ph-bold ph-arrow-right"></i>
+                                Start Building <i class="ph-bold ph-arrow-right"></i>
                             </a>
                         </article>
 
@@ -1850,16 +2114,16 @@ rules:
                                     <i class="ph-bold ph-buildings text-2xl"></i>
                                 </div>
                                 <h3 class="text-2xl sm:text-3xl font-bold">Corporate</h3>
-                                <p class="text-sm text-gray-400 mt-2">A tailored package for companies that need managed deployment, security reviews, support, and enterprise controls.</p>
+                                <p class="text-sm text-gray-400 mt-2">A tailored package for companies that want to bring teams, tools, and business processes together on one secure platform.</p>
                                 <div class="my-6">
                                     <span class="text-3xl sm:text-4xl font-extrabold">Let’s talk</span>
                                     <p class="text-gray-400 text-sm mt-2">We’ll scope the right setup for your organization.</p>
                                 </div>
                                 <ul class="space-y-3 text-sm text-gray-300 mb-8">
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Company-wide deployment planning</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Private infrastructure and security options</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Enterprise integrations and governance</span></li>
-                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Dedicated onboarding and support</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Solutions shaped around your teams and goals</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Secure deployment and access controls</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Integrations across your existing tools</span></li>
+                                    <li class="flex items-start gap-2"><i class="ph-fill ph-check-circle text-brand-400 mt-0.5 shrink-0 text-lg"></i><span>Dedicated onboarding, training, and support</span></li>
                                 </ul>
                             </div>
                             <div class="mt-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1903,7 +2167,7 @@ rules:
 
                                 <div>
                                     <div class="flex justify-between items-baseline gap-2 text-xs sm:text-sm font-medium mb-2">
-                                        <label for="calc-controllers" class="text-gray-300">Controller Hours Saved / Month</label>
+                                        <label for="calc-controllers" class="text-gray-300">Operations & FinOps Hours Saved / Month</label>
                                         <span id="val-controllers" class="text-brand-400 font-bold font-mono shrink-0">40 hrs</span>
                                     </div>
                                     <input id="calc-controllers" type="range" min="10" max="160" step="10" value="40" oninput="updateROI()" class="w-full accent-brand-500 cursor-pointer h-2.5 bg-gray-700 rounded-lg">
@@ -1940,7 +2204,7 @@ rules:
                                         <span id="val-saas-diff" class="font-mono font-semibold text-white shrink-0">$120,000/yr</span>
                                     </div>
                                     <div class="flex justify-between gap-2">
-                                        <span class="text-gray-400">Finance Productivity ($85/hr):</span>
+                                        <span class="text-gray-400">Operations & FinOps Productivity ($85/hr):</span>
                                         <span id="val-fin-saved" class="font-mono font-semibold text-white shrink-0">$40,800/yr</span>
                                     </div>
                                     <div class="flex justify-between gap-2">
@@ -1994,10 +2258,10 @@ rules:
                     </div>
                     <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#1d1d1f] tracking-tight mb-5 leading-tight max-w-4xl mx-auto">
                         Enterprise Support.<br/>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#2997ff]">Zero Month-End Downtime.</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#2997ff]">Zero Production Downtime.</span>
                     </h1>
                     <p class="text-base sm:text-xl text-[#86868b] max-w-3xl mx-auto mb-8 leading-relaxed">
-                        Guaranteed 1-hour P1 SLAs for close blockers, direct Slack Connect with senior solutions architects, isolated single-tenant telemetry, and instant diagnostic self-service.
+                        Guaranteed 1-hour P1 SLAs for critical blockers, direct Slack Connect with senior solutions architects, isolated single-tenant telemetry, and instant diagnostic self-service.
                     </p>
 
                     <!-- Real-Time Infrastructure Status Bar -->
@@ -2022,25 +2286,25 @@ rules:
                         <!-- 4 Service Nodes -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-4">
                             <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                                <div class="text-[11px] text-gray-500 font-medium">PW-M1 Recon Engine</div>
+                                <div class="text-[11px] text-gray-500 font-medium">Patchwork Policy Runtime</div>
                                 <div class="text-sm font-bold text-emerald-600 flex items-center gap-1.5 mt-0.5">
-                                    <i class="ph-fill ph-check-circle text-xs"></i> 0.02ms / row
+                                    <i class="ph-fill ph-check-circle text-xs"></i> 4ms Policy Gate
                                 </div>
-                                <div class="text-[10px] text-gray-400 mt-1">Zero backlog</div>
+                                <div class="text-[10px] text-gray-400 mt-1">Zero latency overhead</div>
                             </div>
                             <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                                <div class="text-[11px] text-gray-500 font-medium">Bank & Ingestion API</div>
+                                <div class="text-[11px] text-gray-500 font-medium">MCP Tool & Ingestion Bus</div>
                                 <div class="text-sm font-bold text-emerald-600 flex items-center gap-1.5 mt-0.5">
-                                    <i class="ph-fill ph-check-circle text-xs"></i> 12ms Latency
+                                    <i class="ph-fill ph-check-circle text-xs"></i> 180+ Tools Active
                                 </div>
-                                <div class="text-[10px] text-gray-400 mt-1">BAI2, MT940, Plaid</div>
+                                <div class="text-[10px] text-gray-400 mt-1">APIs, Webhooks & CLI</div>
                             </div>
                             <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                                <div class="text-[11px] text-gray-500 font-medium">ERP Connector Bus</div>
+                                <div class="text-[11px] text-gray-500 font-medium">Enterprise Connector Mesh</div>
                                 <div class="text-sm font-bold text-emerald-600 flex items-center gap-1.5 mt-0.5">
                                     <i class="ph-fill ph-check-circle text-xs"></i> 100% Synced
                                 </div>
-                                <div class="text-[10px] text-gray-400 mt-1">NetSuite, SAP, Workday</div>
+                                <div class="text-[10px] text-gray-400 mt-1">NetSuite, GitHub, Slack</div>
                             </div>
                             <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
                                 <div class="text-[11px] text-gray-500 font-medium">Private Tenant VPCs</div>
@@ -2069,7 +2333,7 @@ rules:
                                 </div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Submit Priority Ticket</h3>
                                 <p class="text-sm text-gray-600 leading-relaxed">
-                                    Critical month-end blocker, feed disruption, or discrepancy exception? Direct escalation to Tier-3 FinOps Architects.
+                                    Critical pipeline blocker, agent escalation, or integration exception? Direct escalation to Tier-3 Systems Architects.
                                 </p>
                             </div>
                             <div class="pt-6">
@@ -2079,7 +2343,7 @@ rules:
                             </div>
                         </div>
 
-                        <!-- Gateway 2: Live FinOps AI Copilot -->
+                        <!-- Gateway 2: Live AI Copilot -->
                         <div class="bento-card p-6 sm:p-7 flex flex-col justify-between border border-gray-200">
                             <div>
                                 <div class="w-12 h-12 rounded-2xl bg-blue-100 text-[#0071e3] flex items-center justify-center text-2xl mb-4">
@@ -2090,7 +2354,7 @@ rules:
                                 </div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Live Support Copilot</h3>
                                 <p class="text-sm text-gray-600 leading-relaxed">
-                                    Diagnose BAI2 code variances, review YAML reconciliation recipes, check ASC 606 rules, or get instant connector advice.
+                                    Diagnose MCP tool execution, review declarative YAML recipes, inspect blast-radius policies, or get instant connector advice.
                                 </p>
                             </div>
                             <div class="pt-6">
@@ -2236,7 +2500,7 @@ rules:
                                 <div class="flex items-center gap-3 p-3 bg-red-50/70 rounded-xl border border-red-100">
                                     <input type="checkbox" id="ticket-urgent-close" class="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500">
                                     <label for="ticket-urgent-close" class="text-xs text-red-900 cursor-pointer font-medium">
-                                        <strong>Active Month-End Close in Progress</strong> (Auto-escalates directly to Senior On-Call FinOps Lead)
+                                        <strong>Production Outage or Mission-Critical Blocker</strong> (Auto-escalates directly to Senior On-Call Systems Lead)
                                     </label>
                                 </div>
 
@@ -2255,7 +2519,7 @@ rules:
                                 </div>
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2">Support Request Received!</h3>
                                 <p class="text-sm text-gray-600 max-w-md mx-auto mb-4">
-                                    Your ticket has been assigned to a Senior FinOps Solutions Architect. An initial analysis is already running in your sandbox cluster.
+                                    Your ticket has been assigned to a Senior Systems Architect. An initial analysis is already running in your sandbox cluster.
                                 </p>
 
                                 <div class="max-w-md mx-auto bg-gray-50 border border-gray-200 rounded-2xl p-4 text-left space-y-2 mb-6">
@@ -2315,7 +2579,7 @@ rules:
                                             <i class="ph-fill ph-check-circle text-xs"></i> <span>Received & Log Decrypted</span>
                                         </div>
                                         <div class="flex items-center gap-2 text-emerald-600 font-medium">
-                                            <i class="ph-fill ph-check-circle text-xs"></i> <span>Assigned to Tier-3 FinOps Architect</span>
+                                            <i class="ph-fill ph-check-circle text-xs"></i> <span>Assigned to Tier-3 Systems Architect</span>
                                         </div>
                                         <div class="flex items-center gap-2 text-[#0071e3] font-bold">
                                             <i class="ph-bold ph-spinner animate-spin text-xs"></i> <span>Reconciliation rule patch executing</span>
@@ -2363,7 +2627,7 @@ rules:
                                     </div>
                                 </div>
                                 <p class="text-xs text-gray-400 leading-relaxed">
-                                    Enterprise accounts with 24/7 dedicated telephone routing bypass standard queues directly to our on-call bridge during month-end closes.
+                                    Enterprise accounts with 24/7 dedicated telephone routing bypass standard queues directly to our on-call bridge during production incidents.
                                 </p>
                             </div>
                         </div>
@@ -2756,10 +3020,10 @@ rules:
                     </div>
                     <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#1d1d1f] tracking-tight mb-5 leading-tight max-w-4xl mx-auto">
                         Start in Minutes.<br/>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#2997ff]">Reconcile Millions.</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#2997ff]">Automate with Total Trust.</span>
                     </h1>
                     <p class="text-base sm:text-xl text-[#86868b] max-w-3xl mx-auto leading-relaxed">
-                        Spin up an instant developer sandbox with pre-seeded synthetic financial ledgers, or initiate a 30-day enterprise evaluation inside your private single-tenant VPC.
+                        Spin up an instant developer sandbox with mock recipes, MCP bridges, and synthetic event streams, or initiate an enterprise evaluation inside your private single-tenant VPC.
                     </p>
                 </div>
             </section>
@@ -2779,7 +3043,7 @@ rules:
                                         <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Free Instant Access</span>
                                     </div>
                                     <h4 class="text-base font-bold text-gray-900">Developer & Integration</h4>
-                                    <p class="text-xs text-gray-500 mt-1">100,000 synthetic test transactions, NetSuite & Stripe mock endpoints, instant API keys.</p>
+                                    <p class="text-xs text-gray-500 mt-1">Declarative recipes, mock endpoints (Stripe, GitHub, ERP), 180 MCP tools, instant API keys.</p>
                                 </div>
                             </label>
 
@@ -2790,8 +3054,8 @@ rules:
                                         <span class="text-xs font-mono uppercase font-bold text-gray-900">🛡️ Enterprise Evaluation</span>
                                         <span class="px-2 py-0.5 rounded-full bg-blue-100 text-[#0071e3] text-[10px] font-bold">30-Day VPC Trial</span>
                                     </div>
-                                    <h4 class="text-base font-bold text-gray-900">Production & Finance Close</h4>
-                                    <p class="text-xs text-gray-500 mt-1">Dedicated private cloud VPC, Big Four audit pack generator, 1-Hour SLA engineering support.</p>
+                                    <h4 class="text-base font-bold text-gray-900">Enterprise Production & Operations</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Dedicated single-tenant VPC, audit receipt generation, blast-radius policy gates, 1-Hour SLA support.</p>
                                 </div>
                             </label>
                         </div>
@@ -2932,22 +3196,23 @@ rules:
                                 </div>
                             </div>
 
-                            <!-- Interactive 1-Click Test Reconciliation Demo -->
+                            <!-- Interactive 1-Click Test Workflow & Policy Demo -->
                             <div class="max-w-lg mx-auto bg-gray-900 text-white rounded-2xl p-5 text-left mb-6 shadow-xl border border-gray-800">
                                 <div class="flex items-center justify-between mb-3">
-                                    <div class="text-xs font-mono text-brand-400 uppercase">Interactive Close Demo</div>
-                                    <span class="text-[10px] text-emerald-400 font-mono">PW-M1 READY</span>
+                                    <div class="text-xs font-mono text-brand-400 uppercase">Interactive Policy & Workflow Demo</div>
+                                    <span class="text-[10px] text-emerald-400 font-mono">POLICY ENGINE READY</span>
                                 </div>
                                 <p class="text-xs text-gray-300 mb-3">
-                                    Click below to run an instant reconciliation against your seeded 50,000 synthetic transactions:
+                                    Click below to run an instant policy check & recipe validation across 50,000 synthetic workflow events:
                                 </p>
                                 <button id="btn-run-recon" onclick="runSandboxReconDemo()" class="w-full py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all">
-                                    <i class="ph-bold ph-play"></i> Run Test 3-Way Reconciliation
+                                    <i class="ph-bold ph-play"></i> Run Test Recipe Execution
                                 </button>
                                 <div id="recon-demo-results" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs font-mono space-y-1">
-                                    <div class="text-emerald-400">✓ 50,000 rows matched in 0.042 seconds</div>
-                                    <div class="text-gray-300">✓ NetSuite General Ledger balanced: $4,289,120.00</div>
-                                    <div class="text-gray-300">✓ SOC2 Hash Proof: <span class="text-blue-400">e3b0c44298fc1c149afbf4...</span></div>
+                                    <div class="text-emerald-400">✓ 50,000 events evaluated in 0.042 seconds</div>
+                                    <div class="text-gray-300">✓ 49,992 low-risk steps executed automatically</div>
+                                    <div class="text-gray-300">✓ 8 write operations routed to human approval queue</div>
+                                    <div class="text-gray-300">✓ Cryptographic Receipt: <span class="text-blue-400">e3b0c44298fc1c149afbf4...</span></div>
                                 </div>
                             </div>
 
@@ -2977,11 +3242,11 @@ rules:
 
             <div id="demo-form-container">
                 <div class="flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-wider mb-2">
-                    <i class="ph-fill ph-shield-check text-lg"></i> Patchwork Enterprise
+                    <i class="ph-fill ph-shield-check text-lg"></i> Patchwork Corporate
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Book an Architecture & ROI Review</h3>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">See What Patchwork Can Do for Your Team</h3>
                 <p class="text-sm text-gray-600 mb-6">
-                    Bring both your Finance Lead and Engineering Lead. We will walk through Big Four audit packs, Private VPC deployment, and your flat-rate contract.
+                    Tell us how your team works today. We’ll show you how Patchwork can connect your tools, simplify processes, and support the outcomes that matter to your organization.
                 </p>
 
                 <form onsubmit="submitDemoForm(event)" class="space-y-4">
@@ -2992,17 +3257,18 @@ rules:
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Your Primary Role</label>
                         <select class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm bg-white">
-                            <option value="cfo">CFO / Finance Director / Controller</option>
-                            <option value="cto">CTO / VP Engineering / Lead Developer</option>
-                            <option value="other">Operations / IT Security</option>
+                            <option value="business">Business / Operations</option>
+                            <option value="technology">Technology / Product</option>
+                            <option value="finance">Finance / Administration</option>
+                            <option value="other">Other Team or Function</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Primary ERP / Ledger</label>
-                        <input type="text" placeholder="e.g., NetSuite, SAP, Workday, Custom" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm">
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Tools You Use Today</label>
+                        <input type="text" placeholder="e.g., Google Workspace, Slack, Salesforce, SAP, custom tools" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm">
                     </div>
                     <button type="submit" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition-colors cursor-pointer">
-                        Request Enterprise Demo & SLA Guide
+                        Request a Corporate Demo
                     </button>
                 </form>
             </div>
@@ -3013,7 +3279,7 @@ rules:
                 </div>
                 <h4 class="text-2xl font-bold text-gray-900 mb-2">Demo Request Received!</h4>
                 <p class="text-gray-600 text-sm mb-6">
-                    An Enterprise Solutions Architect will reach out within 1 hour (matching our Enterprise SLA) with your custom sandbox and SOC2 compliance overview.
+                    A Patchwork specialist will reach out to learn about your goals and prepare a demo tailored to your team.
                 </p>
                 <button onclick="closeDemoModal()" class="px-6 py-2.5 bg-gray-900 text-white font-semibold rounded-xl text-sm">
                     Back to Patchwork OS
@@ -3035,7 +3301,7 @@ rules:
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 mb-1">Create Your Free Account</h3>
                 <p class="text-xs sm:text-sm text-gray-600 mb-5">
-                    Instant access to pre-seeded synthetic financial ledgers, mock webhooks, and local YAML reconciliation recipes.
+                    Instant access to 180 MCP tools, mock webhooks, declarative recipes, and blast-radius safety policies.
                 </p>
 
                 <!-- Fast SSO -->
@@ -3339,7 +3605,7 @@ rules:
                         <span class="font-bold text-lg text-[#1d1d1f]">Patchwork<span class="text-[#86868b] font-normal ml-0.5">OS</span></span>
                     </div>
                     <p class="text-sm text-gray-600 leading-relaxed max-w-sm">
-                        Commercial financial operating system powering high-volume automated reconciliation, audit readiness, and continuous close for enterprise teams.
+                        Local-first AI runtime and decision layer powering autonomous multi-system workflows, blast-radius policy enforcement, and audit readiness for modern teams.
                     </p>
                     <div class="flex flex-wrap items-center gap-2 pt-2">
                         <span class="px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 font-mono text-[10px] font-bold">
@@ -3362,10 +3628,10 @@ rules:
                     <div class="font-bold text-[#1d1d1f] uppercase tracking-wider text-[11px]">Platform</div>
                     <ul class="space-y-2 text-gray-600">
                         <li><a href="#home" class="hover:text-[#0071e3] transition-colors">Architecture Overview</a></li>
-                        <li><a href="#business" class="hover:text-[#0071e3] transition-colors">For CFOs & Controllers</a></li>
-                        <li><a href="#developers" class="hover:text-[#0071e3] transition-colors">For CTOs & Engineering</a></li>
-                        <li><a href="#industries" class="hover:text-[#0071e3] transition-colors">Industry Blueprints</a></li>
-                        <li><a href="#pricing" class="hover:text-[#0071e3] transition-colors">Flat-Rate Pricing ($30k/yr)</a></li>
+                        <li><a href="#business" class="hover:text-[#0071e3] transition-colors">Decision Layer Architecture</a></li>
+                        <li><a href="#developers" class="hover:text-[#0071e3] transition-colors">For Developers & IDE Bridge</a></li>
+                        <li><a href="#industries" class="hover:text-[#0071e3] transition-colors">Industry & Workflow Blueprints</a></li>
+                        <li><a href="#pricing" class="hover:text-[#0071e3] transition-colors">Basic & Corporate Plans</a></li>
                         <li><a href="#signup" class="hover:text-[#0071e3] transition-colors">Developer Sandbox</a></li>
                     </ul>
                 </div>
@@ -3400,7 +3666,7 @@ rules:
             <!-- Bottom Subfooter -->
             <div class="border-t border-black/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
                 <div class="text-gray-500">
-                    &copy; 2026 Patchwork Inc. All rights reserved. Commercial Financial Operating System.
+                    &copy; 2026 Patchwork Inc. All rights reserved. Local-First AI Runtime & Decision Layer.
                 </div>
                 <div class="flex flex-wrap gap-5 text-gray-500">
                     <a href="#pricing" class="hover:text-[#0071e3]">Enterprise SLAs</a>
@@ -3534,6 +3800,43 @@ rules:
                 data.connectors.map(c => `<span class="px-2.5 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs font-mono text-brand-300">${c}</span>`).join('');
         }
 
+        // Clustered Navigation Dropdown & Mobile Accordion Controls
+        function toggleNavCluster(clusterKey, e) {
+            if (e) e.stopPropagation();
+            const targetPanel = document.getElementById('nav-cluster-' + clusterKey);
+            const allPanels = document.querySelectorAll('.nav-cluster-panel');
+            allPanels.forEach(panel => {
+                if (panel !== targetPanel) {
+                    panel.classList.add('hidden');
+                }
+            });
+            if (targetPanel) {
+                targetPanel.classList.toggle('hidden');
+            }
+        }
+
+        function closeAllNavClusters() {
+            document.querySelectorAll('.nav-cluster-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+        }
+
+        function toggleMobileCluster(clusterId) {
+            const container = document.getElementById(clusterId);
+            const icon = document.getElementById('icon-' + clusterId);
+            if (!container) return;
+            container.classList.toggle('hidden');
+            if (icon) {
+                icon.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('[data-nav-cluster]')) {
+                closeAllNavClusters();
+            }
+        });
+
         // Mobile Menu Controls
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -3602,11 +3905,11 @@ rules:
             };
 
             const titleMap = {
-                '#home': 'Patchwork OS | Secure Enterprise Financial Automation',
-                '#business': 'Patchwork OS | For CFOs & Financial Controllers',
-                '#developers': 'Patchwork OS | For CTOs & Finance-as-Code Engineers',
-                '#industries': 'Patchwork OS | Enterprise Industry Blueprints',
-                '#pricing': 'Patchwork OS | Flat-Rate $30k/yr Platform Pricing & ROI',
+                '#home': 'Patchwork OS | Local-First AI Runtime & Decision Layer',
+                '#business': 'Patchwork OS | Decision Layer Architecture & Governance',
+                '#developers': 'Patchwork OS | For Developers & IDE Bridge (180 MCP Tools)',
+                '#industries': 'Patchwork OS | Multi-Domain Workflows & Vertical Blueprints',
+                '#pricing': 'Patchwork OS | Flexible Plans for Individuals, Teams & Companies',
                 '#support': 'Patchwork OS | Enterprise Support & 99.999% SLA Trust Center',
                 '#contact': 'Patchwork OS | Connect With Solutions Architecture',
                 '#signup': 'Patchwork OS | Sign Up & Developer Sandbox'
@@ -4269,9 +4572,9 @@ rules:
                 We connect to NetSuite SuiteTalk (SOAP/REST) and SAP S/4HANA OData via private outbound tunnels. Transactions are reconciled continuously, and journal entries are posted automatically with full multi-currency and intercompany sign-off hierarchies.`;
             } else if (query.includes('sla') || query.includes('ticket') || query.includes('emergency') || query.includes('p1')) {
                 return `<strong>Emergency Response & SLAs:</strong><br/>
-                For P1 month-end close blockers, our initial response SLA is <strong>under 1 hour</strong> with direct 24/7 on-call engineering dispatch. You can submit directly via our <a href="#support-ticket-form-section" class="text-[#0071e3] underline font-bold" onclick="toggleSupportChat()">Ticket Form</a> or call <strong>+1 (888) 728-2495</strong>.`;
+                For P1 mission-critical blockers and pipeline incidents, our initial response SLA is <strong>under 1 hour</strong> with direct 24/7 on-call engineering dispatch. You can submit directly via our <a href="#support-ticket-form-section" class="text-[#0071e3] underline font-bold" onclick="toggleSupportChat()">Ticket Form</a> or call <strong>+1 (888) 728-2495</strong>.`;
             } else {
-                return `Thank you for reaching out! Patchwork OS processes 2.4M rows/second inside single-tenant VPCs. Would you like to <a href="#support-ticket-form-section" class="text-[#0071e3] underline" onclick="toggleSupportChat()">submit a priority ticket</a>, <a href="#contact" class="text-[#0071e3] underline" onclick="toggleSupportChat()">book an architect review</a>, or <a href="#signup" class="text-[#0071e3] underline" onclick="toggleSupportChat()">spin up a sandbox</a>?`;
+                return `Thank you for reaching out! Patchwork OS is a local-first AI runtime with 180 MCP tools, declarative YAML recipes, and blast-radius policy enforcement. Would you like to <a href="#support-ticket-form-section" class="text-[#0071e3] underline" onclick="toggleSupportChat()">submit a priority ticket</a>, <a href="#contact" class="text-[#0071e3] underline" onclick="toggleSupportChat()">book an architect review</a>, or <a href="#signup" class="text-[#0071e3] underline" onclick="toggleSupportChat()">spin up a sandbox</a>?`;
             }
         }
 
@@ -4427,11 +4730,37 @@ rules:
         localStorage.setItem('patchwork_user', JSON.stringify(data.user));
       }
       async function authenticatePortal(endpoint, payload) {
-        const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Authentication failed.');
         saveSecureSession(data);
-        window.location.assign('/account');
+        const urlParams = new URLSearchParams(window.location.search);
+        const nextUrl = urlParams.get('next');
+        const target = nextUrl || data.redirectUrl || '/plan';
+        window.location.assign(target);
+      }
+      async function logoutUser() {
+        const refreshToken = sessionStorage.getItem('patchwork_refresh_token');
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionStorage.getItem('patchwork_access_token') || ''}`
+            },
+            credentials: 'include',
+            body: JSON.stringify({ refreshToken })
+          });
+        } catch (_) {}
+        sessionStorage.removeItem('patchwork_access_token');
+        sessionStorage.removeItem('patchwork_refresh_token');
+        localStorage.removeItem('patchwork_user');
+        window.location.assign('/');
       }
       function submitSignUpForm(event) {
         event.preventDefault();

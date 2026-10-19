@@ -72,6 +72,14 @@
           <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           <span>Customer Portal (/account)</span>
         </a>
+        <a href="http://localhost:3001/war-room" class="text-amber-300 hover:text-white transition flex items-center gap-1.5 font-medium bg-amber-950/40 border border-amber-800/60 px-3 py-1.5 rounded-lg hover:border-amber-700 shadow-sm shadow-amber-950/30">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>War Room (/war-room) &rarr;</span>
+        </a>
+        <a href="/dashboard" class="text-cyan-300 hover:text-white transition flex items-center gap-1.5 font-medium bg-cyan-950/40 border border-cyan-800/60 px-3 py-1.5 rounded-lg hover:border-cyan-700 shadow-sm shadow-cyan-950/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Patchwork OS (/dashboard) &rarr;</span>
+        </a>
 
         <div class="h-4 w-px bg-slate-800"></div>
 
@@ -89,6 +97,23 @@
 
   <!-- Main Content Container -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+    <!-- C-Suite & Board Executive Command Strip -->
+    <div class="bg-[#111827] border border-indigo-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold">👑 Executive Suite</span>
+        <span class="text-xs text-slate-300 font-medium">Omnichannel C-Suite &amp; Board Command Views:</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="/dashboard/ceo" class="text-xs font-mono bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-lg transition font-semibold">👑 CEO Strategy &amp; P&amp;L</a>
+        <a href="/dashboard/director" class="text-xs font-mono bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-semibold">🏛️ Director &amp; GRC</a>
+        <a href="/dashboard/investor" class="text-xs font-mono bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg transition font-semibold">📈 Investor Relations</a>
+        <a href="/dashboard/cto" class="text-xs font-mono bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg transition font-semibold">⚡ CTO Architecture</a>
+        <a href="/dashboard/coo" class="text-xs font-mono bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-lg transition font-semibold">⚙️ COO Operations</a>
+        <a href="/dashboard/marketing" class="text-xs font-mono bg-pink-500/15 hover:bg-pink-500/25 text-pink-300 border border-pink-500/30 px-3 py-1.5 rounded-lg transition font-semibold">📣 CMO Marketing</a>
+        <a href="/dashboard/sales" class="text-xs font-mono bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg transition font-semibold">💼 CRO Sales</a>
+      </div>
+    </div>
 
     <!-- KPI Header Row (4 Cards) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -815,10 +840,11 @@
     let cachedPayloadString = '';
     let searchDebounceTimer = null;
 
-    const headers = () => ({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    });
+    const headers = () => {
+      const h = { 'Content-Type': 'application/json' };
+      if (token) h['Authorization'] = `Bearer ${token}`;
+      return h;
+    };
 
     // Toast Notification System
     function showToast(message, type = 'success') {
@@ -918,12 +944,8 @@
 
     // Authentication Gate
     async function verifySuperadmin() {
-      if (!token) {
-        openLoginModal();
-        return false;
-      }
       try {
-        const res = await fetch('/api/admin/metrics', { headers: headers() });
+        const res = await fetch('/api/admin/metrics', { headers: headers(), credentials: 'include' });
         if (res.status === 401 || res.status === 403) {
           openLoginModal();
           return false;
