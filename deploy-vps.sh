@@ -103,11 +103,15 @@ PAYSTACK_SECRET_KEY=
 PAYSTACK_PUBLIC_KEY=
 PAYSTACK_GROWTH_PLAN_CODE=
 PAYSTACK_ENTERPRISE_PLAN_CODE=
+PAYSTACK_SUBACCOUNT_CODE=ACCT_c0ajy946qg0z5w1
 PAYSTACK_PROVISION_PLANS=false
 EOF
   chmod 600 .env
 else
   log "Ensuring required variables exist in ${APP_DIR}/.env"
+  if ! grep -q '^PAYSTACK_SUBACCOUNT_CODE=' .env; then
+    echo "PAYSTACK_SUBACCOUNT_CODE=ACCT_c0ajy946qg0z5w1" >> .env
+  fi
   if ! grep -qE '^JWT_SECRET=[a-zA-Z0-9]+' .env; then
     log "Generating missing or empty JWT_SECRET in .env"
     sed -i '/^JWT_SECRET=/d' .env

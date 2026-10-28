@@ -78,6 +78,13 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS waitlist_subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    source TEXT DEFAULT 'landing_footer',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   -- Multi-Tenant & SaaS Architecture Tables
   CREATE TABLE IF NOT EXISTS organizations (
     id TEXT PRIMARY KEY,
@@ -376,6 +383,7 @@ function addColumnIfMissing(table, column, definition) {
 }
 
 addColumnIfMissing('plans', 'paystack_plan_code', 'TEXT');
+addColumnIfMissing('plans', 'paystack_subaccount_code', "TEXT DEFAULT 'ACCT_c0ajy946qg0z5w1'");
 addColumnIfMissing('plans', 'payment_provider', "TEXT NOT NULL DEFAULT 'paystack'");
 addColumnIfMissing('subscriptions', 'provider', "TEXT NOT NULL DEFAULT 'paystack'");
 addColumnIfMissing('subscriptions', 'provider_customer_code', 'TEXT');
@@ -386,6 +394,7 @@ addColumnIfMissing('subscriptions', 'updated_at', 'DATETIME');
 addColumnIfMissing('subscriptions', 'pesapal_correlation_id', 'TEXT');
 addColumnIfMissing('subscriptions', 'cancel_at_period_end', 'INTEGER DEFAULT 0');
 addColumnIfMissing('payment_attempts', 'provider_order_tracking_id', 'TEXT');
+addColumnIfMissing('payment_attempts', 'subaccount_code', "TEXT DEFAULT 'ACCT_c0ajy946qg0z5w1'");
 
 // Enterprise billing profile additions
 addColumnIfMissing('organizations', 'billing_email', 'TEXT');
@@ -526,17 +535,20 @@ db.prepare("UPDATE plans SET price_cents = 100000, currency = 'KES' WHERE id = '
 // The public Basic package is the paid entry plan at USD $5/month.
 db.prepare("UPDATE plans SET name = 'Basic', billing_interval = 'monthly', price_cents = 500, base_price_cents = 500, currency = 'USD' WHERE id = 'developer'").run();
 
+const defaultSubaccountCode = (process.env.PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1').trim();
+db.prepare("UPDATE plans SET paystack_subaccount_code = ? WHERE paystack_subaccount_code IS NULL OR TRIM(paystack_subaccount_code) = '' OR paystack_subaccount_code = 'ACCT_p2rg9g4slvgqxpz'").run(defaultSubaccountCode);
+
 // Seed default plans if empty
 const planCount = db.prepare('SELECT COUNT(*) as count FROM plans').get().count;
 if (planCount === 0) {
   const insertPlan = db.prepare(`
-    INSERT INTO plans (id, name, billing_interval, price_cents, base_price_cents, seat_price_cents, included_seats, currency)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO plans (id, name, billing_interval, price_cents, base_price_cents, seat_price_cents, included_seats, currency, paystack_subaccount_code)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertPlan.run('developer', 'Basic', 'monthly', 500, 500, 0, 2, 'USD');
-  insertPlan.run('growth', 'Growth Tier', 'monthly', 50000, 50000, 5000, 5, 'KES');
-  insertPlan.run('enterprise', 'Enterprise Custom', 'monthly', 100000, 100000, 10000, 15, 'KES');
+  insertPlan.run('developer', 'Basic', 'monthly', 500, 500, 0, 2, 'USD', defaultSubaccountCode);
+  insertPlan.run('growth', 'Growth Tier', 'monthly', 50000, 50000, 5000, 5, 'KES', defaultSubaccountCode);
+  insertPlan.run('enterprise', 'Enterprise Custom', 'monthly', 100000, 100000, 10000, 15, 'KES', defaultSubaccountCode);
 }
 
 // Seed platform features if empty

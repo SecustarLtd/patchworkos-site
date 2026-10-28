@@ -33,9 +33,11 @@ const PESAPAL_API = process.env.PESAPAL_ENVIRONMENT === 'live'
   : 'https://cybqa.pesapal.com/pesapalv3/api';
 let pesapalTokenCache = null;
 const PAYSTACK_API = 'https://api.paystack.co';
+const PAYSTACK_SUBACCOUNT_CODE = (process.env.PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1').trim();
 
 if (process.env.PAYSTACK_GROWTH_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='growth'").run(process.env.PAYSTACK_GROWTH_PLAN_CODE);
 if (process.env.PAYSTACK_ENTERPRISE_PLAN_CODE) db.prepare("UPDATE plans SET paystack_plan_code=?, payment_provider='paystack' WHERE id='enterprise'").run(process.env.PAYSTACK_ENTERPRISE_PLAN_CODE);
+if (PAYSTACK_SUBACCOUNT_CODE) db.prepare("UPDATE plans SET paystack_subaccount_code=? WHERE paystack_subaccount_code IS NULL OR TRIM(paystack_subaccount_code)=''").run(PAYSTACK_SUBACCOUNT_CODE);
 
 const DASHBOARD_SESSION_SECRET = process.env.DASHBOARD_SESSION_SECRET || 'f0d97253e5c3c8b14a795f98a978a42b636e25d50e48d3bc65fc5cd005d72e24';
 const DASHBOARD_SESSION_COOKIE_NAME = 'patchwork_session';
@@ -336,7 +338,7 @@ async function paystack(pathname, options = {}) {
 function assertPaystackPlan(plan) {
   if (!process.env.PAYSTACK_SECRET_KEY) throw Object.assign(new Error('Paystack test keys have not been configured.'), { status: 503 });
   if (!['KES', 'USD'].includes(plan.currency)) throw Object.assign(new Error('This plan currency is not enabled for Paystack checkout.'), { status: 400 });
-  if (!plan.paystack_plan_code) throw Object.assign(new Error(`Plan ${plan.id} has no Paystack plan code.`), { status: 503 });
+  if (!plan.paystack_plan_code && (!plan.price_cents || plan.price_cents <= 0)) throw Object.assign(new Error(`Plan ${plan.id} has no Paystack plan code or valid price.`), { status: 503 });
 }
 function planForPaystackCode(code) { return db.prepare('SELECT * FROM plans WHERE paystack_plan_code=?').get(code); }
 function getSeatUsage(orgId) {
@@ -722,7 +724,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname)));
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'UP', uptime: process.uptime(), database: 'SQLite (WAL Mode Connected)', paystackConfigured: Boolean(process.env.PAYSTACK_SECRET_KEY) });
+  res.json({ status: 'UP', uptime: process.uptime(), database: 'SQLite (WAL Mode Connected)', paystackConfigured: Boolean(process.env.PAYSTACK_SECRET_KEY), paystackSubaccount: PAYSTACK_SUBACCOUNT_CODE || null });
 });
 
 app.get('/api/plans', (req, res) => {
@@ -1977,14 +1979,26 @@ app.post('/api/billing/paystack/checkout', requireBillingAdmin, async (req, res)
     const plan = db.prepare('SELECT * FROM plans WHERE id=?').get(req.body.planId);
     if (!plan || plan.price_cents <= 0) return res.status(400).json({ error: 'Select a paid plan.' });
     assertPaystackPlan(plan);
+    const subaccount = String(plan.paystack_subaccount_code || PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1').trim();
     const reference = `pw.${crypto.randomUUID()}`;
     const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
     const payId = id('pay');
-    db.prepare("INSERT INTO payment_attempts (id,org_id,plan_id,provider,reference,amount_cents,currency) VALUES (?,? ,?,'paystack',?,?,?)").run(payId, req.auth.orgId, plan.id, reference, plan.price_cents, plan.currency);
+    db.prepare("INSERT INTO payment_attempts (id,org_id,plan_id,provider,reference,amount_cents,currency,subaccount_code) VALUES (?,?,?,'paystack',?,?,?,?)").run(payId, req.auth.orgId, plan.id, reference, plan.price_cents, plan.currency, subaccount);
     createInvoiceForAttempt(payId);
-    const checkout = await paystack('/transaction/initialize', { method: 'POST', body: { email: req.auth.user.email, plan: plan.paystack_plan_code, reference, currency: plan.currency, channels: ['card'], callback_url: `${baseUrl}/api/billing/paystack/callback`, metadata: { org_id: req.auth.orgId, plan_id: plan.id } } });
-    audit(req.auth.orgId, 'paystack_checkout_started', { reference, planId: plan.id });
-    res.status(201).json({ authorizationUrl: checkout.authorization_url, reference });
+    const initPayload = {
+      email: req.auth.user.email,
+      amount: plan.price_cents,
+      reference,
+      currency: plan.currency,
+      channels: ['card'],
+      subaccount,
+      callback_url: `${baseUrl}/api/billing/paystack/callback`,
+      metadata: { org_id: req.auth.orgId, plan_id: plan.id, subaccount }
+    };
+    if (plan.paystack_plan_code) initPayload.plan = plan.paystack_plan_code;
+    const checkout = await paystack('/transaction/initialize', { method: 'POST', body: initPayload });
+    audit(req.auth.orgId, 'paystack_checkout_started', { reference, planId: plan.id, subaccount });
+    res.status(201).json({ authorizationUrl: checkout.authorization_url, reference, subaccount });
   } catch (error) { res.status(error.status || 502).json({ error: error.message || 'Unable to initialize checkout.' }); }
 });
 app.get('/api/billing/paystack/callback', async (req, res) => {
@@ -2208,6 +2222,21 @@ app.post('/api/contact', (req, res) => {
   res.status(201).json({ message: 'Inquiry dispatched.', inquiryId });
 });
 app.post('/api/demo-request', (req, res) => { if (!req.body.email) return res.status(400).json({ error: 'Email is required.' }); db.prepare('INSERT INTO demo_requests (email,role,erp) VALUES (?,?,?)').run(req.body.email, req.body.role || 'CFO', req.body.erp || 'Custom ERP'); res.status(201).json({ message: 'Demo request registered.' }); });
+app.post('/api/waitlist', (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Valid email address is required.' });
+  }
+  try {
+    db.prepare('INSERT INTO waitlist_subscribers (email, source) VALUES (?, ?)').run(email, req.body.source || 'landing');
+    res.status(201).json({ success: true, message: 'Subscribed to waitlist successfully.' });
+  } catch (err) {
+    if (err.message && err.message.includes('UNIQUE')) {
+      return res.status(200).json({ success: true, message: 'Already subscribed to waitlist.' });
+    }
+    res.status(500).json({ error: 'Failed to record waitlist subscriber.' });
+  }
+});
 
 // ==========================================
 // Phase 2: Enterprise Expansion Modules
@@ -3365,12 +3394,13 @@ app.get('/api/admin/plans', requireSuperAdmin, (req, res) => {
              p.seat_price_cents AS seatPriceCents, p.included_seats AS includedSeats,
              p.currency, p.payment_provider AS paymentProvider,
              p.paystack_plan_code AS providerPlanCode,
+             COALESCE(NULLIF(TRIM(p.paystack_subaccount_code), ''), ?) AS subaccountCode,
              COUNT(s.id) AS subscriberCount
       FROM plans p
       LEFT JOIN subscriptions s ON s.plan_id = p.id
       GROUP BY p.id
       ORDER BY p.price_cents ASC, p.name ASC
-    `).all();
+    `).all(PAYSTACK_SUBACCOUNT_CODE);
     res.json({ plans });
   } catch (error) {
     console.error('Admin plans list error:', error);
@@ -3380,7 +3410,7 @@ app.get('/api/admin/plans', requireSuperAdmin, (req, res) => {
 
 app.post('/api/admin/plans', requireSuperAdmin, (req, res) => {
   try {
-    const { id: rawId, name, billingInterval = 'monthly', priceCents = 0, currency = 'USD', includedSeats = 1, seatPriceCents = 0, providerPlanCode = null } = req.body;
+    const { id: rawId, name, billingInterval = 'monthly', priceCents = 0, currency = 'USD', includedSeats = 1, seatPriceCents = 0, providerPlanCode = null, subaccountCode = null } = req.body;
     const planId = String(rawId || '').trim().toLowerCase();
     if (!/^[a-z0-9][a-z0-9_-]{1,39}$/.test(planId)) return res.status(400).json({ error: 'Package ID must be 2-40 lowercase letters, numbers, hyphens, or underscores.' });
     if (!String(name || '').trim()) return res.status(400).json({ error: 'Package name is required.' });
@@ -3390,10 +3420,11 @@ app.post('/api/admin/plans', requireSuperAdmin, (req, res) => {
     const seats = Number(includedSeats);
     const seatPrice = Number(seatPriceCents);
     if (![price, seats, seatPrice].every(Number.isInteger) || price < 0 || seats < 1 || seatPrice < 0) return res.status(400).json({ error: 'Prices and included seats must be valid whole numbers.' });
+    const resolvedSubaccount = String(subaccountCode || PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1').trim();
 
-    db.prepare(`INSERT INTO plans (id, name, billing_interval, price_cents, base_price_cents, seat_price_cents, included_seats, currency, payment_provider, paystack_plan_code)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'paystack', ?)`)
-      .run(planId, String(name).trim(), billingInterval, price, price, seatPrice, seats, currency, providerPlanCode || null);
+    db.prepare(`INSERT INTO plans (id, name, billing_interval, price_cents, base_price_cents, seat_price_cents, included_seats, currency, payment_provider, paystack_plan_code, paystack_subaccount_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'paystack', ?, ?)`)
+      .run(planId, String(name).trim(), billingInterval, price, price, seatPrice, seats, currency, providerPlanCode || null, resolvedSubaccount);
     res.status(201).json({ success: true, plan: db.prepare('SELECT * FROM plans WHERE id = ?').get(planId) });
   } catch (error) {
     if (String(error.message).includes('UNIQUE')) return res.status(409).json({ error: 'A package with that ID already exists.' });
@@ -3413,13 +3444,16 @@ app.patch('/api/admin/plans/:id', requireSuperAdmin, (req, res) => {
     const seats = Number(req.body.includedSeats ?? existing.included_seats);
     const seatPrice = Number(req.body.seatPriceCents ?? existing.seat_price_cents);
     const providerPlanCode = req.body.providerPlanCode === undefined ? existing.paystack_plan_code : (req.body.providerPlanCode || null);
+    const subaccountCode = req.body.subaccountCode === undefined
+      ? (existing.paystack_subaccount_code || PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1')
+      : String(req.body.subaccountCode || PAYSTACK_SUBACCOUNT_CODE || 'ACCT_c0ajy946qg0z5w1').trim();
     if (!name) return res.status(400).json({ error: 'Package name is required.' });
     if (!['monthly', 'annual', 'yearly'].includes(billingInterval)) return res.status(400).json({ error: 'Invalid billing interval.' });
     if (!['USD', 'KES'].includes(currency)) return res.status(400).json({ error: 'Currency must be USD or KES.' });
     if (![price, seats, seatPrice].every(Number.isInteger) || price < 0 || seats < 1 || seatPrice < 0) return res.status(400).json({ error: 'Prices and included seats must be valid whole numbers.' });
 
-    db.prepare(`UPDATE plans SET name=?, billing_interval=?, price_cents=?, base_price_cents=?, seat_price_cents=?, included_seats=?, currency=?, paystack_plan_code=? WHERE id=?`)
-      .run(name, billingInterval, price, price, seatPrice, seats, currency, providerPlanCode, req.params.id);
+    db.prepare(`UPDATE plans SET name=?, billing_interval=?, price_cents=?, base_price_cents=?, seat_price_cents=?, included_seats=?, currency=?, paystack_plan_code=?, paystack_subaccount_code=? WHERE id=?`)
+      .run(name, billingInterval, price, price, seatPrice, seats, currency, providerPlanCode, subaccountCode, req.params.id);
     res.json({ success: true, plan: db.prepare('SELECT * FROM plans WHERE id = ?').get(req.params.id) });
   } catch (error) {
     console.error('Admin plan update error:', error);
@@ -3788,6 +3822,27 @@ app.patch('/api/admin/tickets/:id', requireSuperAdmin, (req, res) => {
     res.json({ success: true, ticket: updated });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update ticket.' });
+  }
+});
+
+app.delete('/api/admin/tickets/:id', requireSuperAdmin, (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const ticket = db.prepare('SELECT * FROM tickets WHERE id = ?').get(ticketId);
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found.' });
+
+    db.prepare('DELETE FROM tickets WHERE id = ?').run(ticketId);
+
+    db.logAdminAudit({
+      adminUserId: req.auth.userId,
+      action: 'ticket_deleted',
+      metadata: { ticketId, subject: ticket.subject },
+      ipAddress: req.ip
+    });
+
+    res.json({ success: true, message: 'Ticket deleted successfully.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete ticket.' });
   }
 });
 
@@ -4639,7 +4694,7 @@ app.use('/dashboard', (req, res) => {
   );
 });
 
-// Forward Next.js static asset requests from Secustar when referer is a Secustar route
+// Forward Next.js static asset requests from Secustar or Patchwork OS Runtime Dashboard
 app.use('/_next', (req, res, next) => {
   const referer = req.headers.referer || '';
   const isSecustarReferer =
@@ -4655,7 +4710,26 @@ app.use('/_next', (req, res, next) => {
       'cd c:\\Users\\omu\\projects\\secustar<br/>npm run dev'
     );
   }
-  next();
+
+  // If referer is dashboard or root runtime dashboard, forward to PATCHWORK_DASHBOARD_URL
+  if (referer.includes('/dashboard')) {
+    return forwardProxyRequest(
+      req,
+      res,
+      PATCHWORK_DASHBOARD_URL,
+      'Patchwork OS Runtime Dashboard',
+      'cd c:\\Users\\omu\\projects\\patchwork-os\\dashboard<br/>npm run dev'
+    );
+  }
+
+  // Default fallback for direct /_next requests to avoid returning index.html
+  return forwardProxyRequest(
+    req,
+    res,
+    PATCHWORK_DASHBOARD_URL,
+    'Patchwork OS Runtime Dashboard',
+    'cd c:\\Users\\omu\\projects\\patchwork-os\\dashboard<br/>npm run dev'
+  );
 });
 
 app.use((req, res) => res.sendFile(path.join(__dirname, 'index.html')));

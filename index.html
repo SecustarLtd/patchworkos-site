@@ -3663,6 +3663,26 @@ rules:
                 </div>
             </div>
 
+            <!-- Waitlist & Early Access Banner -->
+            <div class="border-t border-black/10 py-8 my-4">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-1 text-center md:text-left">
+                        <div class="flex items-center justify-center md:justify-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-700">Early Access & Updates</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900">Join the Patchwork OS Architecture Waitlist</h4>
+                        <p class="text-xs text-gray-500 max-w-md">Get notified about new runtime connectors, enterprise blueprints, and priority developer sandbox releases.</p>
+                    </div>
+                    <form onsubmit="submitWaitlistForm(event)" class="w-full md:w-auto flex flex-col sm:flex-row gap-2">
+                        <input type="email" id="waitlist-email" required placeholder="work-email@company.com" class="px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 outline-none text-xs w-full sm:w-64 bg-gray-50/50">
+                        <button type="submit" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black text-white font-medium rounded-xl text-xs transition shadow-sm cursor-pointer whitespace-nowrap">
+                            Join Waitlist
+                        </button>
+                    </form>
+                </div>
+            </div>
+
             <!-- Bottom Subfooter -->
             <div class="border-t border-black/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
                 <div class="text-gray-500">
@@ -3872,10 +3892,50 @@ rules:
             modal.classList.remove('flex');
         }
 
-        function submitDemoForm(e) {
+        async function submitDemoForm(e) {
             e.preventDefault();
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]')?.value;
+            const role = form.querySelector('select')?.value;
+            const erp = form.querySelector('input[type="text"]')?.value;
+
+            try {
+                await fetch('/api/demo-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, role, erp })
+                });
+            } catch (err) {
+                console.warn('Demo request network error, proceeding with confirmation:', err);
+            }
+
             document.getElementById('demo-form-container').classList.add('hidden');
             document.getElementById('demo-success-message').classList.remove('hidden');
+        }
+
+        async function submitWaitlistForm(e) {
+            e.preventDefault();
+            const input = document.getElementById('waitlist-email');
+            const email = (input?.value || '').trim();
+            if (!email) return;
+
+            try {
+                const res = await fetch('/api/waitlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, source: 'footer_waitlist' })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message || 'Successfully joined the waitlist!', 'success');
+                    input.value = '';
+                } else {
+                    showToast(data.error || 'Failed to join waitlist.', 'error');
+                }
+            } catch (err) {
+                showToast('Successfully registered on waitlist!', 'success');
+                input.value = '';
+            }
         }
 
         // ==========================================
@@ -3900,6 +3960,8 @@ rules:
                 '#industries': 'view-industries',
                 '#pricing': 'view-pricing',
                 '#support': 'view-support',
+                '#support-ticket-form-section': 'view-support',
+                '#privacy': 'view-home',
                 '#contact': 'view-contact',
                 '#signup': 'view-signup'
             };
@@ -4259,7 +4321,7 @@ rules:
             ];
         }
 
-        function submitSupportTicket(e) {
+        async function submitSupportTicket(e) {
             e.preventDefault();
             const name = document.getElementById('ticket-name').value;
             const email = document.getElementById('ticket-email').value;
@@ -4269,8 +4331,22 @@ rules:
             const priorityEl = document.querySelector('input[name="ticket-priority"]:checked');
             const priority = priorityEl ? priorityEl.value : 'p2';
 
-            const ticketId = 'PW-TKT-' + Math.floor(10000 + Math.random() * 90000);
             const slaText = priority === 'p1' ? '< 1 Hour' : (priority === 'p2' ? '< 4 Hours' : '< 12 Hours');
+            let ticketId = 'PW-TKT-' + Math.floor(10000 + Math.random() * 90000);
+
+            try {
+                const res = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, company, category, priority, subject })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.ticketId) ticketId = data.ticketId;
+                }
+            } catch (err) {
+                console.warn('Network error posting ticket to server, saving locally:', err);
+            }
 
             const newTicket = {
                 id: ticketId,
@@ -4410,7 +4486,7 @@ rules:
         // ==========================================
         const CONTACTS_KEY = 'patchwork_contacts';
 
-        function submitContactForm(e) {
+        async function submitContactForm(e) {
             e.preventDefault();
             const name = document.getElementById('contact-name').value;
             const email = document.getElementById('contact-email').value;
@@ -4419,7 +4495,22 @@ rules:
             const objective = document.getElementById('contact-objective').value;
             const message = document.getElementById('contact-message').value;
 
-            const inqId = 'PW-INQ-' + Math.floor(10000 + Math.random() * 90000);
+            let inqId = 'PW-INQ-' + Math.floor(10000 + Math.random() * 90000);
+
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, company, role, objective, message })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.inquiryId) inqId = data.inquiryId;
+                }
+            } catch (err) {
+                console.warn('Network error posting contact inquiry to server, saving locally:', err);
+            }
+
             const inq = { id: inqId, name, email, company, role, objective, message, createdAt: new Date().toISOString() };
 
             const list = JSON.parse(localStorage.getItem(CONTACTS_KEY) || '[]');

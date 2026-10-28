@@ -72,7 +72,7 @@
           <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           <span>Customer Portal (/account)</span>
         </a>
-        <a href="http://localhost:3001/war-room" class="text-amber-300 hover:text-white transition flex items-center gap-1.5 font-medium bg-amber-950/40 border border-amber-800/60 px-3 py-1.5 rounded-lg hover:border-amber-700 shadow-sm shadow-amber-950/30">
+        <a href="/war-room" class="text-amber-300 hover:text-white transition flex items-center gap-1.5 font-medium bg-amber-950/40 border border-amber-800/60 px-3 py-1.5 rounded-lg hover:border-amber-700 shadow-sm shadow-amber-950/30">
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
           <span>War Room (/war-room) &rarr;</span>
         </a>
@@ -247,7 +247,8 @@
           <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Included seats</label><input id="package-seats" required type="number" min="1" step="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
           <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Extra seat price</label><input id="package-seat-price" required type="number" min="0" step="0.01" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></div>
           <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Paystack plan code</label><input id="package-provider-code" placeholder="PLN_..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"></div>
-          <div class="sm:col-span-2 lg:col-span-4 flex gap-2">
+          <div><label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">Paystack subaccount</label><input id="package-subaccount-code" value="ACCT_c0ajy946qg0z5w1" placeholder="ACCT_c0ajy946qg0z5w1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"></div>
+          <div class="sm:col-span-2 lg:col-span-3 flex items-end gap-2">
             <button id="package-save-btn" type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">Create Package</button>
             <button type="button" onclick="resetPackageForm()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">Clear</button>
           </div>
@@ -257,8 +258,8 @@
       <div class="bg-[#111827] border border-slate-800 rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs" aria-label="Billing packages">
-            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider"><tr><th class="py-3 px-4">Package</th><th class="py-3 px-4">Price</th><th class="py-3 px-4">Seats</th><th class="py-3 px-4">Provider code</th><th class="py-3 px-4">Subscribers</th><th class="py-3 px-4 text-right">Action</th></tr></thead>
-            <tbody id="packages-table-body" class="divide-y divide-slate-800 text-slate-300"><tr><td colspan="6" class="py-8 text-center text-slate-500 font-mono">Loading packages...</td></tr></tbody>
+            <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px] tracking-wider"><tr><th class="py-3 px-4">Package</th><th class="py-3 px-4">Price</th><th class="py-3 px-4">Seats</th><th class="py-3 px-4">Provider code</th><th class="py-3 px-4">Subaccount</th><th class="py-3 px-4">Subscribers</th><th class="py-3 px-4 text-right">Action</th></tr></thead>
+            <tbody id="packages-table-body" class="divide-y divide-slate-800 text-slate-300"><tr><td colspan="7" class="py-8 text-center text-slate-500 font-mono">Loading packages...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1110,11 +1111,12 @@
             <td class="py-3 px-4 font-mono text-emerald-300">${escapeHtml(plan.currency)} ${(plan.priceCents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}<div class="text-[10px] text-slate-500">/${escapeHtml(plan.billingInterval)}</div></td>
             <td class="py-3 px-4"><span class="text-white">${plan.includedSeats}</span> included<div class="text-[10px] text-slate-500">${escapeHtml(plan.currency)} ${(plan.seatPriceCents / 100).toFixed(2)} extra</div></td>
             <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${escapeHtml(plan.providerPlanCode || 'Not configured')}</td>
+            <td class="py-3 px-4 font-mono text-[11px] text-cyan-300">${escapeHtml(plan.subaccountCode || 'ACCT_c0ajy946qg0z5w1')}</td>
             <td class="py-3 px-4 font-mono">${plan.subscriberCount}</td>
             <td class="py-3 px-4 text-right"><button onclick="editPackageById('${plan.id}')" class="px-3 py-1.5 rounded-lg border border-cyan-800 text-cyan-300 hover:bg-cyan-950 font-bold">Edit</button></td>
           </tr>`).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-rose-400 font-mono">${escapeHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-400 font-mono">${escapeHtml(err.message)}</td></tr>`;
       }
     }
 
@@ -1135,6 +1137,7 @@
       document.getElementById('package-seats').value = plan.includedSeats;
       document.getElementById('package-seat-price').value = (plan.seatPriceCents / 100).toFixed(2);
       document.getElementById('package-provider-code').value = plan.providerPlanCode || '';
+      document.getElementById('package-subaccount-code').value = plan.subaccountCode || 'ACCT_c0ajy946qg0z5w1';
       document.getElementById('package-save-btn').textContent = 'Save Changes';
       document.getElementById('package-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -1146,6 +1149,7 @@
       idInput.disabled = false;
       document.getElementById('package-seats').value = 1;
       document.getElementById('package-seat-price').value = 0;
+      document.getElementById('package-subaccount-code').value = 'ACCT_c0ajy946qg0z5w1';
       document.getElementById('package-save-btn').textContent = 'Create Package';
     }
 
@@ -1160,7 +1164,8 @@
         billingInterval: document.getElementById('package-interval').value,
         includedSeats: Number(document.getElementById('package-seats').value),
         seatPriceCents: Math.round(Number(document.getElementById('package-seat-price').value) * 100),
-        providerPlanCode: document.getElementById('package-provider-code').value.trim()
+        providerPlanCode: document.getElementById('package-provider-code').value.trim(),
+        subaccountCode: document.getElementById('package-subaccount-code').value.trim() || 'ACCT_c0ajy946qg0z5w1'
       };
       const btn = document.getElementById('package-save-btn');
       btn.disabled = true;
