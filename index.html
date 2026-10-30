@@ -386,7 +386,7 @@
                                 <div class="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between px-2">
                                     <span class="text-[11px] font-mono text-gray-500">Quick start: <code class="text-gray-900 font-semibold">npx patchwork-os@beta init</code></span>
                                     <a href="#signup" onclick="closeAllNavClusters()" class="text-[11px] font-bold text-[#0071e3] hover:underline flex items-center gap-1">
-                                        Launch Sandbox <i class="ph-bold ph-arrow-right"></i>
+                                        Create Workspace <i class="ph-bold ph-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -549,7 +549,7 @@
                             <div class="hidden sm:block leading-tight">
                                 <div id="nav-user-workspace" class="text-xs font-bold text-[#1d1d1f] truncate max-w-[110px]">Acme Corp</div>
                                 <div class="text-[9px] text-emerald-600 font-medium flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Sandbox Active
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Workspace Active
                                 </div>
                             </div>
                             <i class="ph-bold ph-caret-down text-xs text-gray-500"></i>
@@ -566,23 +566,11 @@
                             </div>
 
                             <div class="space-y-1 mb-2">
-                                <div class="bg-gray-50 p-2 rounded-xl border border-gray-100">
-                                    <div class="text-[10px] font-mono text-gray-500 uppercase">Tenant API Key</div>
-                                    <div class="flex items-center justify-between gap-1 mt-0.5">
-                                        <code id="dropdown-user-apikey" class="text-[11px] font-mono text-gray-800 truncate">pw_live_sec_89fa...</code>
-                                        <button onclick="copyApiKey()" title="Copy API Key" class="p-1 hover:bg-gray-200 rounded text-gray-600 shrink-0">
-                                            <i class="ph-bold ph-copy text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
                                 <a href="/account" class="flex items-center gap-2 p-2 rounded-xl hover:bg-blue-50 font-semibold text-[#0071e3]">
-                                    <i class="ph-bold ph-credit-card text-base"></i> Account, Plans & Payments
+                                    <i class="ph-bold ph-credit-card text-base"></i> Account, Plans &amp; Payments
                                 </a>
                                 <a href="/docs" class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 font-medium text-gray-800">
                                     <i class="ph-bold ph-book-open-text text-base text-[#0071e3]"></i> Developer &amp; Operator Docs
-                                </a>
-                                <a href="#signup" onclick="toggleUserDropdown()" class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 font-medium text-gray-800">
-                                    <i class="ph-bold ph-terminal-window text-base text-[#0071e3]"></i> Sandbox Workspace
                                 </a>
                                 <a href="#support" onclick="toggleUserDropdown()" class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 font-medium text-gray-800">
                                     <i class="ph-bold ph-lifebuoy text-base text-emerald-600"></i> Enterprise Support
@@ -2519,7 +2507,7 @@ rules:
                                 </div>
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2">Support Request Received!</h3>
                                 <p class="text-sm text-gray-600 max-w-md mx-auto mb-4">
-                                    Your ticket has been assigned to a Senior Systems Architect. An initial analysis is already running in your sandbox cluster.
+                                    Your ticket has been assigned to a Senior Systems Architect. We have sent a confirmation email with your ticket tracking details.
                                 </p>
 
                                 <div class="max-w-md mx-auto bg-gray-50 border border-gray-200 rounded-2xl p-4 text-left space-y-2 mb-6">
@@ -3008,7 +2996,7 @@ rules:
         </div>
 
         <!-- ========================================== -->
-        <!-- VIEW 8: SIGN UP & DEVELOPER SANDBOX        -->
+        <!-- VIEW 8: WORKSPACE REGISTRATION             -->
         <!-- ========================================== -->
         <div id="view-signup" class="page-view">
             <!-- Sign Up Hero -->
@@ -3016,14 +3004,14 @@ rules:
                 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-[#0071e3] text-xs font-bold uppercase tracking-wider mb-5 shadow-sm">
                         <i class="ph-bold ph-rocket-launch"></i>
-                        <span>Instant Onboarding · Zero Card Required</span>
+                        <span>Instant Onboarding · 14-Day Growth Trial</span>
                     </div>
                     <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold text-[#1d1d1f] tracking-tight mb-5 leading-tight max-w-4xl mx-auto">
                         Start in Minutes.<br/>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#2997ff]">Automate with Total Trust.</span>
                     </h1>
                     <p class="text-base sm:text-xl text-[#86868b] max-w-3xl mx-auto leading-relaxed">
-                        Spin up an instant developer sandbox with mock recipes, MCP bridges, and synthetic event streams, or initiate an enterprise evaluation inside your private single-tenant VPC.
+                        Provision your production Patchwork OS workspace with declarative YAML recipes, MCP IDE bridges, ERP connectors, and blast-radius policy enforcement.
                     </p>
                 </div>
             </section>
@@ -3039,11 +3027,11 @@ rules:
                                 <input type="radio" name="signup-tier" value="developer" checked onchange="updateSignupTier(this.value)" class="peer sr-only">
                                 <div class="p-5 rounded-2xl border-2 border-gray-200 peer-checked:border-[#0071e3] peer-checked:bg-blue-50/50 hover:bg-gray-50 transition-all">
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-mono uppercase font-bold text-[#0071e3]">⚡ Developer Sandbox</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Free Instant Access</span>
+                                        <span class="text-xs font-mono uppercase font-bold text-[#0071e3]">⚡ Growth Workspace</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">14-Day Trial Included</span>
                                     </div>
-                                    <h4 class="text-base font-bold text-gray-900">Developer & Integration</h4>
-                                    <p class="text-xs text-gray-500 mt-1">Declarative recipes, mock endpoints (Stripe, GitHub, ERP), 180 MCP tools, instant API keys.</p>
+                                    <h4 class="text-base font-bold text-gray-900">Developer &amp; Team Workspace</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Declarative recipes, ERP &amp; bank connectors, 180 MCP tools, and scoped API keys.</p>
                                 </div>
                             </label>
 
@@ -3051,34 +3039,16 @@ rules:
                                 <input type="radio" name="signup-tier" value="enterprise" onchange="updateSignupTier(this.value)" class="peer sr-only">
                                 <div class="p-5 rounded-2xl border-2 border-gray-200 peer-checked:border-[#0071e3] peer-checked:bg-blue-50/50 hover:bg-gray-50 transition-all">
                                     <div class="flex items-center justify-between mb-2">
-                                        <span class="text-xs font-mono uppercase font-bold text-gray-900">🛡️ Enterprise Evaluation</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-[#0071e3] text-[10px] font-bold">30-Day VPC Trial</span>
+                                        <span class="text-xs font-mono uppercase font-bold text-gray-900">🛡️ Enterprise Production</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-[#0071e3] text-[10px] font-bold">Dedicated VPC</span>
                                     </div>
-                                    <h4 class="text-base font-bold text-gray-900">Enterprise Production & Operations</h4>
+                                    <h4 class="text-base font-bold text-gray-900">Enterprise Production &amp; Operations</h4>
                                     <p class="text-xs text-gray-500 mt-1">Dedicated single-tenant VPC, audit receipt generation, blast-radius policy gates, 1-Hour SLA support.</p>
                                 </div>
                             </label>
                         </div>
 
-                        <!-- Fast SSO Buttons -->
-                        <div class="space-y-3 mb-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <button onclick="quickSSO('Google Workspace')" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold text-xs text-gray-700 transition-all cursor-pointer">
-                                    <i class="ph-bold ph-google-logo text-base text-red-500"></i> Google Workspace
-                                </button>
-                                <button onclick="quickSSO('Okta SAML')" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold text-xs text-gray-700 transition-all cursor-pointer">
-                                    <i class="ph-fill ph-shield-check text-base text-[#0071e3]"></i> Okta / SAML SSO
-                                </button>
-                                <button onclick="quickSSO('GitHub')" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold text-xs text-gray-700 transition-all cursor-pointer">
-                                    <i class="ph-bold ph-github-logo text-base text-gray-900"></i> GitHub SSO
-                                </button>
-                            </div>
-                            <div class="relative flex py-2 items-center">
-                                <div class="flex-grow border-t border-gray-200"></div>
-                                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase font-mono tracking-wider">or sign up with work email</span>
-                                <div class="flex-grow border-t border-gray-200"></div>
-                            </div>
-                        </div>
+                        <div id="signup-error-banner" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium"></div>
 
                         <!-- Registration Form -->
                         <form id="signup-form" onsubmit="submitSignUpForm(event)" class="space-y-4">
@@ -3112,7 +3082,7 @@ rules:
 
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">Create Secure Password *</label>
-                                <input type="password" id="signup-password" oninput="checkPasswordStrength(this.value)" required placeholder="••••••••••••" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] focus:ring-2 focus:ring-blue-100 outline-none text-sm bg-white">
+                                <input type="password" id="signup-password" oninput="checkPasswordStrength(this.value)" required minlength="8" placeholder="At least 8 characters" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] focus:ring-2 focus:ring-blue-100 outline-none text-sm bg-white">
                                 
                                 <!-- Password Strength Indicator -->
                                 <div class="mt-2 flex items-center gap-2">
@@ -3133,99 +3103,9 @@ rules:
                             </div>
 
                             <button type="submit" id="signup-submit-btn" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center gap-2 text-base">
-                                <i class="ph-bold ph-rocket-launch"></i> Create Account & Provision Sandbox
+                                <i class="ph-bold ph-rocket-launch"></i> Create Account &amp; Workspace
                             </button>
                         </form>
-
-                        <!-- Simulated Provisioning State (hidden by default) -->
-                        <div id="signup-provisioning" class="hidden text-center py-8">
-                            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-[#0071e3] flex items-center justify-center mx-auto mb-4 text-3xl">
-                                <i class="ph-bold ph-cpu animate-pulse"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Provisioning Your Sandbox</h3>
-                            <p class="text-xs text-gray-500 mb-6">Configuring encrypted isolated tenant environment...</p>
-
-                            <!-- Terminal Progress Checklist -->
-                            <div class="max-w-md mx-auto bg-gray-900 rounded-2xl p-5 text-left font-mono text-xs text-gray-300 space-y-2.5 shadow-2xl border border-gray-800">
-                                <div id="prov-step-1" class="flex items-center gap-2 text-emerald-400">
-                                    <i class="ph-fill ph-check-circle"></i> <span>Initializing isolated tenant namespace...</span>
-                                </div>
-                                <div id="prov-step-2" class="flex items-center gap-2 text-gray-500">
-                                    <i class="ph-bold ph-spinner animate-spin"></i> <span>Generating cryptographic SHA-256 keys...</span>
-                                </div>
-                                <div id="prov-step-3" class="flex items-center gap-2 text-gray-500">
-                                    <i class="ph-circle"></i> <span>Seeding 50,000 synthetic payment transactions...</span>
-                                </div>
-                                <div id="prov-step-4" class="flex items-center gap-2 text-gray-500">
-                                    <i class="ph-circle"></i> <span>Mounting mock NetSuite & Stripe endpoints...</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Welcome Sandbox Active Dashboard Card (shown after provisioning) -->
-                        <div id="signup-complete-dashboard" class="hidden text-center py-6">
-                            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-3xl">
-                                <i class="ph-fill ph-check-circle"></i>
-                            </div>
-                            <div class="inline-block px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-mono font-bold uppercase mb-2">
-                                Workspace Ready & Live
-                            </div>
-                            <h3 class="text-3xl font-bold text-gray-900 mb-2">Welcome to Patchwork OS!</h3>
-                            <p class="text-sm text-gray-600 max-w-md mx-auto mb-6">
-                                Your sandbox workspace is active and seeded with 50,000 multi-currency ledger rows.
-                            </p>
-
-                            <!-- Live Workspace Details Bento -->
-                            <div class="max-w-lg mx-auto bg-gray-50 border border-gray-200 rounded-2xl p-5 text-left space-y-3 mb-6">
-                                <div class="flex justify-between items-center text-xs pb-2 border-b border-gray-200">
-                                    <span class="text-gray-500 font-medium">Active Workspace:</span>
-                                    <span id="sb-workspace-name" class="font-bold text-gray-900">Acme Corp</span>
-                                </div>
-                                <div class="flex justify-between items-center text-xs pb-2 border-b border-gray-200">
-                                    <span class="text-gray-500 font-medium">Tenant ID:</span>
-                                    <span id="sb-tenant-id" class="font-mono text-gray-700">pw_org_9204bc</span>
-                                </div>
-                                <div>
-                                    <div class="text-[11px] font-mono text-gray-500 uppercase mb-1">Your Sandbox API Key:</div>
-                                    <div class="flex items-center justify-between gap-2 bg-white border border-gray-300 rounded-xl px-3 py-2">
-                                        <code id="sb-api-key" class="text-xs font-mono text-gray-800 truncate">pw_live_sec_89f024cba71920ef</code>
-                                        <button onclick="copySandboxApiKey()" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0 cursor-pointer">
-                                            <i class="ph-bold ph-copy"></i> Copy
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Interactive 1-Click Test Workflow & Policy Demo -->
-                            <div class="max-w-lg mx-auto bg-gray-900 text-white rounded-2xl p-5 text-left mb-6 shadow-xl border border-gray-800">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="text-xs font-mono text-brand-400 uppercase">Interactive Policy & Workflow Demo</div>
-                                    <span class="text-[10px] text-emerald-400 font-mono">POLICY ENGINE READY</span>
-                                </div>
-                                <p class="text-xs text-gray-300 mb-3">
-                                    Click below to run an instant policy check & recipe validation across 50,000 synthetic workflow events:
-                                </p>
-                                <button id="btn-run-recon" onclick="runSandboxReconDemo()" class="w-full py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all">
-                                    <i class="ph-bold ph-play"></i> Run Test Recipe Execution
-                                </button>
-                                <div id="recon-demo-results" class="hidden mt-3 pt-3 border-t border-gray-800 text-xs font-mono space-y-1">
-                                    <div class="text-emerald-400">✓ 50,000 events evaluated in 0.042 seconds</div>
-                                    <div class="text-gray-300">✓ 49,992 low-risk steps executed automatically</div>
-                                    <div class="text-gray-300">✓ 8 write operations routed to human approval queue</div>
-                                    <div class="text-gray-300">✓ Cryptographic Receipt: <span class="text-blue-400">e3b0c44298fc1c149afbf4...</span></div>
-                                </div>
-                            </div>
-
-                            <div class="flex flex-wrap justify-center gap-4">
-                                <a href="#home" class="px-6 py-2.5 bg-gray-900 text-white font-semibold rounded-xl text-xs hover:bg-black">
-                                    Back to Home Overview
-                                </a>
-                                <a href="#support" class="px-6 py-2.5 bg-[#0071e3] text-white font-semibold rounded-xl text-xs hover:bg-[#0077ed]">
-                                    Visit Support Center
-                                </a>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </section>
@@ -3297,31 +3177,14 @@ rules:
 
             <div id="modal-signup-form-container">
                 <div class="flex items-center gap-2 text-[#0071e3] font-bold text-xs uppercase tracking-wider mb-2">
-                    <i class="ph-bold ph-rocket-launch text-base"></i> Developer Sandbox & Trial
+                    <i class="ph-bold ph-rocket-launch text-base"></i> Workspace Registration
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 mb-1">Create Your Free Account</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mb-5">
-                    Instant access to 180 MCP tools, mock webhooks, declarative recipes, and blast-radius safety policies.
+                <p id="modal-signup-subtitle" class="text-xs sm:text-sm text-gray-600 mb-5">
+                    Includes a 14-day Growth trial with 180 MCP tools, ERP &amp; bank connectors, declarative recipes, and blast-radius safety policies.
                 </p>
 
-                <!-- Fast SSO -->
-                <div class="grid grid-cols-3 gap-2.5 mb-5">
-                    <button onclick="quickSSO('Google Workspace')" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 transition-all cursor-pointer">
-                        <i class="ph-bold ph-google-logo text-sm text-red-500"></i> Google
-                    </button>
-                    <button onclick="quickSSO('Okta SAML')" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 transition-all cursor-pointer">
-                        <i class="ph-fill ph-shield-check text-sm text-[#0071e3]"></i> Okta
-                    </button>
-                    <button onclick="quickSSO('GitHub')" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 transition-all cursor-pointer">
-                        <i class="ph-bold ph-github-logo text-sm text-gray-900"></i> GitHub
-                    </button>
-                </div>
-
-                <div class="relative flex py-2 items-center mb-4">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="flex-shrink mx-3 text-gray-400 text-[10px] uppercase font-mono tracking-wider">or email</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
-                </div>
+                <div id="modal-signup-error" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium"></div>
 
                 <form onsubmit="submitModalSignUp(event)" class="space-y-3.5 text-left">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -3337,7 +3200,7 @@ rules:
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Company Name</label>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Company / Workspace</label>
                             <input type="text" id="modal-signup-workspace" required placeholder="Acme Global" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
                         </div>
                         <div>
@@ -3352,12 +3215,12 @@ rules:
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Password</label>
-                        <input type="password" id="modal-signup-password" required placeholder="••••••••••••" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Password (min 8 characters)</label>
+                        <input type="password" id="modal-signup-password" required minlength="8" placeholder="••••••••••••" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-rocket-launch"></i> Create Sandbox & Provision Workspace
+                    <button type="submit" id="modal-signup-submit-btn" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-rocket-launch"></i> Create Account &amp; Workspace
                     </button>
                 </form>
 
@@ -3367,34 +3230,6 @@ rules:
                         Sign In here
                     </button>
                 </div>
-            </div>
-
-            <!-- Provisioning State Inside Modal -->
-            <div id="modal-signup-provisioning" class="hidden text-center py-8">
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[#0071e3] flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="ph-bold ph-cpu animate-pulse"></i>
-                </div>
-                <h4 class="text-xl font-bold text-gray-900 mb-1">Spinning Up Isolated Sandbox</h4>
-                <p class="text-xs text-gray-500 mb-4">Generating SHA-256 keys and seeding synthetic transactions...</p>
-                <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden max-w-xs mx-auto">
-                    <div class="bg-[#0071e3] h-full rounded-full animate-pulse" style="width: 85%"></div>
-                </div>
-            </div>
-
-            <!-- Success State Inside Modal -->
-            <div id="modal-signup-success" class="hidden text-center py-6">
-                <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="ph-fill ph-check-circle"></i>
-                </div>
-                <h4 class="text-2xl font-bold text-gray-900 mb-1">Workspace Active!</h4>
-                <p class="text-xs text-gray-600 mb-4">You are now logged in to your sandbox environment.</p>
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-left font-mono text-xs text-gray-700 mb-4">
-                    <div class="text-[10px] uppercase text-gray-400">Sandbox API Key:</div>
-                    <code id="modal-success-apikey" class="text-[11px] text-[#0071e3] truncate block mt-0.5">pw_live_sec_89fa12bc...</code>
-                </div>
-                <button onclick="closeSignUpModal(); window.location.hash='#signup';" class="w-full py-2.5 bg-gray-900 hover:bg-black text-white font-semibold rounded-xl text-xs">
-                    Open Sandbox Workspace Dashboard
-                </button>
             </div>
         </div>
     </div>
@@ -3408,62 +3243,27 @@ rules:
 
             <div>
                 <div class="flex items-center gap-2 text-[#0071e3] font-bold text-xs uppercase tracking-wider mb-2">
-                    <i class="ph-fill ph-lock-key text-base"></i> Commercial Sign In
+                    <i class="ph-fill ph-lock-key text-base"></i> Workspace Sign In
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h3>
-                <p class="text-xs text-gray-500 mb-5">Sign in to your Patchwork OS enterprise workspace.</p>
+                <p class="text-xs text-gray-500 mb-5">Sign in to your Patchwork OS workspace and billing portal.</p>
 
-                <!-- Fast Demo 1-Click Login Personas (for testing & evaluation) -->
-                <div class="mb-5 p-3 rounded-2xl bg-blue-50/70 border border-blue-100">
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-[#0071e3] mb-2 flex items-center justify-between">
-                        <span>⚡ 1-Click Demo Personas</span>
-                        <span class="text-[9px] text-gray-400">Instant Preview</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <button onclick="quickDemoLogin('cfo')" class="px-2.5 py-1.5 bg-white hover:bg-blue-100/50 rounded-xl border border-blue-200 text-left font-medium text-gray-800 transition-colors cursor-pointer">
-                            <div class="font-bold text-[11px] text-gray-900">Alex Morgan</div>
-                            <div class="text-[9px] text-gray-500">CFO · Acme Corp</div>
-                        </button>
-                        <button onclick="quickDemoLogin('cto')" class="px-2.5 py-1.5 bg-white hover:bg-blue-100/50 rounded-xl border border-blue-200 text-left font-medium text-gray-800 transition-colors cursor-pointer">
-                            <div class="font-bold text-[11px] text-gray-900">Sarah Chen</div>
-                            <div class="text-[9px] text-gray-500">VP Eng · FinCloud</div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- SSO Buttons -->
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <button onclick="quickSSO('Google Workspace')" class="flex items-center justify-center gap-1 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700">
-                        <i class="ph-bold ph-google-logo text-red-500 text-sm"></i> Google
-                    </button>
-                    <button onclick="quickSSO('Okta SAML')" class="flex items-center justify-center gap-1 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700">
-                        <i class="ph-fill ph-shield-check text-[#0071e3] text-sm"></i> Okta
-                    </button>
-                    <button onclick="quickSSO('GitHub')" class="flex items-center justify-center gap-1 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-[11px] font-semibold text-gray-700">
-                        <i class="ph-bold ph-github-logo text-gray-900 text-sm"></i> GitHub
-                    </button>
-                </div>
-
-                <div class="relative flex py-2 items-center mb-4">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="flex-shrink mx-3 text-gray-400 text-[10px] uppercase font-mono">or email</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
-                </div>
+                <div id="signin-error-banner" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium"></div>
 
                 <form onsubmit="submitSignInForm(event)" class="space-y-3.5 text-left">
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Work Email</label>
-                        <input type="email" id="signin-email" required placeholder="alex@acmecorp.com" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                        <input type="email" id="signin-email" required placeholder="you@company.com" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-xs font-bold uppercase text-gray-700">Password</label>
-                            <a href="#support" onclick="closeSignInModal()" class="text-[11px] text-[#0071e3] hover:underline">Forgot password?</a>
+                            <button type="button" onclick="openForgotPasswordModal()" class="text-[11px] text-[#0071e3] font-semibold hover:underline cursor-pointer">Forgot password?</button>
                         </div>
-                        <input type="password" id="signin-password" required placeholder="••••••••••••" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                        <input type="password" id="signin-password" required placeholder="••••••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm">
+                    <button type="submit" id="signin-submit-btn" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm">
                         Sign In to Workspace
                     </button>
                 </form>
@@ -3474,6 +3274,76 @@ rules:
                         Sign up for free
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-password-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-950/70 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-gray-200 relative my-auto">
+            <button onclick="closeForgotPasswordModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-gray-400 hover:text-gray-700 p-1 cursor-pointer">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+
+            <div id="forgot-password-form-container">
+                <div class="flex items-center gap-2 text-[#0071e3] font-bold text-xs uppercase tracking-wider mb-2">
+                    <i class="ph-fill ph-envelope-simple-open text-base"></i> Account Recovery
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-1">Reset Your Password</h3>
+                <p class="text-xs text-gray-500 mb-5">Enter the email address associated with your workspace and we'll send you a secure password reset link.</p>
+
+                <div id="forgot-password-status" class="hidden mb-4 p-3 rounded-xl text-xs font-medium"></div>
+
+                <form onsubmit="submitForgotPasswordForm(event)" class="space-y-3.5 text-left">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Work Email</label>
+                        <input type="email" id="forgot-email" required placeholder="you@company.com" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                    </div>
+                    <button type="submit" id="forgot-submit-btn" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm">
+                        Send Password Reset Link
+                    </button>
+                </form>
+
+                <div class="mt-5 pt-4 border-t border-gray-100 text-center text-xs text-gray-500">
+                    Remembered your password?
+                    <button onclick="closeForgotPasswordModal(); openSignInModal();" class="text-[#0071e3] font-semibold hover:underline cursor-pointer">
+                        Back to Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESET PASSWORD MODAL -->
+    <div id="reset-password-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-950/70 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-gray-200 relative my-auto">
+            <button onclick="closeResetPasswordModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-gray-400 hover:text-gray-700 p-1 cursor-pointer">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+
+            <div>
+                <div class="flex items-center gap-2 text-[#0071e3] font-bold text-xs uppercase tracking-wider mb-2">
+                    <i class="ph-fill ph-key text-base"></i> Set New Password
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-1">Choose a New Password</h3>
+                <p id="reset-password-subtitle" class="text-xs text-gray-500 mb-5">Enter your new password below (minimum 8 characters).</p>
+
+                <div id="reset-password-status" class="hidden mb-4 p-3 rounded-xl text-xs font-medium"></div>
+
+                <form onsubmit="submitResetPasswordForm(event)" class="space-y-3.5 text-left">
+                    <input type="hidden" id="reset-token-input">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">New Password</label>
+                        <input type="password" id="reset-new-password" required minlength="8" placeholder="At least 8 characters" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Confirm New Password</label>
+                        <input type="password" id="reset-confirm-password" required minlength="8" placeholder="Re-enter new password" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] outline-none text-xs sm:text-sm">
+                    </div>
+                    <button type="submit" id="reset-submit-btn" class="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-bold rounded-xl shadow-md transition-all cursor-pointer text-sm">
+                        Update Password &amp; Sign In
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -3632,7 +3502,7 @@ rules:
                         <li><a href="#developers" class="hover:text-[#0071e3] transition-colors">For Developers & IDE Bridge</a></li>
                         <li><a href="#industries" class="hover:text-[#0071e3] transition-colors">Industry & Workflow Blueprints</a></li>
                         <li><a href="#pricing" class="hover:text-[#0071e3] transition-colors">Basic & Corporate Plans</a></li>
-                        <li><a href="#signup" class="hover:text-[#0071e3] transition-colors">Developer Sandbox</a></li>
+                        <li><a href="/docs" class="hover:text-[#0071e3] transition-colors">API & Platform Docs</a></li>
                     </ul>
                 </div>
 
@@ -3655,7 +3525,7 @@ rules:
                     <ul class="space-y-2 text-gray-600">
                         <li><a href="#contact" class="hover:text-[#0071e3] transition-colors font-medium text-gray-900">Contact Architecture Team</a></li>
                         <li><button onclick="openDemoModal()" class="hover:text-[#0071e3] text-left cursor-pointer">Book Executive Demo</button></li>
-                        <li><button onclick="openSignUpModal()" class="hover:text-[#0071e3] text-left cursor-pointer text-[#0071e3] font-semibold">Create Free Sandbox</button></li>
+                        <li><button onclick="openSignUpModal()" class="hover:text-[#0071e3] text-left cursor-pointer text-[#0071e3] font-semibold">Create Free Account</button></li>
                         <li><button onclick="openSignInModal()" class="hover:text-[#0071e3] text-left cursor-pointer">Sign In to Workspace</button></li>
                         <li><a href="mailto:sales@patchworkos.io" class="hover:text-[#0071e3] transition-colors font-mono">sales@patchworkos.io</a></li>
                         <li><a href="tel:+18887282495" class="hover:text-[#0071e3] transition-colors font-mono">+1 (888) 728-2495</a></li>
@@ -3672,7 +3542,7 @@ rules:
                             <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-700">Early Access & Updates</span>
                         </div>
                         <h4 class="text-lg font-bold text-gray-900">Join the Patchwork OS Architecture Waitlist</h4>
-                        <p class="text-xs text-gray-500 max-w-md">Get notified about new runtime connectors, enterprise blueprints, and priority developer sandbox releases.</p>
+                        <p class="text-xs text-gray-500 max-w-md">Get notified about new runtime connectors, enterprise blueprints, and priority platform releases.</p>
                     </div>
                     <form onsubmit="submitWaitlistForm(event)" class="w-full md:w-auto flex flex-col sm:flex-row gap-2">
                         <input type="email" id="waitlist-email" required placeholder="work-email@company.com" class="px-4 py-2.5 rounded-xl border border-gray-300 focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 outline-none text-xs w-full sm:w-64 bg-gray-50/50">
@@ -3951,6 +3821,13 @@ rules:
             } else if (hash === '#signin') {
                 openSignInModal();
                 hash = '#home';
+            } else if (hash === '#forgot-password') {
+                openForgotPasswordModal();
+                hash = '#home';
+            } else if (hash === '#reset-password') {
+                const params = new URLSearchParams(window.location.search);
+                openResetPasswordModal(params.get('reset_token') || '', params.get('email') || '');
+                hash = '#home';
             }
 
             const viewMap = {
@@ -3974,7 +3851,7 @@ rules:
                 '#pricing': 'Patchwork OS | Flexible Plans for Individuals, Teams & Companies',
                 '#support': 'Patchwork OS | Enterprise Support & 99.999% SLA Trust Center',
                 '#contact': 'Patchwork OS | Connect With Solutions Architecture',
-                '#signup': 'Patchwork OS | Sign Up & Developer Sandbox'
+                '#signup': 'Patchwork OS | Create Workspace & Account'
             };
 
             const targetViewId = viewMap[hash] || 'view-home';
@@ -4005,7 +3882,7 @@ rules:
         }
 
         // ==========================================
-        // USER AUTHENTICATION & SANDBOX SESSION
+        // USER AUTHENTICATION & WORKSPACE SESSION
         // ==========================================
         const DEFAULT_USER_KEY = 'patchwork_user';
 
@@ -4025,21 +3902,13 @@ rules:
                     const dropName = document.getElementById('dropdown-user-name');
                     const dropEmail = document.getElementById('dropdown-user-email');
                     const dropRole = document.getElementById('dropdown-user-role');
-                    const dropApiKey = document.getElementById('dropdown-user-apikey');
 
                     const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'PW';
                     if (avatar) avatar.textContent = initials;
-                    if (wsLabel) wsLabel.textContent = user.workspace || 'Enterprise Sandbox';
-                    if (dropName) dropName.textContent = user.name || 'Enterprise User';
+                    if (wsLabel) wsLabel.textContent = user.workspace || 'Enterprise Workspace';
+                    if (dropName) dropName.textContent = user.name || 'Workspace User';
                     if (dropEmail) dropEmail.textContent = user.email || 'user@company.com';
-                    if (dropRole) dropRole.textContent = user.role || 'Finance Lead';
-                    if (dropApiKey) dropApiKey.textContent = user.apiKey || 'pw_live_sec_89fa...';
-
-                    // Update sandbox view if active
-                    const sbWsName = document.getElementById('sb-workspace-name');
-                    const sbApiKey = document.getElementById('sb-api-key');
-                    if (sbWsName) sbWsName.textContent = user.workspace || 'Acme Corp';
-                    if (sbApiKey) sbApiKey.textContent = user.apiKey || 'pw_live_sec_89fa12bc44810';
+                    if (dropRole) dropRole.textContent = user.role || 'Workspace Member';
                 } catch(e) {
                     console.error("Error parsing user session", e);
                 }
@@ -4047,29 +3916,6 @@ rules:
                 if (guestNav) guestNav.classList.remove('hidden');
                 if (userNav) userNav.classList.add('hidden');
             }
-        }
-
-        function saveUserSession(userData) {
-            const apiKey = userData.apiKey || 'pw_live_sec_' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-            const user = {
-                name: userData.name || 'Alex Morgan',
-                email: userData.email || 'alex@acme.com',
-                workspace: userData.workspace || 'Acme Corp',
-                role: userData.role || 'CFO / Controller',
-                apiKey: apiKey,
-                tier: userData.tier || 'developer',
-                createdAt: new Date().toISOString()
-            };
-            localStorage.setItem(DEFAULT_USER_KEY, JSON.stringify(user));
-            checkUserSession();
-            return user;
-        }
-
-        function logoutUser() {
-            localStorage.removeItem(DEFAULT_USER_KEY);
-            checkUserSession();
-            toggleUserDropdown(false);
-            showToast('Signed out of Patchwork OS workspace', 'info');
         }
 
         function toggleUserDropdown(forceState) {
@@ -4081,45 +3927,6 @@ rules:
             } else {
                 menu.classList.toggle('hidden');
             }
-        }
-
-        function quickDemoLogin(persona) {
-            let user;
-            if (persona === 'cfo') {
-                user = saveUserSession({
-                    name: 'Alex Morgan',
-                    email: 'alex.morgan@acmeglobal.com',
-                    workspace: 'Acme Global Corp',
-                    role: 'Chief Financial Officer',
-                    tier: 'enterprise'
-                });
-            } else {
-                user = saveUserSession({
-                    name: 'Sarah Chen',
-                    email: 'sarah.chen@fincloud.dev',
-                    workspace: 'FinCloud Infrastructure',
-                    role: 'VP of Engineering',
-                    tier: 'developer'
-                });
-            }
-            closeSignInModal();
-            triggerConfetti();
-            showToast(`Welcome back, ${user.name}! Connected to ${user.workspace}`, 'success');
-        }
-
-        function quickSSO(provider) {
-            const user = saveUserSession({
-                name: 'Taylor Swift',
-                email: 'taylor@modernretail.io',
-                workspace: 'Modern Retail Corp',
-                role: 'VP Finance & Operations',
-                tier: 'developer'
-            });
-            closeSignUpModal();
-            closeSignInModal();
-            triggerConfetti();
-            showToast(`Authenticated via ${provider}! Provisioned workspace for ${user.workspace}`, 'success');
-            window.location.hash = '#signup';
         }
 
         function autoSuggestWorkspace(email) {
@@ -4143,7 +3950,7 @@ rules:
             if (!b1 || !b2 || !b3 || !txt) return;
 
             let score = 0;
-            if (pwd.length >= 6) score++;
+            if (pwd.length >= 8) score++;
             if (pwd.length >= 10 && /[0-9]/.test(pwd)) score++;
             if (pwd.length >= 12 && /[^A-Za-z0-9]/.test(pwd)) score++;
 
@@ -4155,130 +3962,6 @@ rules:
             else if (score === 1) txt.textContent = 'Fair';
             else if (score === 2) txt.textContent = 'Good';
             else if (score >= 3) txt.textContent = 'Strong (Enterprise Grade)';
-        }
-
-        // ==========================================
-        // SIGN UP FLOW & SIMULATED PROVISIONING
-        // ==========================================
-        function submitSignUpForm(e) {
-            e.preventDefault();
-            const form = document.getElementById('signup-form');
-            const provState = document.getElementById('signup-provisioning');
-            const compDashboard = document.getElementById('signup-complete-dashboard');
-
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            const workspace = document.getElementById('signup-workspace').value;
-            const role = document.getElementById('signup-role').value;
-
-            form.classList.add('hidden');
-            provState.classList.remove('hidden');
-
-            // Animate progress steps
-            const step2 = document.getElementById('prov-step-2');
-            const step3 = document.getElementById('prov-step-3');
-            const step4 = document.getElementById('prov-step-4');
-
-            setTimeout(() => {
-                if (step2) step2.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> <span class="text-emerald-400">Cryptographic SHA-256 keys generated</span>';
-                if (step3) step3.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-blue-400"></i> <span class="text-blue-400">Seeding 50,000 synthetic payment transactions...</span>';
-            }, 600);
-
-            setTimeout(() => {
-                if (step3) step3.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> <span class="text-emerald-400">50,000 synthetic transactions seeded</span>';
-                if (step4) step4.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-blue-400"></i> <span class="text-blue-400">Mounting mock NetSuite & Stripe endpoints...</span>';
-            }, 1200);
-
-            setTimeout(() => {
-                if (step4) step4.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> <span class="text-emerald-400">Mock endpoints mounted & verified</span>';
-                provState.classList.add('hidden');
-                compDashboard.classList.remove('hidden');
-
-                const user = saveUserSession({ name, email, workspace, role });
-                triggerConfetti();
-                showToast(`Workspace "${workspace}" successfully provisioned!`, 'success');
-            }, 1800);
-        }
-
-        function submitModalSignUp(e) {
-            e.preventDefault();
-            const formCont = document.getElementById('modal-signup-form-container');
-            const provState = document.getElementById('modal-signup-provisioning');
-            const succState = document.getElementById('modal-signup-success');
-
-            const name = document.getElementById('modal-signup-name').value;
-            const email = document.getElementById('modal-signup-email').value;
-            const workspace = document.getElementById('modal-signup-workspace').value;
-            const role = document.getElementById('modal-signup-role').value;
-
-            formCont.classList.add('hidden');
-            provState.classList.remove('hidden');
-
-            setTimeout(() => {
-                provState.classList.add('hidden');
-                succState.classList.remove('hidden');
-
-                const user = saveUserSession({ name, email, workspace, role });
-                const codeEl = document.getElementById('modal-success-apikey');
-                if (codeEl) codeEl.textContent = user.apiKey;
-
-                triggerConfetti();
-                showToast(`Account created! Logged into ${workspace}`, 'success');
-            }, 1200);
-        }
-
-        function submitSignInForm(e) {
-            e.preventDefault();
-            const email = document.getElementById('signin-email').value;
-            const name = email.split('@')[0].replace('.', ' ');
-            const capitalizedName = name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-            const workspace = email.split('@')[1] ? email.split('@')[1].split('.')[0].toUpperCase() + ' Corp' : 'Acme Corp';
-
-            const user = saveUserSession({
-                name: capitalizedName,
-                email: email,
-                workspace: workspace,
-                role: 'Finance Controller'
-            });
-
-            closeSignInModal();
-            triggerConfetti();
-            showToast(`Welcome back, ${user.name}!`, 'success');
-        }
-
-        function runSandboxReconDemo() {
-            const btn = document.getElementById('btn-run-recon');
-            const res = document.getElementById('recon-demo-results');
-            if (!btn || !res) return;
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Reconciling 50,000 Transactions...';
-
-            setTimeout(() => {
-                btn.innerHTML = '<i class="ph-fill ph-check-circle text-emerald-400"></i> Reconciliation Succeeded';
-                res.classList.remove('hidden');
-                triggerConfetti();
-                showToast('50,000 rows matched with 0 exceptions in 0.042s!', 'success');
-            }, 800);
-        }
-
-        function copyApiKey() {
-            const stored = localStorage.getItem(DEFAULT_USER_KEY);
-            let key = 'pw_live_sec_89fa12bc44810fe91';
-            if (stored) {
-                try { key = JSON.parse(stored).apiKey || key; } catch(e){}
-            }
-            navigator.clipboard.writeText(key).then(() => {
-                showToast('Tenant API Key copied to clipboard!', 'success');
-            });
-        }
-
-        function copySandboxApiKey() {
-            const keyEl = document.getElementById('sb-api-key');
-            const text = keyEl ? keyEl.textContent : 'pw_live_sec_89f024cba71920ef';
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Sandbox API Key copied to clipboard!', 'success');
-            });
         }
 
         // ==========================================
@@ -4665,7 +4348,7 @@ rules:
                 return `<strong>Emergency Response & SLAs:</strong><br/>
                 For P1 mission-critical blockers and pipeline incidents, our initial response SLA is <strong>under 1 hour</strong> with direct 24/7 on-call engineering dispatch. You can submit directly via our <a href="#support-ticket-form-section" class="text-[#0071e3] underline font-bold" onclick="toggleSupportChat()">Ticket Form</a> or call <strong>+1 (888) 728-2495</strong>.`;
             } else {
-                return `Thank you for reaching out! Patchwork OS is a local-first AI runtime with 180 MCP tools, declarative YAML recipes, and blast-radius policy enforcement. Would you like to <a href="#support-ticket-form-section" class="text-[#0071e3] underline" onclick="toggleSupportChat()">submit a priority ticket</a>, <a href="#contact" class="text-[#0071e3] underline" onclick="toggleSupportChat()">book an architect review</a>, or <a href="#signup" class="text-[#0071e3] underline" onclick="toggleSupportChat()">spin up a sandbox</a>?`;
+                return `Thank you for reaching out! Patchwork OS is a local-first AI runtime with 180 MCP tools, declarative YAML recipes, and blast-radius policy enforcement. Would you like to <a href="#support-ticket-form-section" class="text-[#0071e3] underline" onclick="toggleSupportChat()">submit a priority ticket</a>, <a href="#contact" class="text-[#0071e3] underline" onclick="toggleSupportChat()">book an architect review</a>, or <a href="#signup" class="text-[#0071e3] underline" onclick="toggleSupportChat()">create a workspace</a>?`;
             }
         }
 
@@ -4721,6 +4404,8 @@ rules:
         // ==========================================
         function openSignUpModal() {
             const modal = document.getElementById('signup-modal');
+            const err = document.getElementById('modal-signup-error');
+            if (err) err.classList.add('hidden');
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -4737,6 +4422,8 @@ rules:
 
         function openSignInModal() {
             const modal = document.getElementById('signin-modal');
+            const err = document.getElementById('signin-error-banner');
+            if (err) err.classList.add('hidden');
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -4745,6 +4432,59 @@ rules:
 
         function closeSignInModal() {
             const modal = document.getElementById('signin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openForgotPasswordModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            const formContainer = document.getElementById('forgot-password-form-container');
+            const successBox = document.getElementById('forgot-password-success');
+            const err = document.getElementById('forgot-password-error');
+            const signInEmail = document.getElementById('signin-email')?.value;
+            const forgotEmail = document.getElementById('forgot-password-email');
+            if (signInEmail && forgotEmail && !forgotEmail.value) {
+                forgotEmail.value = signInEmail;
+            }
+            if (formContainer) formContainer.classList.remove('hidden');
+            if (successBox) successBox.classList.add('hidden');
+            if (err) err.classList.add('hidden');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeForgotPasswordModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openResetPasswordModal(token = '', email = '') {
+            const modal = document.getElementById('reset-password-modal');
+            const tokenInput = document.getElementById('reset-password-token');
+            const emailLabel = document.getElementById('reset-password-email-label');
+            const err = document.getElementById('reset-password-error');
+            if (tokenInput) tokenInput.value = token;
+            if (emailLabel) {
+                emailLabel.textContent = email
+                    ? `Choose a new password for ${email}.`
+                    : 'Choose a new password (minimum 8 characters) to restore access to your workspace.';
+            }
+            if (err) err.classList.add('hidden');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeResetPasswordModal() {
+            const modal = document.getElementById('reset-password-modal');
             if (modal) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
@@ -4773,6 +4513,8 @@ rules:
                 closeDemoModal();
                 closeSignUpModal();
                 closeSignInModal();
+                closeForgotPasswordModal();
+                closeResetPasswordModal();
                 closeSupportTicketModal();
                 toggleUserDropdown(false);
             }
@@ -4805,22 +4547,72 @@ rules:
             }
         }
 
+        function checkQueryActionsOnLoad() {
+            const params = new URLSearchParams(window.location.search);
+            const resetToken = params.get('reset_token');
+            const email = params.get('email') || '';
+            const inviteToken = params.get('invite_token');
+            const orgName = params.get('org') || '';
+
+            if (resetToken) {
+                openResetPasswordModal(resetToken, email);
+                return;
+            }
+
+            if (inviteToken) {
+                if (email) {
+                    const sEmail = document.getElementById('signup-email');
+                    const mEmail = document.getElementById('modal-signup-email');
+                    const inEmail = document.getElementById('signin-email');
+                    if (sEmail) sEmail.value = email;
+                    if (mEmail) mEmail.value = email;
+                    if (inEmail) inEmail.value = email;
+                }
+                if (orgName) {
+                    const sWs = document.getElementById('signup-workspace');
+                    const mWs = document.getElementById('modal-signup-workspace');
+                    if (sWs) sWs.value = orgName;
+                    if (mWs) mWs.value = orgName;
+                }
+                if (window.location.hash !== '#signup') {
+                    openSignUpModal();
+                }
+            }
+        }
+
         window.addEventListener('hashchange', handleRouting);
         document.addEventListener('DOMContentLoaded', () => {
             handleRouting();
             loadPublicPackagePricing();
             checkUserSession();
             renderTicketsList();
+            checkQueryActionsOnLoad();
         });
     </script>
     <script>
-      // Secure portal authentication replaces the previous client-only demo session.
       function saveSecureSession(data) {
         sessionStorage.setItem('patchwork_access_token', data.accessToken);
         sessionStorage.setItem('patchwork_refresh_token', data.refreshToken);
         localStorage.setItem('patchwork_user', JSON.stringify(data.user));
       }
+
+      function showBannerError(elementId, message) {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.textContent = message;
+          el.classList.remove('hidden');
+        }
+        if (typeof showToast === 'function') {
+          showToast(message, 'error');
+        }
+      }
+
       async function authenticatePortal(endpoint, payload) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteToken = urlParams.get('invite_token');
+        if (inviteToken && !payload.inviteToken) {
+          payload.inviteToken = inviteToken;
+        }
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -4830,11 +4622,11 @@ rules:
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Authentication failed.');
         saveSecureSession(data);
-        const urlParams = new URLSearchParams(window.location.search);
         const nextUrl = urlParams.get('next');
-        const target = nextUrl || data.redirectUrl || '/plan';
+        const target = nextUrl || data.redirectUrl || '/account';
         window.location.assign(target);
       }
+
       async function logoutUser() {
         const refreshToken = sessionStorage.getItem('patchwork_refresh_token');
         try {
@@ -4853,34 +4645,168 @@ rules:
         localStorage.removeItem('patchwork_user');
         window.location.assign('/');
       }
-      function submitSignUpForm(event) {
+
+      async function submitSignUpForm(event) {
         event.preventDefault();
-        authenticatePortal('/api/auth/signup', {
-          name: document.getElementById('signup-name').value,
-          email: document.getElementById('signup-email').value,
-          password: document.getElementById('signup-password').value,
-          workspace: document.getElementById('signup-workspace').value,
-          role: document.getElementById('signup-role').value
-        }).catch((error) => alert(error.message));
+        const errEl = document.getElementById('signup-error-banner');
+        if (errEl) errEl.classList.add('hidden');
+        const btn = document.getElementById('signup-submit-btn');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Creating Workspace...';
+        }
+        try {
+          await authenticatePortal('/api/auth/signup', {
+            name: document.getElementById('signup-name').value,
+            email: document.getElementById('signup-email').value,
+            password: document.getElementById('signup-password').value,
+            workspace: document.getElementById('signup-workspace').value,
+            role: document.getElementById('signup-role').value
+          });
+        } catch (error) {
+          showBannerError('signup-error-banner', error.message);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        }
       }
-      function submitModalSignUp(event) {
+
+      async function submitModalSignUp(event) {
         event.preventDefault();
-        authenticatePortal('/api/auth/signup', {
-          name: document.getElementById('modal-signup-name').value,
-          email: document.getElementById('modal-signup-email').value,
-          password: document.getElementById('modal-signup-password').value,
-          workspace: document.getElementById('modal-signup-workspace').value,
-          role: document.getElementById('modal-signup-role').value
-        }).catch((error) => alert(error.message));
+        const errEl = document.getElementById('modal-signup-error');
+        if (errEl) errEl.classList.add('hidden');
+        const btn = document.getElementById('modal-signup-submit-btn');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Creating Account...';
+        }
+        try {
+          await authenticatePortal('/api/auth/signup', {
+            name: document.getElementById('modal-signup-name').value,
+            email: document.getElementById('modal-signup-email').value,
+            password: document.getElementById('modal-signup-password').value,
+            workspace: document.getElementById('modal-signup-workspace').value,
+            role: document.getElementById('modal-signup-role').value
+          });
+        } catch (error) {
+          showBannerError('modal-signup-error', error.message);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        }
       }
-      function submitSignInForm(event) {
+
+      async function submitSignInForm(event) {
         event.preventDefault();
-        authenticatePortal('/api/auth/login', {
-          email: document.getElementById('signin-email').value,
-          password: document.getElementById('signin-password').value
-        }).catch((error) => alert(error.message));
+        const errEl = document.getElementById('signin-error-banner');
+        if (errEl) errEl.classList.add('hidden');
+        const btn = document.getElementById('signin-submit-btn');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Signing In...';
+        }
+        try {
+          await authenticatePortal('/api/auth/login', {
+            email: document.getElementById('signin-email').value,
+            password: document.getElementById('signin-password').value
+          });
+        } catch (error) {
+          showBannerError('signin-error-banner', error.message);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        }
       }
-      function quickDemoLogin() { alert('Demo login cannot access the secure billing portal. Please create an account or sign in.'); }
+
+      async function submitForgotPasswordForm(event) {
+        event.preventDefault();
+        const errEl = document.getElementById('forgot-password-error');
+        if (errEl) errEl.classList.add('hidden');
+        const email = document.getElementById('forgot-password-email').value.trim();
+        const btn = document.getElementById('forgot-password-submit-btn');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Sending Reset Link...';
+        }
+        try {
+          const response = await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Unable to process password reset request.');
+          document.getElementById('forgot-password-form-container').classList.add('hidden');
+          const msgEl = document.getElementById('forgot-password-success-text');
+          if (msgEl && data.message) msgEl.textContent = data.message;
+          document.getElementById('forgot-password-success').classList.remove('hidden');
+          showToast('Password reset instructions sent to your email.', 'success');
+        } catch (error) {
+          showBannerError('forgot-password-error', error.message);
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        }
+      }
+
+      async function submitResetPasswordForm(event) {
+        event.preventDefault();
+        const errEl = document.getElementById('reset-password-error');
+        if (errEl) errEl.classList.add('hidden');
+        const token = document.getElementById('reset-password-token').value.trim();
+        const newPassword = document.getElementById('reset-password-new').value;
+        const confirmPassword = document.getElementById('reset-password-confirm').value;
+
+        if (!token) {
+          showBannerError('reset-password-error', 'Missing password reset token. Please request a new reset link.');
+          return;
+        }
+        if (newPassword.length < 8) {
+          showBannerError('reset-password-error', 'Password must be at least 8 characters long.');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          showBannerError('reset-password-error', 'Passwords do not match.');
+          return;
+        }
+
+        const btn = document.getElementById('reset-password-submit-btn');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Updating Password...';
+        }
+        try {
+          const response = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ token, password: newPassword })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Failed to reset password.');
+          saveSecureSession(data);
+          showToast('Password updated! Redirecting to your workspace...', 'success');
+          setTimeout(() => {
+            window.location.assign(data.redirectUrl || '/account');
+          }, 600);
+        } catch (error) {
+          showBannerError('reset-password-error', error.message);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+          }
+        }
+      }
     </script>
 </body>
 </html>

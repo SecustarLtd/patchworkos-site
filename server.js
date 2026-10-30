@@ -54,9 +54,144 @@ if (!JWT_SECRET) {
 if (!process.env.JWT_SECRET) console.warn('Using a development JWT secret. Set JWT_SECRET before deployment.');
 
 
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ verify: (req, res, buffer) => { req.rawBody = buffer; } }));
 app.use(express.urlencoded({ extended: true }));
+
+function resolveResendApiKey() {
+  if (process.env.RESEND_API_KEY && String(process.env.RESEND_API_KEY).trim()) {
+    return String(process.env.RESEND_API_KEY).trim();
+  }
+  const smtpUrl = String(process.env.SMTP_URL || '').trim();
+  if (smtpUrl) {
+    try {
+      const parsed = new URL(smtpUrl);
+      if (parsed.password && parsed.password.startsWith('re_')) {
+        return decodeURIComponent(parsed.password);
+      }
+    } catch (_) {}
+  }
+  return '';
+}
+
+function getEmailFrom() {
+  const raw = String(process.env.EMAIL_FROM || 'no-reply@patchworkos.com').trim();
+  if (raw.includes('<')) return raw;
+  return `Patchwork OS <${raw}>`;
+}
+
+function getAdminNotificationEmail() {
+  return String(process.env.ADMIN_NOTIFICATION_EMAIL || 'jnasire1@gmail.com').trim();
+}
+
+function isEmailConfigured() {
+  return Boolean(resolveResendApiKey() || process.env.SMTP_URL);
+}
+
+function buildEmailHtml({ title, preheader, bodyHtml, ctaLabel, ctaUrl, footerNote }) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f4f4f5;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader || title}</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#09090b;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#121318;border:1px solid #27272a;border-radius:16px;padding:36px 32px;">
+          <tr>
+            <td style="padding-bottom:24px;border-bottom:1px solid #27272a;">
+              <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;color:#ffffff;">Patchwork<span style="color:#2997ff;">OS</span></span>
+              <span style="float:right;font-size:11px;font-family:monospace;color:#a1a1aa;background:#18181b;padding:3px 8px;border-radius:6px;border:1px solid #27272a;">ENTERPRISE</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top:28px;padding-bottom:20px;">
+              <h1 style="margin:0 0 16px 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;">${title}</h1>
+              <div style="font-size:14px;line-height:1.65;color:#d4d4d8;">
+                ${bodyHtml}
+              </div>
+              ${ctaLabel && ctaUrl ? `
+              <div style="margin-top:28px;margin-bottom:12px;">
+                <a href="${ctaUrl}" style="display:inline-block;background-color:#0071e3;color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;padding:12px 24px;border-radius:10px;">${ctaLabel}</a>
+              </div>
+              <p style="margin:12px 0 0 0;font-size:11px;color:#71717a;word-break:break-all;">Or copy and paste this URL into your browser:<br><a href="${ctaUrl}" style="color:#2997ff;text-decoration:none;">${ctaUrl}</a></p>
+              ` : ''}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top:24px;border-top:1px solid #27272a;font-size:12px;color:#71717a;line-height:1.5;">
+              ${footerNote || 'You are receiving this transactional notification from Patchwork OS Financial Control Plane.'}<br>
+              &copy; ${new Date().getFullYear()} Patchwork OS &bull; <a href="https://patchworkos.com" style="color:#a1a1aa;text-decoration:none;">patchworkos.com</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+async function sendEmail({ to, subject, html, text, replyTo }) {
+  const apiKey = resolveResendApiKey();
+  const recipients = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
+  if (!recipients.length) return { sent: false, reason: 'no_recipient' };
+
+  if (!apiKey) {
+    console.log(`[Email Fallback Log] To: ${recipients.join(', ')} | Subject: ${subject}`);
+    return { sent: false, simulated: true, reason: 'missing_api_key' };
+  }
+
+  try {
+    const payload = {
+      from: getEmailFrom(),
+      to: recipients,
+      subject,
+      html: html || `<p>${text || ''}</p>`,
+      text: text || String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+    };
+    if (replyTo) payload.reply_to = replyTo;
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      console.warn(`[Email] Resend API error (${response.status}) to ${recipients.join(', ')}:`, data);
+      return { sent: false, status: response.status, error: data.message || 'Resend error' };
+    }
+    console.log(`[Email] Dispatched "${subject}" to ${recipients.join(', ')} (id: ${data.id || 'ok'})`);
+    return { sent: true, id: data.id };
+  } catch (err) {
+    console.warn(`[Email] Failed to send "${subject}" to ${recipients.join(', ')}:`, err.message);
+    return { sent: false, error: err.message };
+  }
+}
+
+function getOrgNotificationEmail(orgId, fallbackEmail) {
+  try {
+    const org = db.prepare(`
+      SELECT o.billing_email, o.name, u.email as owner_email
+      FROM organizations o
+      LEFT JOIN users u ON u.id = o.owner_id
+      WHERE o.id = ?
+    `).get(orgId);
+    return org?.billing_email || org?.owner_email || fallbackEmail || null;
+  } catch (_) {
+    return fallbackEmail || null;
+  }
+}
 
 function id(prefix) { return `${prefix}_${crypto.randomUUID().replace(/-/g, '')}`; }
 function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
@@ -205,7 +340,7 @@ function buildAuthResponse(user, membership) {
     refreshToken: issueRefreshToken(user.id),
     user: safeUser(user, membership),
     isSuperadmin: Boolean(user.is_superadmin),
-    redirectUrl: process.env.PATCHWORK_POST_AUTH_REDIRECT || '/plan'
+    redirectUrl: process.env.PATCHWORK_POST_AUTH_REDIRECT || '/account'
   };
 }
 function membershipFor(userId, orgId) {
@@ -686,6 +821,33 @@ function completeTransaction(data) {
   syncInvoicePayment(data.reference, true);
   recordUsage(orgId, 'invoices_paid', 1);
   audit(orgId, 'paystack_payment_verified', { reference: data.reference, transactionId: data.id, planId });
+
+  const recipientEmail = getOrgNotificationEmail(orgId, data.customer?.email);
+  const plan = db.prepare('SELECT * FROM plans WHERE id = ?').get(planId);
+  if (recipientEmail && plan) {
+    const baseUrl = process.env.APP_BASE_URL || 'https://patchworkos.com';
+    const amountFormatted = `${plan.currency || 'KES'} ${((attempt?.amount_cents || plan.price_cents || 0) / 100).toFixed(2)}`;
+    sendEmail({
+      to: recipientEmail,
+      subject: `Payment Receipt — Patchwork OS ${plan.name} (${amountFormatted})`,
+      html: buildEmailHtml({
+        title: 'Payment Verified & Subscription Active',
+        preheader: `Your payment of ${amountFormatted} for ${plan.name} has been confirmed.`,
+        bodyHtml: `
+          <p>Thank you for your payment. Your Patchwork OS subscription has been updated and verified:</p>
+          <ul style="padding-left:18px;color:#d4d4d8;">
+            <li><strong>Plan:</strong> ${plan.name}</li>
+            <li><strong>Amount Paid:</strong> ${amountFormatted}</li>
+            <li><strong>Reference:</strong> <code>${data.reference}</code></li>
+            <li><strong>Status:</strong> Active</li>
+          </ul>
+          <p>You can view and download your printable tax invoice and receipt from your Account Portal.</p>
+        `,
+        ctaLabel: 'View Invoices & Receipts',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+  }
 }
 
 app.use(authenticate);
@@ -724,7 +886,14 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname)));
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'UP', uptime: process.uptime(), database: 'SQLite (WAL Mode Connected)', paystackConfigured: Boolean(process.env.PAYSTACK_SECRET_KEY), paystackSubaccount: PAYSTACK_SUBACCOUNT_CODE || null });
+  res.json({
+    status: 'UP',
+    uptime: process.uptime(),
+    database: 'SQLite (WAL Mode Connected)',
+    paystackConfigured: Boolean(process.env.PAYSTACK_SECRET_KEY),
+    paystackSubaccount: PAYSTACK_SUBACCOUNT_CODE || null,
+    emailConfigured: isEmailConfigured()
+  });
 });
 
 app.get('/api/plans', (req, res) => {
@@ -735,21 +904,55 @@ app.get('/api/plans', (req, res) => {
 
 app.post('/api/auth/signup', (req, res) => {
   try {
-    const { name, email, password, workspace, role } = req.body;
-    if (!name || !email || !workspace || !password) return res.status(400).json({ error: 'Name, email, workspace, and password are required.' });
-    if (String(password).length < 12) return res.status(400).json({ error: 'Passwords must contain at least 12 characters.' });
+    const { name, email, password, workspace, role, inviteToken } = req.body;
+    if (!name || !email || (!workspace && !inviteToken) || !password) {
+      return res.status(400).json({ error: 'Name, email, workspace, and password are required.' });
+    }
+    if (String(password).length < 8) {
+      return res.status(400).json({ error: 'Passwords must contain at least 8 characters.' });
+    }
     const normalizedEmail = String(email).trim().toLowerCase();
-    if (db.prepare('SELECT id FROM users WHERE email=?').get(normalizedEmail)) return res.status(409).json({ error: 'An account with this email already exists.' });
-    const slugBase = String(workspace).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'workspace';
-    const orgId = id('org');
+    if (db.prepare('SELECT id FROM users WHERE email=?').get(normalizedEmail)) {
+      return res.status(409).json({ error: 'An account with this email already exists.' });
+    }
+
+    // Check if an invitation token or pending email invitation exists
+    let invitation = null;
+    if (inviteToken) {
+      invitation = db.prepare("SELECT * FROM invitations WHERE token = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP").get(String(inviteToken).trim());
+    }
+    if (!invitation) {
+      invitation = db.prepare("SELECT * FROM invitations WHERE LOWER(email) = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP ORDER BY created_at DESC LIMIT 1").get(normalizedEmail);
+    }
+
+    let targetOrgId = null;
+    let joinedViaInvite = false;
+
     const create = db.transaction(() => {
+      if (invitation) {
+        const invitedOrg = db.prepare('SELECT * FROM organizations WHERE id = ?').get(invitation.org_id);
+        if (invitedOrg) {
+          targetOrgId = invitedOrg.id;
+          joinedViaInvite = true;
+          const userId = db.prepare(`INSERT INTO users (name,email,password_hash,workspace,role,tier,api_key,auth_provider) VALUES (?,?,?,?,?,'growth',?,'local')`)
+            .run(String(name).trim(), normalizedEmail, bcrypt.hashSync(password, 12), invitedOrg.name, invitation.role || role || 'member', generateApiKey()).lastInsertRowid;
+          db.prepare('INSERT OR IGNORE INTO organization_members (org_id,user_id,role) VALUES (?,?,?)').run(targetOrgId, userId, invitation.role || 'member');
+          db.prepare("UPDATE invitations SET status = 'accepted' WHERE id = ?").run(invitation.id);
+          audit(targetOrgId, 'member_joined_via_invite', { email: normalizedEmail, role: invitation.role, inviteId: invitation.id }, Number(userId));
+          return Number(userId);
+        }
+      }
+
+      const workspaceName = String(workspace || `${name}'s Workspace`).trim();
+      const slugBase = workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'workspace';
+      targetOrgId = id('org');
       const userId = db.prepare(`INSERT INTO users (name,email,password_hash,workspace,role,tier,api_key,auth_provider) VALUES (?,?,?,?,?,'developer',?,'local')`)
-        .run(String(name).trim(), normalizedEmail, bcrypt.hashSync(password, 12), String(workspace).trim(), role || 'Finance Lead', generateApiKey()).lastInsertRowid;
-      db.prepare('INSERT INTO organizations (id,name,slug,owner_id) VALUES (?,?,?,?)').run(orgId, String(workspace).trim(), `${slugBase}-${crypto.randomBytes(3).toString('hex')}`, userId);
-      db.prepare("INSERT INTO organization_members (org_id,user_id,role) VALUES (?,?,'owner')").run(orgId, userId);
+        .run(String(name).trim(), normalizedEmail, bcrypt.hashSync(password, 12), workspaceName, role || 'Finance Lead', generateApiKey()).lastInsertRowid;
+      db.prepare('INSERT INTO organizations (id,name,slug,owner_id,billing_email) VALUES (?,?,?,?,?)').run(targetOrgId, workspaceName, `${slugBase}-${crypto.randomBytes(3).toString('hex')}`, userId, normalizedEmail);
+      db.prepare("INSERT INTO organization_members (org_id,user_id,role) VALUES (?,?,'owner')").run(targetOrgId, userId);
       const trialStart = new Date().toISOString();
       const trialEnd = new Date(Date.now() + 14 * 86400000).toISOString();
-      markSubscription(orgId, 'growth', {
+      markSubscription(targetOrgId, 'growth', {
         status: 'trialing',
         trialStart,
         trialEnd,
@@ -760,20 +963,79 @@ app.post('/api/auth/signup', (req, res) => {
       });
       return Number(userId);
     });
+
     const user = db.prepare('SELECT * FROM users WHERE id=?').get(create());
-    const membership = membershipFor(user.id, orgId);
+    const membership = membershipFor(user.id, targetOrgId);
     setDashboardSessionCookie(res, user);
     syncRosterToPatchworkHome();
-    res.status(201).json({ message: 'Workspace successfully provisioned on a 14-day Growth trial.', ...buildAuthResponse(user, membership) });
-  } catch (error) { res.status(500).json({ error: 'Failed to create account.' }); }
+
+    const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    sendEmail({
+      to: user.email,
+      subject: `Welcome to Patchwork OS — ${user.workspace}`,
+      html: buildEmailHtml({
+        title: `Welcome to Patchwork OS, ${user.name}!`,
+        preheader: `Your workspace ${user.workspace} is active and ready.`,
+        bodyHtml: `
+          <p>Your account (<strong style="color:#ffffff;">${user.email}</strong>) has been provisioned for workspace <strong style="color:#ffffff;">${user.workspace}</strong>.</p>
+          <p>${joinedViaInvite ? 'You have joined your team workspace and can immediately access shared reconciliation pipelines, API keys, and audit logs.' : 'Your workspace includes a 14-day Growth trial with full access to automated financial reconciliation, ERP connectors, and developer API keys.'}</p>
+        `,
+        ctaLabel: 'Open Account & Billing Portal',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+
+    const adminEmail = getAdminNotificationEmail();
+    if (adminEmail && adminEmail.toLowerCase() !== user.email.toLowerCase()) {
+      sendEmail({
+        to: adminEmail,
+        subject: `[Patchwork OS] New Workspace Signup: ${user.workspace} (${user.email})`,
+        html: buildEmailHtml({
+          title: 'New User & Workspace Registration',
+          bodyHtml: `
+            <p>A new user has registered on Patchwork OS:</p>
+            <ul style="padding-left:18px;color:#d4d4d8;">
+              <li><strong>Name:</strong> ${user.name}</li>
+              <li><strong>Email:</strong> ${user.email}</li>
+              <li><strong>Workspace:</strong> ${user.workspace} (${targetOrgId})</li>
+              <li><strong>Role:</strong> ${membership ? membership.role : user.role}</li>
+            </ul>
+          `,
+          ctaLabel: 'View in Superadmin Cockpit',
+          ctaUrl: `${baseUrl}/admin`
+        })
+      }).catch(() => {});
+    }
+
+    res.status(201).json({
+      message: joinedViaInvite
+        ? `Successfully joined workspace ${user.workspace}.`
+        : 'Workspace successfully provisioned on a 14-day Growth trial.',
+      ...buildAuthResponse(user, membership)
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Failed to create account.' });
+  }
 });
 
 app.post('/api/auth/login', (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
   const password = req.body.password;
+  const inviteToken = req.body.inviteToken;
   const user = db.prepare('SELECT * FROM users WHERE email=?').get(email);
   if (!user || !user.password_hash || !password || !bcrypt.compareSync(password, user.password_hash)) return res.status(401).json({ error: 'Invalid email or password.' });
-  let membership = db.prepare('SELECT * FROM organization_members WHERE user_id=? ORDER BY joined_at LIMIT 1').get(user.id);
+
+  if (inviteToken) {
+    const invitation = db.prepare("SELECT * FROM invitations WHERE token = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP").get(String(inviteToken).trim());
+    if (invitation && invitation.email.toLowerCase() === email) {
+      db.prepare('INSERT OR IGNORE INTO organization_members (org_id, user_id, role) VALUES (?, ?, ?)').run(invitation.org_id, user.id, invitation.role || 'member');
+      db.prepare("UPDATE invitations SET status = 'accepted' WHERE id = ?").run(invitation.id);
+      audit(invitation.org_id, 'member_joined_via_invite', { email, role: invitation.role, inviteId: invitation.id }, user.id);
+    }
+  }
+
+  let membership = db.prepare('SELECT * FROM organization_members WHERE user_id=? ORDER BY joined_at DESC LIMIT 1').get(user.id);
   if (!membership && user.is_superadmin) {
     const hq = db.prepare("SELECT * FROM organizations WHERE id='org_patchwork_hq'").get();
     if (hq) membership = { org_id: hq.id, role: 'owner' };
@@ -782,6 +1044,173 @@ app.post('/api/auth/login', (req, res) => {
   setDashboardSessionCookie(res, user);
   syncRosterToPatchworkHome();
   res.json({ message: 'Authentication successful.', ...buildAuthResponse(user, membership) });
+});
+
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(email);
+    if (user) {
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = hash(rawToken);
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+      // Invalidate previous unused tokens for this user
+      db.prepare('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE user_id = ? AND used_at IS NULL').run(user.id);
+      db.prepare('INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at) VALUES (?, ?, ?, ?)')
+        .run(id('prt'), user.id, tokenHash, expiresAt);
+
+      const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+      const resetUrl = `${baseUrl}/?reset_token=${rawToken}&email=${encodeURIComponent(user.email)}#reset-password`;
+
+      const membership = db.prepare('SELECT * FROM organization_members WHERE user_id=? ORDER BY joined_at LIMIT 1').get(user.id);
+      if (membership) {
+        audit(membership.org_id, 'user_password_reset_requested', { email: user.email, ip: req.ip }, user.id);
+      }
+
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your Patchwork OS password',
+        html: buildEmailHtml({
+          title: 'Password Reset Request',
+          preheader: 'Use this secure link to reset your Patchwork OS password.',
+          bodyHtml: `
+            <p>Hello <strong style="color:#ffffff;">${user.name}</strong>,</p>
+            <p>We received a request to reset the password for your Patchwork OS account (<strong style="color:#ffffff;">${user.email}</strong>).</p>
+            <p>Click the button below to choose a new password. This link will expire in <strong>60 minutes</strong>.</p>
+            <p style="font-size:12px;color:#a1a1aa;margin-top:16px;">If you did not request a password reset, you can safely ignore this email — your password will remain unchanged.</p>
+          `,
+          ctaLabel: 'Reset Password',
+          ctaUrl: resetUrl
+        })
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'If an account is registered with that email address, a password reset link has been sent.'
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Unable to process password reset request.' });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const rawToken = String(req.body.token || '').trim();
+    const newPassword = String(req.body.password || req.body.newPassword || '');
+
+    if (!rawToken) {
+      return res.status(400).json({ error: 'Password reset token is required.' });
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters long.' });
+    }
+
+    const tokenRecord = db.prepare(`
+      SELECT * FROM password_reset_tokens
+      WHERE token_hash = ? AND used_at IS NULL AND expires_at > CURRENT_TIMESTAMP
+    `).get(hash(rawToken));
+
+    if (!tokenRecord) {
+      return res.status(400).json({ error: 'This password reset link is invalid or has expired. Please request a new one.' });
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(tokenRecord.user_id);
+    if (!user) {
+      return res.status(404).json({ error: 'Account no longer exists.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(newPassword, 12);
+    db.transaction(() => {
+      db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, user.id);
+      db.prepare('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?').run(tokenRecord.id);
+      db.prepare('UPDATE auth_refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE user_id = ? AND revoked_at IS NULL').run(user.id);
+    })();
+
+    let membership = db.prepare('SELECT * FROM organization_members WHERE user_id=? ORDER BY joined_at LIMIT 1').get(user.id);
+    if (!membership && user.is_superadmin) {
+      const hq = db.prepare("SELECT * FROM organizations WHERE id='org_patchwork_hq'").get();
+      if (hq) membership = { org_id: hq.id, role: 'owner' };
+    }
+    if (membership) {
+      audit(membership.org_id, 'user_password_reset_completed', { email: user.email, ip: req.ip }, user.id);
+    }
+
+    const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    sendEmail({
+      to: user.email,
+      subject: 'Your Patchwork OS password has been updated',
+      html: buildEmailHtml({
+        title: 'Password Successfully Changed',
+        preheader: 'Your Patchwork OS account password was just updated.',
+        bodyHtml: `
+          <p>Hello <strong style="color:#ffffff;">${user.name}</strong>,</p>
+          <p>The password for your Patchwork OS account (<strong style="color:#ffffff;">${user.email}</strong>) was successfully reset on ${new Date().toUTCString()}.</p>
+          <p>If you did not perform this change, please contact support immediately at <a href="mailto:support@patchworkos.com" style="color:#2997ff;">support@patchworkos.com</a>.</p>
+        `,
+        ctaLabel: 'Go to Account Portal',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+
+    const updatedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+    setDashboardSessionCookie(res, updatedUser);
+    res.json({
+      success: true,
+      message: 'Password has been reset successfully.',
+      ...(membership ? buildAuthResponse(updatedUser, membership) : {})
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password.' });
+  }
+});
+
+app.post('/api/auth/change-password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current password and new password are required.' });
+    }
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters long.' });
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.auth.userId);
+    if (!user || !user.password_hash || !bcrypt.compareSync(String(currentPassword), user.password_hash)) {
+      return res.status(401).json({ error: 'Current password is incorrect.' });
+    }
+
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(bcrypt.hashSync(String(newPassword), 12), user.id);
+    audit(req.auth.orgId, 'user_password_changed', { email: user.email }, user.id);
+
+    const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    sendEmail({
+      to: user.email,
+      subject: 'Your Patchwork OS password has been changed',
+      html: buildEmailHtml({
+        title: 'Password Updated',
+        preheader: 'Your Patchwork OS account password was changed.',
+        bodyHtml: `
+          <p>Hello <strong style="color:#ffffff;">${user.name}</strong>,</p>
+          <p>Your Patchwork OS password for <strong style="color:#ffffff;">${user.email}</strong> was updated from your Account Portal on ${new Date().toUTCString()}.</p>
+        `,
+        ctaLabel: 'Open Account Portal',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+
+    res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to update password.' });
+  }
 });
 
 app.post('/api/auth/refresh', (req, res) => {
@@ -984,6 +1413,26 @@ app.post('/api/billing/cancel', requireBillingAdmin, (req, res) => {
     cancelledBy: req.auth.userId
   });
 
+  const cancelEmail = getOrgNotificationEmail(req.auth.orgId, req.auth.user?.email);
+  if (cancelEmail) {
+    const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    sendEmail({
+      to: cancelEmail,
+      subject: 'Patchwork OS Subscription Cancellation Scheduled',
+      html: buildEmailHtml({
+        title: 'Subscription Cancellation Scheduled',
+        preheader: 'Your Patchwork OS subscription will remain active until the end of your current period.',
+        bodyHtml: `
+          <p>We have scheduled the cancellation of your Patchwork OS subscription for workspace <strong style="color:#ffffff;">${req.auth.user?.workspace || req.auth.orgId}</strong>.</p>
+          <p>You will retain full access to your current tier until <strong>${new Date(effectiveDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>.</p>
+          <p>Changed your mind? You can reactivate your subscription with a single click from your Account Portal at any time before that date.</p>
+        `,
+        ctaLabel: 'Manage Subscription',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+  }
+
   const updatedSub = subscriptionFor(req.auth.orgId);
   res.json({
     message: 'Subscription cancellation scheduled. You retain full access until your billing period ends.',
@@ -1012,6 +1461,25 @@ app.post('/api/billing/reactivate', requireBillingAdmin, (req, res) => {
     orgId: req.auth.orgId,
     reactivatedBy: req.auth.userId
   });
+
+  const reactivateEmail = getOrgNotificationEmail(req.auth.orgId, req.auth.user?.email);
+  if (reactivateEmail) {
+    const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    sendEmail({
+      to: reactivateEmail,
+      subject: 'Patchwork OS Subscription Reactivated',
+      html: buildEmailHtml({
+        title: 'Subscription Reactivated',
+        preheader: 'Your Patchwork OS subscription has been reactivated.',
+        bodyHtml: `
+          <p>Your Patchwork OS subscription for workspace <strong style="color:#ffffff;">${req.auth.user?.workspace || req.auth.orgId}</strong> has been reactivated.</p>
+          <p>Automatic renewals will continue without interruption.</p>
+        `,
+        ctaLabel: 'Open Account Portal',
+        ctaUrl: `${baseUrl}/account`
+      })
+    }).catch(() => {});
+  }
 
   const updatedSub = subscriptionFor(req.auth.orgId);
   res.json({
@@ -1220,6 +1688,25 @@ app.post('/api/billing/change-plan', requireBillingAdmin, async (req, res) => {
         netChargeCents,
         remainingDays
       });
+
+      const upgradeEmail = getOrgNotificationEmail(req.auth.orgId, req.auth.user?.email);
+      if (upgradeEmail) {
+        const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+        sendEmail({
+          to: upgradeEmail,
+          subject: `Patchwork OS Plan Upgraded to ${targetPlan.name}`,
+          html: buildEmailHtml({
+            title: `Workspace Upgraded to ${targetPlan.name}`,
+            preheader: `Your workspace is now running on ${targetPlan.name}.`,
+            bodyHtml: `
+              <p>Your Patchwork OS workspace (<strong style="color:#ffffff;">${req.auth.user?.workspace || req.auth.orgId}</strong>) has been upgraded from <strong>${sub.plan_name}</strong> to <strong style="color:#ffffff;">${targetPlan.name}</strong>.</p>
+              <p>Your new reconciliation quotas, seat allocations, and ERP connector limits are active immediately.</p>
+            `,
+            ctaLabel: 'Open Account Portal',
+            ctaUrl: `${baseUrl}/account`
+          })
+        }).catch(() => {});
+      }
 
       return res.json({
         success: true,
@@ -1515,9 +2002,30 @@ app.post('/api/organization/members/invite', requireBillingAdmin, requireActiveS
 
   audit(req.auth.orgId, 'member_invited', { email: normalizedEmail, role: assignedRole, inviteId });
 
+  const org = db.prepare('SELECT name FROM organizations WHERE id = ?').get(req.auth.orgId);
+  const inviterName = req.auth.user?.name || 'A workspace administrator';
+  const workspaceName = org?.name || req.auth.user?.workspace || 'Patchwork OS Workspace';
+  const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+  const joinUrl = `${baseUrl}/?invite_token=${token}&email=${encodeURIComponent(normalizedEmail)}&workspace=${encodeURIComponent(workspaceName)}#signup`;
+
+  sendEmail({
+    to: normalizedEmail,
+    subject: `${inviterName} invited you to join ${workspaceName} on Patchwork OS`,
+    html: buildEmailHtml({
+      title: `You're invited to join ${workspaceName}`,
+      preheader: `${inviterName} invited you to collaborate on ${workspaceName} (${assignedRole}).`,
+      bodyHtml: `
+        <p><strong style="color:#ffffff;">${inviterName}</strong> (${req.auth.user?.email || ''}) has invited you to join the <strong style="color:#ffffff;">${workspaceName}</strong> workspace on Patchwork OS with the role of <strong style="color:#ffffff;text-transform:capitalize;">${assignedRole}</strong>.</p>
+        <p>Click the button below to accept your invitation and set up your account. This invitation expires in 7 days.</p>
+      `,
+      ctaLabel: `Accept Invitation & Join ${workspaceName}`,
+      ctaUrl: joinUrl
+    })
+  }).catch(() => {});
+
   const updatedUsage = getSeatUsage(req.auth.orgId);
   res.status(201).json({
-    message: `Invitation successfully created for ${normalizedEmail}.`,
+    message: `Invitation email dispatched to ${normalizedEmail}.`,
     invitation: { id: inviteId, email: normalizedEmail, role: assignedRole, expires_at: expiresAt },
     seatUsage: updatedUsage
   });
@@ -2212,6 +2720,50 @@ app.post('/api/tickets', (req, res) => {
   const ticketId = `PW-TKT-${Math.floor(10000 + Math.random() * 90000)}`; const sla = priority === 'p1' ? '< 1 Hour' : priority === 'p2' ? '< 4 Hours' : '< 12 Hours';
   db.prepare('INSERT INTO tickets (id,name,email,company,category,priority,subject,description,status,sla,assigned_engineer) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
     .run(ticketId, name, email, company || 'Company Workspace', category || 'General Technical', priority || 'p3', subject, description || '', 'INVESTIGATING', sla, 'Marcus Vance (Tier-3 ERP Lead)');
+
+  const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+  sendEmail({
+    to: email,
+    subject: `[${ticketId}] Support Ticket Received — ${subject}`,
+    html: buildEmailHtml({
+      title: `Support Ticket Dispatched (${ticketId})`,
+      preheader: `Our engineering team is reviewing your request (SLA: ${sla}).`,
+      bodyHtml: `
+        <p>Hello <strong style="color:#ffffff;">${name}</strong>,</p>
+        <p>Your support ticket has been logged and assigned to <strong style="color:#ffffff;">Marcus Vance (Tier-3 ERP Lead)</strong>.</p>
+        <ul style="padding-left:18px;color:#d4d4d8;">
+          <li><strong>Ticket ID:</strong> <code>${ticketId}</code></li>
+          <li><strong>Subject:</strong> ${subject}</li>
+          <li><strong>Priority / Target SLA:</strong> ${(priority || 'p3').toUpperCase()} (${sla})</li>
+          <li><strong>Status:</strong> INVESTIGATING</li>
+        </ul>
+        <p>We will send you an email notification as soon as your ticket status is updated.</p>
+      `,
+      ctaLabel: 'Open Support Center',
+      ctaUrl: `${baseUrl}/#support`
+    })
+  }).catch(() => {});
+
+  const adminEmail = getAdminNotificationEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      replyTo: email,
+      subject: `[${ticketId}] New ${(priority || 'p3').toUpperCase()} Support Ticket: ${subject}`,
+      html: buildEmailHtml({
+        title: `New Support Ticket: ${ticketId}`,
+        bodyHtml: `
+          <p><strong>From:</strong> ${name} (${email}) — ${company || 'Company Workspace'}</p>
+          <p><strong>Category:</strong> ${category || 'General Technical'} | <strong>Priority:</strong> ${(priority || 'p3').toUpperCase()} (${sla})</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <div style="background:#18181b;border:1px solid #27272a;padding:12px 16px;border-radius:8px;margin-top:12px;">${description || 'No description provided.'}</div>
+        `,
+        ctaLabel: 'Triage in Superadmin Cockpit',
+        ctaUrl: `${baseUrl}/admin`
+      })
+    }).catch(() => {});
+  }
+
   res.status(201).json({ message: 'Support ticket successfully dispatched.', ticketId });
 });
 app.post('/api/contact', (req, res) => {
@@ -2219,9 +2771,90 @@ app.post('/api/contact', (req, res) => {
   if (!name || !email || !message) return res.status(400).json({ error: 'Name, work email, and message are required.' });
   const inquiryId = `PW-INQ-${Math.floor(10000 + Math.random() * 90000)}`;
   db.prepare('INSERT INTO contact_inquiries (id,name,email,company,role,objective,volume,erp,preferred_slot,message) VALUES (?,?,?,?,?,?,?,?,?,?)').run(inquiryId, name, email, company || 'Enterprise Organization', role || 'Finance Lead', objective || 'Architecture Review', volume || '', erp || '', preferred_slot || '', message);
+
+  const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+  sendEmail({
+    to: email,
+    subject: `Patchwork OS Architecture & Sales Inquiry (${inquiryId})`,
+    html: buildEmailHtml({
+      title: 'We received your inquiry',
+      preheader: `Reference ${inquiryId} — A Principal Solutions Architect will reach out shortly.`,
+      bodyHtml: `
+        <p>Hello <strong style="color:#ffffff;">${name}</strong>,</p>
+        <p>Thank you for contacting Patchwork OS. Your inquiry (<code>${inquiryId}</code>) for <strong style="color:#ffffff;">${company || 'your organization'}</strong> has been routed to our solutions architecture team.</p>
+        <p>We will follow up shortly regarding your <strong style="color:#ffffff;">${objective || 'Architecture Review'}</strong>.</p>
+      `,
+      ctaLabel: 'Visit Patchwork OS',
+      ctaUrl: baseUrl
+    })
+  }).catch(() => {});
+
+  const adminEmail = getAdminNotificationEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      replyTo: email,
+      subject: `[${inquiryId}] New Enterprise Inquiry from ${name} (${company || email})`,
+      html: buildEmailHtml({
+        title: `New Contact Inquiry (${inquiryId})`,
+        bodyHtml: `
+          <ul style="padding-left:18px;color:#d4d4d8;">
+            <li><strong>Name:</strong> ${name} (${role || 'Finance Lead'})</li>
+            <li><strong>Email:</strong> ${email}</li>
+            <li><strong>Company:</strong> ${company || 'Enterprise Organization'}</li>
+            <li><strong>Objective:</strong> ${objective || 'Architecture Review'}</li>
+            <li><strong>ERP / Volume:</strong> ${erp || 'N/A'} / ${volume || 'N/A'}</li>
+          </ul>
+          <div style="background:#18181b;border:1px solid #27272a;padding:12px 16px;border-radius:8px;margin-top:12px;">${message}</div>
+        `,
+        ctaLabel: 'Review in Admin Cockpit',
+        ctaUrl: `${baseUrl}/admin`
+      })
+    }).catch(() => {});
+  }
+
   res.status(201).json({ message: 'Inquiry dispatched.', inquiryId });
 });
-app.post('/api/demo-request', (req, res) => { if (!req.body.email) return res.status(400).json({ error: 'Email is required.' }); db.prepare('INSERT INTO demo_requests (email,role,erp) VALUES (?,?,?)').run(req.body.email, req.body.role || 'CFO', req.body.erp || 'Custom ERP'); res.status(201).json({ message: 'Demo request registered.' }); });
+app.post('/api/demo-request', (req, res) => {
+  if (!req.body.email) return res.status(400).json({ error: 'Email is required.' });
+  const email = String(req.body.email).trim();
+  const role = req.body.role || 'CFO';
+  const erp = req.body.erp || 'Custom ERP';
+  db.prepare('INSERT INTO demo_requests (email,role,erp) VALUES (?,?,?)').run(email, role, erp);
+
+  const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+  sendEmail({
+    to: email,
+    subject: 'Patchwork OS — Live Architecture Demo Request Confirmed',
+    html: buildEmailHtml({
+      title: 'Demo Request Registered',
+      preheader: 'Our team is preparing your tailored reconciliation walkthrough.',
+      bodyHtml: `
+        <p>Thank you for requesting a tailored walkthrough of Patchwork OS for your <strong style="color:#ffffff;">${erp}</strong> environment.</p>
+        <p>A Solutions Architect will reach out to <strong style="color:#ffffff;">${email}</strong> to confirm your preferred session slot. You can also create a workspace immediately from our portal.</p>
+      `,
+      ctaLabel: 'Explore Patchwork OS',
+      ctaUrl: baseUrl
+    })
+  }).catch(() => {});
+
+  const adminEmail = getAdminNotificationEmail();
+  if (adminEmail) {
+    sendEmail({
+      to: adminEmail,
+      replyTo: email,
+      subject: `[Patchwork OS] New Demo Request: ${email} (${erp})`,
+      html: buildEmailHtml({
+        title: 'New Demo Request',
+        bodyHtml: `<p><strong>Email:</strong> ${email}<br><strong>Role:</strong> ${role}<br><strong>ERP Stack:</strong> ${erp}</p>`,
+        ctaLabel: 'View Demo Requests',
+        ctaUrl: `${baseUrl}/admin`
+      })
+    }).catch(() => {});
+  }
+
+  res.status(201).json({ message: 'Demo request registered.' });
+});
 app.post('/api/waitlist', (req, res) => {
   const email = (req.body.email || '').trim().toLowerCase();
   if (!email || !email.includes('@')) {
@@ -2491,6 +3124,30 @@ async function executeScheduledJob(job, isAdHoc = false) {
       thresholdCount,
       thresholdCents
     });
+
+    const alertEmail = getOrgNotificationEmail(orgId, null);
+    if (alertEmail) {
+      const baseUrl = process.env.APP_BASE_URL || 'https://patchworkos.com';
+      sendEmail({
+        to: alertEmail,
+        subject: `[Discrepancy Alert] Scheduled Job "${job.name}" exceeded variance threshold`,
+        html: buildEmailHtml({
+          title: `Reconciliation Discrepancy Alert: ${job.name}`,
+          preheader: `${discrepancyCount} discrepancies detected during scheduled run ${runId}.`,
+          bodyHtml: `
+            <p>Your scheduled reconciliation job <strong style="color:#ffffff;">${job.name}</strong> flagged variances exceeding your configured threshold:</p>
+            <ul style="padding-left:18px;color:#d4d4d8;">
+              <li><strong>Run ID:</strong> <code>${runId}</code></li>
+              <li><strong>Rows Processed:</strong> ${rowsProcessed.toLocaleString()}</li>
+              <li><strong>Discrepancy Count:</strong> ${discrepancyCount} (Threshold: ${thresholdCount})</li>
+              <li><strong>Discrepancy Amount:</strong> ${(discrepancyAmountCents / 100).toFixed(2)} (Threshold: ${(thresholdCents / 100).toFixed(2)})</li>
+            </ul>
+          `,
+          ctaLabel: 'Review Job Runs in Portal',
+          ctaUrl: `${baseUrl}/account`
+        })
+      }).catch(() => {});
+    }
   }
 
   dispatchWebhookEvent(orgId, 'job.run.completed', {
@@ -3742,6 +4399,23 @@ app.patch('/api/admin/users/:id', requireSuperAdmin, (req, res) => {
     if (password) {
       if (String(password).length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
       db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(bcrypt.hashSync(password, 12), userId);
+
+      const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+      sendEmail({
+        to: user.email,
+        subject: 'Your Patchwork OS password has been updated by an administrator',
+        html: buildEmailHtml({
+          title: 'Account Password Updated',
+          preheader: 'A platform administrator updated your Patchwork OS account password.',
+          bodyHtml: `
+            <p>Hello <strong style="color:#ffffff;">${user.name}</strong>,</p>
+            <p>A platform administrator has reset the password for your Patchwork OS account (<strong style="color:#ffffff;">${user.email}</strong>).</p>
+            <p>If you need to set a new personal password at any time, you can use the <strong>Forgot Password</strong> option on the Sign In screen or update it inside your Account Portal.</p>
+          `,
+          ctaLabel: 'Sign In to Patchwork OS',
+          ctaUrl: `${baseUrl}/account`
+        })
+      }).catch(() => {});
     }
     if (name) {
       db.prepare('UPDATE users SET name = ? WHERE id = ?').run(name, userId);
@@ -3819,6 +4493,28 @@ app.patch('/api/admin/tickets/:id', requireSuperAdmin, (req, res) => {
     });
 
     const updated = db.prepare('SELECT * FROM tickets WHERE id = ?').get(ticketId);
+    if (status && status !== ticket.status && updated.email) {
+      const baseUrl = process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+      sendEmail({
+        to: updated.email,
+        subject: `[${updated.id}] Support Ticket Status Updated to ${updated.status}`,
+        html: buildEmailHtml({
+          title: `Ticket ${updated.id} is now ${updated.status}`,
+          preheader: `Status update on "${updated.subject}".`,
+          bodyHtml: `
+            <p>Hello <strong style="color:#ffffff;">${updated.name}</strong>,</p>
+            <p>Your support ticket <strong style="color:#ffffff;">${updated.id}</strong> (<em>${updated.subject}</em>) has been updated:</p>
+            <ul style="padding-left:18px;color:#d4d4d8;">
+              <li><strong>New Status:</strong> ${updated.status}</li>
+              <li><strong>Assigned Engineer:</strong> ${updated.assigned_engineer}</li>
+              <li><strong>Priority:</strong> ${(updated.priority || 'p3').toUpperCase()}</li>
+            </ul>
+          `,
+          ctaLabel: 'View Support Queue',
+          ctaUrl: `${baseUrl}/#support`
+        })
+      }).catch(() => {});
+    }
     res.json({ success: true, ticket: updated });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update ticket.' });
@@ -4512,7 +5208,11 @@ app.get('/account', (req, res) => res.sendFile(path.join(__dirname, 'account.htm
 // Post-auth /plan destination route
 app.get('/plan', (req, res) => {
   const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
-  res.redirect(302, `/dashboard/plan${query}`);
+  const target = process.env.PATCHWORK_POST_AUTH_REDIRECT || '/account';
+  if (target === '/plan') {
+    return res.redirect(302, `/dashboard/plan${query}`);
+  }
+  res.redirect(302, `${target}${query}`);
 });
 
 function forwardProxyRequest(req, res, targetBaseUrl, serviceName, devCommand) {

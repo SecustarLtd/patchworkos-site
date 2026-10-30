@@ -368,12 +368,23 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  -- Password Reset Tokens
+  CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT UNIQUE NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   -- High-Performance Enterprise Indexes
   CREATE INDEX IF NOT EXISTS idx_audit_logs_org_created ON audit_logs(org_id, created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_org_created ON webhook_deliveries(org_id, delivered_at DESC);
   CREATE INDEX IF NOT EXISTS idx_integrations_org ON integrations(org_id);
   CREATE INDEX IF NOT EXISTS idx_scheduled_jobs_next_run ON scheduled_jobs(is_active, next_run_at);
   CREATE INDEX IF NOT EXISTS idx_scheduled_job_runs_job ON scheduled_job_runs(job_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_password_reset_token_hash ON password_reset_tokens(token_hash);
 `);
 
 // SQLite migrations for databases created before Paystack billing was introduced.

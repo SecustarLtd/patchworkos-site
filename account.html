@@ -177,6 +177,27 @@
               <p id="profRole" class="text-sm font-semibold text-indigo-400 mt-1">Owner / Chief Financial Officer</p>
             </div>
           </div>
+
+          <div class="mt-6 pt-6 border-t border-slate-800/80">
+            <h3 class="text-sm font-bold text-white mb-1">Password & Account Security</h3>
+            <p class="text-xs text-slate-400 mb-4">Update your account password. We will send a confirmation notification to your work email.</p>
+            <form onsubmit="submitAccountPasswordChange(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+              <div>
+                <label for="acctCurrentPassword" class="block text-[11px] font-mono text-slate-400 mb-1">Current Password</label>
+                <input type="password" id="acctCurrentPassword" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500">
+              </div>
+              <div>
+                <label for="acctNewPassword" class="block text-[11px] font-mono text-slate-400 mb-1">New Password (Min 8 chars)</label>
+                <input type="password" id="acctNewPassword" required minlength="8" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-cyan-500">
+              </div>
+              <div>
+                <button type="submit" id="acctChangePwdBtn" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-semibold text-xs px-4 py-2 rounded-lg transition">
+                  Update Password
+                </button>
+              </div>
+            </form>
+            <p id="acctPasswordChangeMsg" class="hidden text-xs font-mono mt-2"></p>
+          </div>
         </div>
 
         <!-- Runtime Status Strip (Dual-System Interop) -->
@@ -335,7 +356,7 @@
           <div class="bg-[#111827] rounded-xl border border-slate-800 p-6 flex flex-col justify-between">
             <div>
               <h4 class="font-bold text-white text-base">Developer</h4>
-              <p class="text-xs text-slate-400 mt-1">For sandbox testing and pilot prototypes.</p>
+              <p class="text-xs text-slate-400 mt-1">For individual developers and starter workflows.</p>
               <div class="mt-4 mb-6">
                 <span class="text-3xl font-extrabold text-white">$0</span>
                 <span class="text-xs text-slate-400">/ mo</span>
@@ -2684,8 +2705,8 @@
           <div>
             <label for="ic_environment" class="block text-[11px] font-mono text-slate-400 mb-1">Environment</label>
             <select id="ic_environment" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono outline-none">
-              <option value="sandbox">Sandbox (Testing)</option>
-              <option value="development">Development</option>
+              <option value="development">Development (Testing)</option>
+              <option value="staging">Staging</option>
               <option value="production">Production</option>
             </select>
           </div>
@@ -3204,6 +3225,49 @@
     function closeJobRunsModal() {
       const modal = document.getElementById('jobRunsModal');
       if (modal && modal.open) modal.close();
+    }
+
+    async function submitAccountPasswordChange(e) {
+      e.preventDefault();
+      const currentPassword = document.getElementById('acctCurrentPassword').value;
+      const newPassword = document.getElementById('acctNewPassword').value;
+      const btn = document.getElementById('acctChangePwdBtn');
+      const msgEl = document.getElementById('acctPasswordChangeMsg');
+      if (msgEl) msgEl.classList.add('hidden');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Updating...';
+      }
+      try {
+        const res = await fetch('/api/auth/change-password', {
+          method: 'POST',
+          headers: portalHeaders(),
+          credentials: 'include',
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update password.');
+        document.getElementById('acctCurrentPassword').value = '';
+        document.getElementById('acctNewPassword').value = '';
+        if (msgEl) {
+          msgEl.className = 'text-xs font-mono mt-2 text-emerald-400';
+          msgEl.innerText = data.message || 'Password updated successfully.';
+          msgEl.classList.remove('hidden');
+        }
+        paymentNotice('Password updated and confirmation email sent.', true);
+      } catch (err) {
+        if (msgEl) {
+          msgEl.className = 'text-xs font-mono mt-2 text-rose-400';
+          msgEl.innerText = err.message;
+          msgEl.classList.remove('hidden');
+        }
+        paymentNotice(err.message, false);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Update Password';
+        }
+      }
     }
 
     (async () => {

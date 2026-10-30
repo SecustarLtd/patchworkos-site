@@ -651,24 +651,19 @@
 
     <form onsubmit="handleSuperadminLogin(event)" class="p-6 space-y-4">
       <div id="login-error-banner" class="hidden p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-rose-300 text-xs font-mono"></div>
+      <div id="login-reset-banner" class="hidden p-3 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-xs font-mono"></div>
 
       <div>
         <label for="admin-login-email" class="block text-xs font-mono text-slate-300 mb-1">Superadmin Email</label>
-        <input type="email" id="admin-login-email" required placeholder="admin@patchworkos.com" value="admin@patchworkos.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
+        <input type="email" id="admin-login-email" required placeholder="admin@patchworkos.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
       </div>
 
       <div>
-        <label for="admin-login-password" class="block text-xs font-mono text-slate-300 mb-1">Password</label>
-        <input type="password" id="admin-login-password" required placeholder="••••••••••••" value="Admin123!" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
-      </div>
-
-      <!-- Helper pre-fill note -->
-      <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl text-xs flex items-center justify-between">
-        <div>
-          <span class="text-slate-400 block text-[11px]">Default Root Superadmin:</span>
-          <span class="text-slate-200 font-mono font-medium text-[11px]">admin@patchworkos.com &bull; Admin123!</span>
+        <div class="flex items-center justify-between mb-1">
+          <label for="admin-login-password" class="block text-xs font-mono text-slate-300">Password</label>
+          <button type="button" onclick="handleSuperadminForgotPassword()" class="text-[11px] font-mono text-cyan-400 hover:underline">Forgot password?</button>
         </div>
-        <button type="button" onclick="fillAdminCreds()" class="text-cyan-400 hover:text-cyan-300 font-mono text-[11px] underline">Auto-fill</button>
+        <input type="password" id="admin-login-password" required placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-rose-500 font-mono">
       </div>
 
       <div class="pt-2">
@@ -970,9 +965,34 @@
       if (modal && modal.open) modal.close();
     }
 
-    function fillAdminCreds() {
-      document.getElementById('admin-login-email').value = 'admin@patchworkos.com';
-      document.getElementById('admin-login-password').value = 'Admin123!';
+    async function handleSuperadminForgotPassword() {
+      const email = document.getElementById('admin-login-email').value.trim();
+      const errBanner = document.getElementById('login-error-banner');
+      const resetBanner = document.getElementById('login-reset-banner');
+      errBanner.classList.add('hidden');
+      if (resetBanner) resetBanner.classList.add('hidden');
+      if (!email) {
+        errBanner.innerText = 'Please enter your Superadmin email address first to receive a password reset link.';
+        errBanner.classList.remove('hidden');
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to send reset link.');
+        if (resetBanner) {
+          resetBanner.innerText = data.message || 'Password reset link dispatched to your email.';
+          resetBanner.classList.remove('hidden');
+        }
+        showToast('Password reset link sent to your email.', 'success');
+      } catch (err) {
+        errBanner.innerText = err.message;
+        errBanner.classList.remove('hidden');
+      }
     }
 
     async function handleSuperadminLogin(e) {
@@ -981,7 +1001,9 @@
       const password = document.getElementById('admin-login-password').value;
       const btn = document.getElementById('admin-login-btn');
       const errBanner = document.getElementById('login-error-banner');
+      const resetBanner = document.getElementById('login-reset-banner');
       errBanner.classList.add('hidden');
+      if (resetBanner) resetBanner.classList.add('hidden');
 
       btn.disabled = true;
       btn.innerHTML = `<span class="inline-block animate-spin mr-2">↻</span> Authenticating Superadmin...`;
@@ -990,6 +1012,7 @@
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
